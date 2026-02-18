@@ -11,7 +11,7 @@ const buttonVariants = cva(
       variant: {
         default: "bg-gradient w-[137px] h-[40px] text-foreground-primary rounded-full font-poppins text-[16px] leading-[100%] weight-[400]",
         outline:
-          "bg-transparent w-[137px] h-[40px] text-foreground-secondary rounded-full font-poppins text-[16px] leading-[100%] weight-[400] border-2 border-foreground-secondary border-solid ",
+          "bg-transparent w-[137px] h-[40px] text-foreground-green rounded-full font-poppins text-[16px] leading-[100%] weight-[400] border-2 border-foreground-secondary border-solid ",
         dark:
           "bg-dark w-[137px] h-[40px] text-foreground-primary rounded-full font-poppins text-[16px] leading-[100%] weight-[400]",
       },

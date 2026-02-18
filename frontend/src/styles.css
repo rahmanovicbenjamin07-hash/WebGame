@@ -11,7 +11,8 @@
   --background-image-gradient: var(--gradient-primary);
   --font-poppins: Poppins, sans-serif;
   --color-foreground-primary: #fff;
-  --color-foreground-secondary: #619B8A;
+  --color-foreground-green: #619B8A;
+  --color-foreground-dark:#322D38;
 }
 
 @theme inline {
