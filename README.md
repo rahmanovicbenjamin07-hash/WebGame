@@ -2,4 +2,5 @@
 
 To run the application you must use following commands: 
 
-1. pnpm dev 
+On frontend - pnpm dev
+On server - pnpm dev
