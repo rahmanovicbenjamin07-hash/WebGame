@@ -1,5 +1,5 @@
 import { createFileRoute} from '@tanstack/react-router'
-import { SignUpPage } from '@/components/pages/SingUp'
+import {SingInPage} from "../components/pages/SignInPage";
 export const Route = createFileRoute('/')({
   component: HomePage,
 })
@@ -8,7 +8,7 @@ export const Route = createFileRoute('/')({
 function HomePage() {
   return (
     <div>
-      <SignUpPage></SignUpPage>
+      <SingInPage></SingInPage>
     </div>
   )
 }

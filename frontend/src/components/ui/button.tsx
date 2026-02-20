@@ -9,11 +9,11 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-gradient w-[137px] h-[40px] text-foreground-primary rounded-full font-poppins text-[16px] leading-[100%] weight-[400]",
+        default: "bg-gradient w-[137px] min-h-[40px] text-foreground-primary rounded-full font-poppins text-[16px] leading-[100%] weight-[400]",
         outline:
-          "bg-transparent w-[137px] h-[40px] text-foreground-green rounded-full font-poppins text-[16px] leading-[100%] weight-[400] border-2 border-foreground-secondary border-solid ",
+          "bg-transparent w-[137px] min-h-[40px] text-foreground-green rounded-full font-poppins text-[16px] weight-[400] border-2 border-foreground-secondary border-solid leading-[24px]",
         dark:
-          "bg-dark w-[137px] h-[40px] text-foreground-primary rounded-full font-poppins text-[16px] leading-[100%] weight-[400]",
+          "bg-dark w-[137px] min-h-[40px] text-foreground-primary rounded-full font-poppins text-[16px] leading-[100%] weight-[400]",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
