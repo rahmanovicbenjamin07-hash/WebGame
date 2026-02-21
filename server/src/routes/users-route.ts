@@ -12,8 +12,8 @@ usersRoute.get('/', async (c) => {
 })
 
 usersRoute.post("/", async (c) => {
-    const {firstname,lastname,email,password} = await c.req.json();
-    const newUser = await db.insert(usersTable).values({firstname,lastname,email,password});
+    const {firstname,lastname,email,password,image} = await c.req.json();
+    const newUser = await db.insert(usersTable).values({firstname,lastname,email,password,image});
     return c.json(newUser);
 })
 
@@ -25,9 +25,9 @@ usersRoute.get("/:id", async (c) => {
 
 usersRoute.put("/:id",async (c) => {
     const {id} = c.req.param();
-    const {firstname,lastname,email,password} = await c.req.json();
+    const {firstname,lastname,email,password,image} = await c.req.json();
 
-    const updateUser = await db.update(usersTable).set({firstname,lastname,email,password}).where(eq(usersTable.id, Number(id)));
+    const updateUser = await db.update(usersTable).set({firstname,lastname,email,password,image}).where(eq(usersTable.id, Number(id)));
 })
 
 usersRoute.delete("/:id", async (c) => {

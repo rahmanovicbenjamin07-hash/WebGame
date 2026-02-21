@@ -9,6 +9,7 @@ export const usersTable = sqliteTable(
     lastname: text().notNull(),
     email: text().notNull().unique(),
     password:text().notNull(),
+    image:text(),
     createdAt: text()
       .notNull()
       .default(sql`CURRENT_TIMESTAMP`),

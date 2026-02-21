@@ -15,6 +15,13 @@
       "when": 1771678354033,
       "tag": "0001_absurd_havok",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1771682315595,
+      "tag": "0002_careless_pet_avengers",
+      "breakpoints": true
     }
   ]
 }
