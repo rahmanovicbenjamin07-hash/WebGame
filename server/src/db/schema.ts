@@ -1,8 +1,23 @@
-import { int, mysqlTable, serial, varchar } from 'drizzle-orm/mysql-core';
-export const usersTable = mysqlTable('users_table', {
-  id: serial().primaryKey(),
-  firstName: varchar({ length: 255 }).notNull(),
-  lastName: int().notNull(),
-  email: varchar({ length: 255 }).notNull().unique(),
-  password: varchar({length:30}).notNull(),
-});
+import { sql } from "drizzle-orm";
+import { int, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+
+export const usersTable = sqliteTable(
+  "users",
+  {
+    id: int().primaryKey({ autoIncrement: true }),
+    firstname: text().notNull(),
+    lastname: text().notNull(),
+    email: text().notNull().unique(),
+    password:text().notNull(),
+    createdAt: text()
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: text()
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+  },
+  (table) => [uniqueIndex("email_idx").on(table.email)]
+);
+
+export type User = typeof usersTable.$inferSelect;
+export type InsertUser = typeof usersTable.$inferInsert;
