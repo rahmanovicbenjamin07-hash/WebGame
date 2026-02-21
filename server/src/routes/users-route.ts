@@ -3,6 +3,7 @@ import { usersTable } from '../db/schema.js';
 import { db } from '../db/index.js';
 import { eq } from 'drizzle-orm';
 import { NUMBER } from 'sequelize';
+import { error } from 'console';
 
 const usersRoute = new Hono()
 
@@ -27,7 +28,14 @@ usersRoute.put("/:id",async (c) => {
     const {id} = c.req.param();
     const {firstname,lastname,email,password,image} = await c.req.json();
 
-    const updateUser = await db.update(usersTable).set({firstname,lastname,email,password,image}).where(eq(usersTable.id, Number(id)));
+    const response = await db.update(usersTable).set({firstname,lastname,email,password,image}).where(eq(usersTable.id, Number(id)));
+
+    if(!response){
+        return c.json({error:"User not found"},404);
+    }
+
+    const updatedUser = await db.select().from(usersTable).where(eq(usersTable.id, Number(id)))
+    return c.json(updatedUser);
 })
 
 usersRoute.delete("/:id", async (c) => {
