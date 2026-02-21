@@ -23,4 +23,17 @@ usersRoute.get("/:id", async (c) => {
     return c.json(user);
 })
 
+usersRoute.put("/:id",async (c) => {
+    const {id} = c.req.param();
+    const {firstname,lastname,email,password} = await c.req.json();
+
+    const updateUser = await db.update(usersTable).set({firstname,lastname,email,password}).where(eq(usersTable.id, Number(id)));
+})
+
+usersRoute.delete("/:id", async (c) => {
+    const {id} = c.req.param();
+    const deletedUser = await db.delete(usersTable).where(eq(usersTable.id,Number(id)));
+    return c.json(deletedUser);
+})
+
 export default usersRoute;
