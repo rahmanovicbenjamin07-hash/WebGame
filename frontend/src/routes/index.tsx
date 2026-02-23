@@ -1,14 +1,11 @@
-import { createFileRoute} from '@tanstack/react-router'
-import { SignUpPage } from '@/components/pages/SingUpPage';
+import { createFileRoute } from '@tanstack/react-router'
 export const Route = createFileRoute('/')({
+
   component: HomePage,
 })
 
 
 function HomePage() {
-  return (
-    <div>
-      <SignUpPage></SignUpPage>
-    </div>
+   return (<></>
   )
 }

@@ -2,6 +2,8 @@ import { Input } from "./input"
 import { Button } from "./button"
 import ProfileImage from "../../assets/ProfileImageIcon.png";
 import { useState } from "react";
+import { useNavigate } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 
 interface SignUpFormState  {
   email: string,
@@ -12,6 +14,7 @@ interface SignUpFormState  {
 }
 
 export function SignUpForm(){
+    const navigate = useNavigate();
 
     const [formData,setFormData] = useState<SignUpFormState>({
             email:"",
@@ -26,10 +29,36 @@ export function SignUpForm(){
             setFormData(prevData => ({...prevData,[name]:value}))
         }
     
-         const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        if (formData.password !== formData.confirmpassword) {
+        alert("Lozinke se ne podudaraju!");
+        return;
+    }            
+
         try {
-          console.log(formData);
+
+            const response = await fetch("http://localhost:3001/user/signup", {
+                method:"POST",
+                headers:{
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                firstname: formData.firstname,
+                lastname: formData.lastname,
+                email: formData.email,
+                password: formData.password,
+                }),
+            })
+
+            const result = await response.json();
+
+            if(response.ok){
+                console.log(result);
+                navigate({ to: '/home' }); 
+            }
+          
         }catch (error) {
           console.error(error);
         }
@@ -88,7 +117,7 @@ export function SignUpForm(){
 
                 <div className="flex justify-between items-center">
                     <p className="leading-6">Already have an account?</p>
-                    <a href="google.com" className="text-primary text-[16px] font-normal">Sign in</a>
+                    <Link  to="/signin" className="text-primary text-[16px] font-normal">Sign in</Link>
                 </div>
             </form>
         </div>

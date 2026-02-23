@@ -1,6 +1,8 @@
 import { Input } from "./input";
 import { Button } from "./button";
 import { useState } from "react";
+import { useNavigate } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 
 interface SignUpFormState  {
   email: string;
@@ -8,6 +10,8 @@ interface SignUpFormState  {
 }
 
 export function SingInForm(){
+
+    const navigate = useNavigate();
 
     const [formData,setFormData] = useState<SignUpFormState>({
         email:"",
@@ -21,11 +25,31 @@ export function SingInForm(){
 
      const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     try {
-      console.log(formData);
-    }catch (error) {
-      console.error(error);
-    }
+
+            const response = await fetch("http://localhost:3001/user/signin", {
+                method:"POST",
+                headers:{
+                    "Content-Type": "application/json",
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                email: formData.email,
+                password: formData.password,
+                }),
+            })
+
+            const result = await response.json();
+
+            if(response.ok){
+                console.log(result);
+                navigate({ to: '/home' }); 
+            }
+          
+        }catch (error) {
+          console.error(error);
+        }
   }
 
     return(
@@ -57,7 +81,7 @@ export function SingInForm(){
 
                 <div className="flex justify-between items-center">
                     <p className="leading-6">Do you want to create an account?</p>
-                    <a href="google.com" className="text-primary text-[16px] font-normal">Sign up</a>
+                    <Link  to="/signup" className="text-primary text-[16px] font-normal">Sign up</Link>
                 </div>
             </form>
 
