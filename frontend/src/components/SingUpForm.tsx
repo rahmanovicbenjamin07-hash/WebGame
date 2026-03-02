@@ -1,6 +1,6 @@
-import { Input } from "./input"
-import { Button } from "./button"
-import ProfileImage from "../../assets/ProfileImageIcon.png";
+import { Input } from "../components/ui/input"
+import { Button } from "../components/ui/button"
+import ProfileImage from "../assets/ProfileImageIcon.png";
 import { useState } from "react";
 import { useNavigate } from '@tanstack/react-router';
 import { Link } from '@tanstack/react-router';

@@ -1,6 +1,6 @@
-import Logo from "../../assets/Logo.png";
+import Logo from "../assets/Logo.png";
 import { Link } from '@tanstack/react-router';
-import ProfileImage from "../../assets/ProfileImageSmall.png";
+import ProfileImage from "../assets/ProfileImageSmall.png";
 
 export function NavigationSignedIn(){
     return(
