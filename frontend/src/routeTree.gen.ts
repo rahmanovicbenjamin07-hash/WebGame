@@ -11,8 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SigninRouteImport } from './routes/signin'
-import { Route as HomeRouteImport } from './routes/home'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as HomeSignedOutRouteImport } from './routes/home/signed-out'
+import { Route as HomeSignedInRouteImport } from './routes/home/signed-in'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -24,49 +25,69 @@ const SigninRoute = SigninRouteImport.update({
   path: '/signin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HomeRoute = HomeRouteImport.update({
-  id: '/home',
-  path: '/home',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HomeSignedOutRoute = HomeSignedOutRouteImport.update({
+  id: '/home/signed-out',
+  path: '/home/signed-out',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HomeSignedInRoute = HomeSignedInRouteImport.update({
+  id: '/home/signed-in',
+  path: '/home/signed-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/home': typeof HomeRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/home/signed-in': typeof HomeSignedInRoute
+  '/home/signed-out': typeof HomeSignedOutRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/home': typeof HomeRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/home/signed-in': typeof HomeSignedInRoute
+  '/home/signed-out': typeof HomeSignedOutRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/home': typeof HomeRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/home/signed-in': typeof HomeSignedInRoute
+  '/home/signed-out': typeof HomeSignedOutRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/home' | '/signin' | '/signup'
+  fullPaths:
+    | '/'
+    | '/signin'
+    | '/signup'
+    | '/home/signed-in'
+    | '/home/signed-out'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/home' | '/signin' | '/signup'
-  id: '__root__' | '/' | '/home' | '/signin' | '/signup'
+  to: '/' | '/signin' | '/signup' | '/home/signed-in' | '/home/signed-out'
+  id:
+    | '__root__'
+    | '/'
+    | '/signin'
+    | '/signup'
+    | '/home/signed-in'
+    | '/home/signed-out'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  HomeRoute: typeof HomeRoute
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
+  HomeSignedInRoute: typeof HomeSignedInRoute
+  HomeSignedOutRoute: typeof HomeSignedOutRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -85,13 +106,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SigninRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/home': {
-      id: '/home'
-      path: '/home'
-      fullPath: '/home'
-      preLoaderRoute: typeof HomeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -99,14 +113,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/home/signed-out': {
+      id: '/home/signed-out'
+      path: '/home/signed-out'
+      fullPath: '/home/signed-out'
+      preLoaderRoute: typeof HomeSignedOutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/home/signed-in': {
+      id: '/home/signed-in'
+      path: '/home/signed-in'
+      fullPath: '/home/signed-in'
+      preLoaderRoute: typeof HomeSignedInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  HomeRoute: HomeRoute,
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
+  HomeSignedInRoute: HomeSignedInRoute,
+  HomeSignedOutRoute: HomeSignedOutRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

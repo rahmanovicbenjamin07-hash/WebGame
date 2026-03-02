@@ -4,8 +4,10 @@ export const Route = createFileRoute('/')({
   component: HomePage,
 })
 
-
 function HomePage() {
-   return (<></>
+   return (
+    <div>
+      <h1>Hello</h1>
+    </div>
   )
 }

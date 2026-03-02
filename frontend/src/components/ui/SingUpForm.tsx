@@ -56,7 +56,7 @@ export function SignUpForm(){
 
             if(response.ok){
                 console.log(result);
-                navigate({ to: '/home' }); 
+                navigate({ to: '/home/signed-out' }); 
             }
           
         }catch (error) {

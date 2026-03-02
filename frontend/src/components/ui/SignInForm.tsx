@@ -44,7 +44,7 @@ export function SingInForm(){
 
             if(response.ok){
                 console.log(result);
-                navigate({ to: '/home' }); 
+                navigate({ to: '/home/signed-in' }); 
             }
           
         }catch (error) {

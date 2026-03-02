@@ -23,7 +23,6 @@ hr{
 }
 
 @layer base {
-  
   h1{
     font-size: 98px;
     line-height: 100%;
