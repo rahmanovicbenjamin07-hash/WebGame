@@ -65,7 +65,7 @@ export function SingInForm(){
 
             <form className="flex flex-col gap-4 w-full" onSubmit={handleSubmit}>
                 <div className="flex flex-col gap-2">
-                    <p className="text-[12px] weight-[500]! leading-none">Email</p>
+                    <p className="text-[12px] weight-[500]! leading-none text-dark">Email</p>
                     <Input placeholder="example@net.com" type="email" name="email" onChange={handleInputChange}></Input>
                 </div>
 
@@ -73,7 +73,7 @@ export function SingInForm(){
             {/* Password input wrapper */}
 
                 <div className="flex flex-col gap-2">
-                    <p className="text-[12px] weight-[500]! leading-none">Password</p>
+                    <p className="text-[12px] weight-[500]! leading-none text-dark">Password</p>
                     <Input placeholder="••••••••••••••••" type="password" name="password" onChange={handleInputChange}></Input>
                 </div>
 

@@ -82,7 +82,7 @@ export function SignUpForm(){
             {/* Email input wrapper */}
             <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
                 <div className="flex flex-col gap-2">
-                    <p className="text-[12px] weight-[500]! leading-none">Email</p>
+                    <p className="text-[12px] weight-[500]! leading-none text-dark">Email</p>
                     <Input placeholder="example@net.com" type="email" name="email" onChange={handleInputChange}></Input>
                 </div>
 
@@ -90,11 +90,11 @@ export function SignUpForm(){
 
                 <div className="flex gap-4">
                     <div className="flex flex-col gap-2">
-                        <p className="text-[12px] weight-[500]!">First Name</p>
+                        <p className="text-[12px] weight-[500]! text-dark">First Name</p>
                         <Input placeholder="Jacob" name="firstname" onChange={handleInputChange}></Input>
                     </div>
                     <div className="flex flex-col gap-2">
-                        <p className="text-[12px] weight-[500]!">Last Name</p>
+                        <p className="text-[12px] weight-[500]! text-dark">Last Name</p>
                         <Input placeholder="Jones" name="lastname" onChange={handleInputChange}></Input>
                     </div>
                 </div>
@@ -102,14 +102,14 @@ export function SignUpForm(){
             {/* Password input wrapper */}
 
                 <div className="flex flex-col gap-2">
-                    <p className="text-[12px] weight-[500]! leading-none">Password</p>
+                    <p className="text-[12px] weight-[500]! leading-none text-dark">Password</p>
                     <Input placeholder="••••••••••••••••" type="password" name="password" onChange={handleInputChange}></Input>
                 </div>
 
             {/* Confirm password input wrapper */}
 
                 <div className="flex flex-col gap-2">
-                    <p className="text-[12px] weight-[500]! leading-none">Confirm password</p>
+                    <p className="text-[12px] weight-[500]! leading-none text-dark">Confirm password</p>
                     <Input placeholder="••••••••••••••••" type="password" name="confirmpassword" onChange={handleInputChange}></Input>
                 </div>
 

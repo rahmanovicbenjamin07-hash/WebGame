@@ -1,4 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
+import ImageSample from "../assets/placeholder-image.png"
+import ClosesGuesesProfile from '@/components/ProfileBestGuess'
 export const Route = createFileRoute('/')({
 
   component: HomePage,
@@ -7,7 +9,7 @@ export const Route = createFileRoute('/')({
 function HomePage() {
    return (
     <div>
-      <h1>Hello</h1>
+      <ClosesGuesesProfile meters={123} imageUrl={ImageSample}></ClosesGuesesProfile>
     </div>
   )
 }
