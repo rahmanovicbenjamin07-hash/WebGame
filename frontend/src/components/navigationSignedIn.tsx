@@ -11,7 +11,9 @@ export function NavigationSignedIn(){
             <div className="flex gap-12 items-center">
                 <Link  to="/home/signed-in" className="text-dark text-[16px] font-normal font-poppins cursor-pointer">Home</Link>
                 <button className="text-dark text-[16px] font-normal font-poppins cursor-pointer">Logout</button>
-                <img src={ProfileImage} className="cursor-pointer"/>
+                <Link to="/profile">
+                    <img src={ProfileImage} className="cursor-pointer"/>
+                </Link>
             </div>
         </div>
     )

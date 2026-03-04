@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { SingInForm } from '@/components/ui/SignInForm';
+import { SingInForm } from '../components/SignInForm';
 import BgImage from "../assets/SignUpPageImage.png";
 import Logo from "../assets/Logo.png";
 

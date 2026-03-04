@@ -7,7 +7,7 @@ import { error } from 'console';
 import { compare, hash } from 'bcryptjs';
 import { sign } from "hono/jwt";
 import { setCookie } from "hono/cookie";
-import { authMiddleware } from '../../middleware.js';
+import { authMiddleware } from '../../middleware/middleware.js';
 import "dotenv/config";
 
 const usersRoute = new Hono()
@@ -44,13 +44,30 @@ usersRoute.post("/signup", async (c) => {
 
     setCookie(c, "session", token, {
         httpOnly: true,
-        secure: true, 
+        secure: false, 
         sameSite: "Lax",
         path: "/",
     });
 
     return c.json({ message: "User created and signed in", user: newUser }, 201);
 })
+
+usersRoute.get("/me", authMiddleware, async (c) => {
+    const tokenData = c.get("jwtPayload");
+    const [user] = await db
+        .select({
+            id: usersTable.id,
+            email: usersTable.email,
+            firstname: usersTable.firstname,
+            lastname: usersTable.lastname
+        })
+        .from(usersTable)
+        .where(eq(usersTable.id, tokenData.userId));
+
+    if (!user) return c.json({ error: "User not found" }, 404);
+
+    return c.json({ user });
+});
 
 {/* Route to get user with specific id*/}
 
@@ -94,12 +111,13 @@ usersRoute.delete("/:id", async (c) => {
 usersRoute.post("/signin", async (c) => {
     const {email,password} = await c.req.json();
     const [user] = await db.select().from(usersTable).where(eq(usersTable.email, email));
-
+    
     if(!user) {
         return c.json({error:"Invalid credentials"},401);
     }
 
     const isPasswordSame = await compare(password, user.password);
+
     if (!isPasswordSame) return c.json({ error: "Invalid credentials" }, 401);
 
     const tokenData = {
@@ -113,28 +131,21 @@ usersRoute.post("/signin", async (c) => {
 
     setCookie(c, "session", token, {
     httpOnly: true,
-    secure: true, 
+    secure: false, 
     sameSite: "Lax", 
     path: "/",
   });
 
-     return c.json({ message: "Signed in successfully" });
+    return c.json({ message: "Signed in successfully" });
 })
 
 {/* "Security" route to redirect */}
 
-usersRoute.get("/auth", authMiddleware, async (c) => {
-    const tokenData = c.get("jwtPayload");
+usersRoute.post("/signout", (c) => {
+  setCookie(c, "session", "", { expires: new Date(0) });
+  return c.json({ message: "Logged out" });
+});
 
-    const [user] = await db.select({id: usersTable.id,firstname: usersTable.firstname,lastname: usersTable.lastname,email: usersTable.email,}).from(usersTable).where(eq(usersTable.id, tokenData.userId));
-
-    if (!user) {
-        return c.json({ error: "User no longer exists" }, 404);
-    }
-    
-
-    return c.json(user, 200); 
-})
 
 
 export default usersRoute;

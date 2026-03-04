@@ -11,7 +11,9 @@ export function NavigationSignedOut(){
             <div className="flex gap-3 items-center">
                 <Link  to="/home/signed-in" className="text-dark text-[16px] font-normal font-poppins cursor-pointer">Sign in</Link>
                 <p className="text-dark text-[16px] font-normal font-poppins cursor-pointer">Or</p>
-                <Button variant="default">Sign up</Button>
+                <Link to="/signup">
+                    <Button variant="default">Sign up</Button>
+                </Link>            
             </div>
         </div>
     )

@@ -2,8 +2,10 @@ import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import usersRoute from './routes/users-route.js'
 import { cors } from 'hono/cors' 
+import { authMiddleware } from '../middleware/middleware.js'
 
 const app = new Hono()
+app.use('/user/me', authMiddleware);
 
 app.use('*', cors({
   origin: 'http://localhost:3000', 
@@ -13,6 +15,10 @@ app.use('*', cors({
   maxAge: 600,
   credentials: true,
 }))
+
+app.use('*', async (c, next) => {
+  await next();
+})
 
 app.get('/', (c) => {
   return c.text('Hello Hono!')
