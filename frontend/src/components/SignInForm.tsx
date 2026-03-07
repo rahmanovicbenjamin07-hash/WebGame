@@ -18,12 +18,13 @@ export function SingInForm(){
         password:""
     })
 
+    
     const handleInputChange = (e:React.ChangeEvent<HTMLInputElement>) => {
         const {name,value} = e.target;
         setFormData(prevData => ({...prevData,[name]:value}))
     }
 
-     const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {

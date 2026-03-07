@@ -9,6 +9,7 @@ import { sign } from "hono/jwt";
 import { setCookie } from "hono/cookie";
 import { authMiddleware } from '../../middleware/middleware.js';
 import "dotenv/config";
+import { findUserIdByEmail } from '../../helper/userFindByEmail.js';
 
 const usersRoute = new Hono()
 
@@ -52,6 +53,8 @@ usersRoute.post("/signup", async (c) => {
     return c.json({ message: "User created and signed in", user: newUser }, 201);
 })
 
+{/* Cookie check route */}
+
 usersRoute.get("/me", authMiddleware, async (c) => {
     const tokenData = c.get("jwtPayload");
     const [user] = await db
@@ -84,16 +87,26 @@ usersRoute.get("/:id", async (c) => {
 
 {/* Route to get update user*/}
 
-usersRoute.put("/:id",async (c) => {
-    const {id} = c.req.param();
-    const {firstname,lastname,email,password,image} = await c.req.json();
-    const response = await db.update(usersTable).set({firstname,lastname,email,password,image}).where(eq(usersTable.id, Number(id)));
+usersRoute.put("/update",async (c) => {
     
+    const {firstname,lastname,email,password,image} = await c.req.json();
+    const result = await findUserIdByEmail(email);
+
+    if (!result || !result.userId) {
+        return c.json({ error: "User not found" }, 404);
+    }
+
+    const userId = result;
+
+    const response = await db.update(usersTable).set({firstname,lastname,email,password,image}).where(eq(usersTable.id, Number(userId)));
+    
+    console.log(userId);
+
     if(!response){
         return c.json({error:"User not found"}, 404);
     }
 
-    const [updatedUser] = await db.select().from(usersTable).where(eq(usersTable.id, Number(id)))
+    const [updatedUser] = await db.select().from(usersTable).where(eq(usersTable.id, Number(userId))).limit(1);
     return c.json(updatedUser);
 })
 

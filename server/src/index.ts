@@ -1,6 +1,8 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import usersRoute from './routes/users-route.js'
+import locationRoute from "./routes/locations-route.js"
+import guessesRoute from "./routes/guess-routes.js"
 import { cors } from 'hono/cors' 
 import { authMiddleware } from '../middleware/middleware.js'
 
@@ -25,6 +27,8 @@ app.get('/', (c) => {
 })
 
 app.route("/user",usersRoute);
+app.route("/location",locationRoute)
+app.route("/guess", guessesRoute)
 
 serve({
   fetch: app.fetch,

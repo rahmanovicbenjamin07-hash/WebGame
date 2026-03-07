@@ -9,12 +9,10 @@ export const authMiddleware = createMiddleware( async (c, next) => {
     if(!token) {
         return c.json({error:"Unauthorized!"},401);
     }
-     
-    try {
-        
+    
+    try {       
         const secret = process.env.AUTH_SECRET!;
         const decodedPayload = await verify(token, secret,"HS256");
-
         c.set("jwtPayload", decodedPayload);
 
         await next();

@@ -9,8 +9,10 @@ interface ProfileFormState  {
   firstname:string,
   lastname:string,
   password: string,
-  confirmpassword:string,
 }
+
+/* Moras nekako proslijediti email korisniku koji je ulogovan kao i njegov id 
+tako da ne bi mijenjali i mail prilikom update.  */
 
 export function ProfileForm(){
     const navigate = useNavigate();
@@ -20,7 +22,7 @@ export function ProfileForm(){
             firstname:"",
             lastname:"",
             password:"",
-            confirmpassword:"",         
+                    
         })
     
         const handleInputChange = (e:React.ChangeEvent<HTMLInputElement>) => {
@@ -29,17 +31,12 @@ export function ProfileForm(){
         }
     
     const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
-        if (formData.password !== formData.confirmpassword) {
-        alert("Lozinke se ne podudaraju!");
-        return;
-    }            
+        e.preventDefault();               
 
         try {
 
-            const response = await fetch("http://localhost:3001/user/signup", {
-                method:"POST",
+            const response = await fetch("http://localhost:3001/user/update", {
+                method:"PUT",
                 headers:{
                     "Content-Type": "application/json",
                 },
@@ -48,6 +45,7 @@ export function ProfileForm(){
                 lastname: formData.lastname,
                 email: formData.email,
                 password: formData.password,
+                image:""
                 }),
             })
 
@@ -78,14 +76,14 @@ export function ProfileForm(){
             <form className="flex flex-col gap-4 w-full" onSubmit={handleSubmit}>
                 <div className="flex flex-col gap-2">
                     <p className="text-[16px] weight-[500]! leading-[150%]">Name</p>
-                    <InputNoBorder placeholder="Jacob" type="email" name="name" onChange={handleInputChange}/>
+                    <InputNoBorder placeholder="Jacob" name="name" onChange={handleInputChange}/>
                 </div>
 
             {/* Name input wrapper */}
 
                 <div className="flex flex-col gap-2">
                     <p className="text-[16px] weight-[500]! leading-[150%]">Last Name</p>
-                    <InputNoBorder placeholder="Jacob" type="email" name="name" onChange={handleInputChange}/>
+                    <InputNoBorder placeholder="Jones"  name="name" onChange={handleInputChange}/>
                 </div>
 
 
@@ -93,14 +91,14 @@ export function ProfileForm(){
 
                 <div className="flex flex-col gap-2">
                     <p className="text-[16px] weight-[500]! leading-[150%]">Email</p>
-                    <InputNoBorder placeholder="Jacob" type="email" name="name" onChange={handleInputChange}/>
+                    <InputNoBorder placeholder="example@net.com" type="email" name="name" onChange={handleInputChange}/>
                 </div>
 
             {/* Confirm password input wrapper */}
 
                 <div className="flex flex-col gap-2">
                     <p className="text-[16px] weight-[500]! leading-[150%]">Password</p>
-                    <InputNoBorder placeholder="Jacob" type="email" name="name" onChange={handleInputChange}/>
+                    <InputNoBorder placeholder="••••••••••••••••" type="password" name="name" onChange={handleInputChange}/>
                 </div>
 
             <Button className="w-full mt-23.5" type="submit">Save Profile</Button>
