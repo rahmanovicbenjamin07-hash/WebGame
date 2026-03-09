@@ -1,8 +1,8 @@
 import { Button } from "../components/ui/button"
 import ProfileImage from "../assets/ProfileImageLarge.png";
-import { useState } from "react";
-import { useNavigate } from '@tanstack/react-router';
+import { useEffect, useState } from "react";
 import { InputNoBorder } from "./ui/inputNoBorder";
+import { fetchUser } from "@/authentication/auth";
 
 interface ProfileFormState  {
   email: string,
@@ -11,12 +11,15 @@ interface ProfileFormState  {
   password: string,
 }
 
-/* Moras nekako proslijediti email korisniku koji je ulogovan kao i njegov id 
-tako da ne bi mijenjali i mail prilikom update.  */
+interface userData {
+    email: string,
+    firstname:string,
+    id:number;
+    lastname:string,
+}
 
 export function ProfileForm(){
-    const navigate = useNavigate();
-
+    const [user, setUser] = useState<userData | null>(null);
     const [formData,setFormData] = useState<ProfileFormState>({
             email:"",
             firstname:"",
@@ -24,18 +27,35 @@ export function ProfileForm(){
             password:"",
                     
         })
+
+
+    useEffect(() => {
+        fetchUser().then((data) => {
+            if (data) {
+                setUser(data);
+                setFormData(prev => ({
+                    ...prev,
+                    email: data.email,
+                    firstname: data.firstname,
+                    lastname: data.lastname,
+                }));
+            }
+        });
+    }, []);
     
-        const handleInputChange = (e:React.ChangeEvent<HTMLInputElement>) => {
-            const {name,value} = e.target;
-            setFormData(prevData => ({...prevData,[name]:value}))
-        }
+    const handleInputChange = (e:React.ChangeEvent<HTMLInputElement>) => {
+        const {name,value} = e.target;
+        setFormData(prevData => ({...prevData,[name]:value}))
+    }
     
     const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();               
 
+        if (!user?.id) return;
+
         try {
 
-            const response = await fetch("http://localhost:3001/user/update", {
+            const response = await fetch(`http://localhost:3001/user/update/${user.id}`, {
                 method:"PUT",
                 headers:{
                     "Content-Type": "application/json",
@@ -53,9 +73,7 @@ export function ProfileForm(){
 
             if(response.ok){
                 console.log(result);
-                navigate({ to: '/home/signed-out' }); 
-            }
-          
+            }      
         }catch (error) {
           console.error(error);
         }
@@ -76,14 +94,14 @@ export function ProfileForm(){
             <form className="flex flex-col gap-4 w-full" onSubmit={handleSubmit}>
                 <div className="flex flex-col gap-2">
                     <p className="text-[16px] weight-[500]! leading-[150%]">Name</p>
-                    <InputNoBorder placeholder="Jacob" name="name" onChange={handleInputChange}/>
+                    <InputNoBorder placeholder={formData.firstname} name="firstname" onChange={handleInputChange}/>
                 </div>
 
             {/* Name input wrapper */}
 
                 <div className="flex flex-col gap-2">
                     <p className="text-[16px] weight-[500]! leading-[150%]">Last Name</p>
-                    <InputNoBorder placeholder="Jones"  name="name" onChange={handleInputChange}/>
+                    <InputNoBorder placeholder={formData.lastname}  name="lastname" onChange={handleInputChange}/>
                 </div>
 
 
@@ -91,14 +109,14 @@ export function ProfileForm(){
 
                 <div className="flex flex-col gap-2">
                     <p className="text-[16px] weight-[500]! leading-[150%]">Email</p>
-                    <InputNoBorder placeholder="example@net.com" type="email" name="name" onChange={handleInputChange}/>
+                    <InputNoBorder placeholder={formData.email} type="email" name="email" onChange={handleInputChange}/>
                 </div>
 
             {/* Confirm password input wrapper */}
 
                 <div className="flex flex-col gap-2">
                     <p className="text-[16px] weight-[500]! leading-[150%]">Password</p>
-                    <InputNoBorder placeholder="••••••••••••••••" type="password" name="name" onChange={handleInputChange}/>
+                    <InputNoBorder placeholder="••••••••••••••••" type="password" name="password" onChange={handleInputChange}/>
                 </div>
 
             <Button className="w-full mt-23.5" type="submit">Save Profile</Button>

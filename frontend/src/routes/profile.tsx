@@ -6,6 +6,7 @@ import { NavigationSignedIn } from '@/components/navigationSignedIn'
 import { Footer } from '@/components/footer'
 
 export const Route = createFileRoute('/profile')({
+
   component: RouteComponent,
 })
 

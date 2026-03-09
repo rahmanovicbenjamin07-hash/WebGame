@@ -87,28 +87,25 @@ usersRoute.get("/:id", async (c) => {
 
 {/* Route to get update user*/}
 
-usersRoute.put("/update",async (c) => {
-    
+
+usersRoute.put("/update/:id",async (c) => {
+    const {id} = c.req.param();
     const {firstname,lastname,email,password,image} = await c.req.json();
-    const result = await findUserIdByEmail(email);
+    const [user] = await db.select().from(usersTable).where(eq(usersTable.email, email));
 
-    if (!result || !result.userId) {
-        return c.json({ error: "User not found" }, 404);
-    }
+    const isPasswordSame = await compare(password, user.password);
+    if (!isPasswordSame) return c.json({ error: "Invalid credentials" }, 401);
 
-    const userId = result;
-
-    const response = await db.update(usersTable).set({firstname,lastname,email,password,image}).where(eq(usersTable.id, Number(userId)));
+    const response = await db.update(usersTable).set({firstname,lastname,image}).where(eq(usersTable.id, Number(id)));
     
-    console.log(userId);
-
     if(!response){
         return c.json({error:"User not found"}, 404);
     }
 
-    const [updatedUser] = await db.select().from(usersTable).where(eq(usersTable.id, Number(userId))).limit(1);
+    const [updatedUser] = await db.select().from(usersTable).where(eq(usersTable.id, Number(id))).limit(1);
     return c.json(updatedUser);
 })
+
 
 {/* Route to delete user with specific id*/}
 

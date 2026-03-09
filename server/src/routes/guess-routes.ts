@@ -5,6 +5,7 @@ import { eq, asc, desc } from 'drizzle-orm';
 import { NUMBER } from 'sequelize';
 import { error } from 'console';
 import { locationsTable } from '../db/schema.js';
+import { usersTable } from '../db/schema.js';
 
 const guessesRoute = new Hono()
 
@@ -17,7 +18,10 @@ guessesRoute.get('/', async (c) => {
 
 {/* Guess route to get 3 best guesses */}
 
-guessesRoute.get('/bestGuesses', async (c) => {
+guessesRoute.get('/bestGuesses/:id', async (c) => {
+
+    const {id} = c.req.param();
+
     const bestGuesses = await db
         .select({
             id: guessesTable.id,
@@ -26,6 +30,8 @@ guessesRoute.get('/bestGuesses', async (c) => {
         })
         .from(guessesTable)
         .innerJoin(locationsTable, eq(guessesTable.locationId, locationsTable.id))
+        .innerJoin(usersTable, eq(guessesTable.userId, usersTable.id))
+        .where(eq(usersTable.id,Number(id)))
         .orderBy(desc(guessesTable.missMeters))
         .limit(3);
 
