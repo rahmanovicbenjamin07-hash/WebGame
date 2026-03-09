@@ -2,7 +2,8 @@ import { createFileRoute, redirect } from '@tanstack/react-router'
 import "leaflet/dist/leaflet.css"
 
 export const Route = createFileRoute('/')({
-  beforeLoad: async () => {
+
+    beforeLoad: async () => {
       if (1==1) {
         throw redirect({ to: '/signin' })
       }
@@ -12,6 +13,7 @@ export const Route = createFileRoute('/')({
 
 function HomePage() {
    return (
-    <></>
+    <>
+    </>
   )
 }
