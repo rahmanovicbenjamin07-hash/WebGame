@@ -32,11 +32,27 @@ guessesRoute.get('/bestGuesses/:id', async (c) => {
         .innerJoin(locationsTable, eq(guessesTable.locationId, locationsTable.id))
         .innerJoin(usersTable, eq(guessesTable.userId, usersTable.id))
         .where(eq(usersTable.id,Number(id)))
-        .orderBy(desc(guessesTable.missMeters))
+        .orderBy(asc(guessesTable.missMeters))
         .limit(3);
 
     return c.json(bestGuesses);
 });
 
+guessesRoute.post('/:userId', async (c) => {
+
+    const {userId} = c.req.param();
+    const {locationId,guessedLat,guessedLng,missMeters} = await c.req.json();
+
+    const newGuess = await db.insert(guessesTable).values({
+        userId: Number(userId),
+        locationId: Number(locationId),
+        guessedLat: Number(guessedLat),
+        guessedLng: Number(guessedLng),
+        missMeters: Number(missMeters),
+    }).returning();
+
+    return c.json({ message: "Guess added.", user: newGuess }, 201);
+
+})
 
 export default guessesRoute;

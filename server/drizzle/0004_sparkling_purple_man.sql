@@ -1,0 +1,1 @@
+DROP INDEX `locations_location_unique`;

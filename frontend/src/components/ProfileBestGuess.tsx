@@ -24,7 +24,6 @@ export function ClosesGuesesProfile(){
 
     useEffect(() => {
         fetchUser().then((data) => {
-            console.log("Fetched user data:", data);
             if (data) {
                 setUser(data);                
             }

@@ -26,7 +26,7 @@ export type InsertUser = typeof usersTable.$inferInsert;
 export const locationsTable = sqliteTable("locations",
   {
     id: int().primaryKey({ autoIncrement: true }),
-    location: text().notNull().unique(),
+    location: text().notNull(),
     locationImage:text().notNull(),
     lat: real().notNull(),
     lng: real().notNull(),
@@ -34,7 +34,6 @@ export const locationsTable = sqliteTable("locations",
       .notNull()
       .default(sql`CURRENT_TIMESTAMP`),
   },
-  (table) => [uniqueIndex("location_idx").on(table.location)]
 );
 
 export type Location = typeof usersTable.$inferSelect;

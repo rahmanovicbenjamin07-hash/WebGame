@@ -5,6 +5,7 @@ import NewUploads from "../components/ui/NewUploads";
 import { NavigationSignedIn } from '../components/navigationSignedIn'
 import { useState, useEffect } from "react";
 import { fetchUser } from "@/authentication/auth";
+import { GuessingTab } from "./GuessingTab";
 
 type Guess = {
     id: number;
@@ -36,6 +37,8 @@ const newUploads = async ():Promise<NewUpload[]> => {
     }
 
 export function HeroHomeSignedIn(){
+    const [open, setOpen] = useState(false);
+    const [selectedLocationId, setSelectedLocationId] = useState<number | null>(null);
     const [user, setUser] = useState<userData | null>(null);
     const [guesses, setGuesses] = useState<Guess[]>([]);
     const [uploads, setUploads] = useState<NewUpload[]>([]);
@@ -44,10 +47,11 @@ export function HeroHomeSignedIn(){
     useEffect(() => {
     newUploads().then(setUploads);
     fetchUser().then((data) => {
-            console.log("Fetched user data:", data);
             if (data) {
                 setUser(data);                
-            }
+            }else {
+            setLoading(false); 
+        }
         });
     }, []);
 
@@ -57,11 +61,9 @@ export function HeroHomeSignedIn(){
             const fetchGuesses = async () => {
                 try {
                     const res = await fetch(`http://localhost:3001/guess/bestGuesses/${user.id}`);
-    
                     if(!res.ok) {
                         throw new Error("Failed to get the guesses");
                     }
-    
                     const data: Guess[] = await res.json();
                     setGuesses(data);
                 } catch (error) {
@@ -76,8 +78,15 @@ export function HeroHomeSignedIn(){
       
     if (loading) return <div>Loading...</div>;    
 
+    const getLocationData = (id: number) => {
+    setSelectedLocationId(id);
+    setOpen(true);
+}
+
     return(   
         <>
+        <GuessingTab open={open} setOpen={setOpen} locationId={selectedLocationId} />
+
         <div className="max-w-325 mx-auto mb-11.75">
             <NavigationSignedIn/>
             <div className="flex flex-col gap-2">
@@ -95,7 +104,7 @@ export function HeroHomeSignedIn(){
                     <p>New uploads from users. Try to guess all the locations by pressing on a picture.</p>
                     <div className="grid grid-cols-3 gap-5 mt-6">
                         {uploads.map((upload) => 
-                            <NewUploads imageUrl={upload.imageUrl} key={upload.id}  />
+                            <NewUploads imageUrl={upload.imageUrl} key={upload.id} onClick={() => getLocationData(upload.id)} />
                         )}
                     </div>
                 </div>
