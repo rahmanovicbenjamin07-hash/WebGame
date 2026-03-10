@@ -1,6 +1,9 @@
 {
   "outputDirectory": "dist",
-  "buildCommand": "pnpm build",
-  "installCommand": "pnpm install",
-  "framework": "vite"
+  "buildCommand": "npx vite build",
+  "installCommand": "npm install",
+  "framework": "vite",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
