@@ -33,7 +33,11 @@ export function HeroHomeSignedIn(){
     const [uploads, setUploads] = useState<NewUpload[]>([]);
     const [loading, setLoading] = useState(true);
 
-
+    const loadmoreUploads = async ()=> {
+        const res = await fetch(`http://localhost:3001/location/new?offset=${uploads.length}`)
+        const data: NewUpload[] = await res.json();
+        setUploads(prev=>[...prev,...data]);
+    }
 
     useEffect(() => {
     const load = async () => {
@@ -106,7 +110,7 @@ export function HeroHomeSignedIn(){
                         )}
                     </div>
                 </div>
-                <Button variant="outline" className="mx-auto">
+                <Button variant="outline" className="mx-auto" onClick={loadmoreUploads}>
                     Load more
                 </Button>
             </div>           

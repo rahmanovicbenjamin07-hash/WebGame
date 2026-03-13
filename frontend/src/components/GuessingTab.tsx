@@ -119,7 +119,7 @@ export function GuessingTab({open,setOpen,locationId,onGuessSumbit}: GuessingTab
                 </div>
                 <div className="flex flex-col gap-4 w-[50%] justify-stretch items-stretch">
                     <div>
-                        <MapContainer center={[44.0, 17.0]} zoom={7} className="w-full h-63.75 rounded-[19px] z-0">
+                        <MapContainer center={[44.6131, 17.9867]} zoomControl={false} zoom={7} className="w-full h-63.75 rounded-[19px] z-0">
                             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />                                                              
                             <LocationPicker onLocationSelect={async (lat, lng) => {
                                 setLat(lat);

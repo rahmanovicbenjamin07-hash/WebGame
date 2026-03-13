@@ -59,7 +59,14 @@ locationRoute.post("/newLocation", async (c) => {
 {/* Get the newest locations */}
 
 locationRoute.get("/new", async (c) => {
-    const newestLocations = await db.select({id: locationsTable.id,imageUrl: locationsTable.locationImage}).from(locationsTable).orderBy(desc(locationsTable.createdAt)).limit(9);
+    const offset = Number(c.req.query("offset") || 0)
+
+    const newestLocations = await db
+    .select({id: locationsTable.id,imageUrl: locationsTable.locationImage})
+    .from(locationsTable)
+    .orderBy(desc(locationsTable.createdAt))
+    .limit(9)
+    .offset(offset);
     return c.json(newestLocations);
 })
 
