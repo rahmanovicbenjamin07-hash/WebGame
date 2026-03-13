@@ -9,7 +9,7 @@ interface SignUpFormState  {
   password: string
 }
 
-export function SingInForm(){
+export function SignInForm(){
 
     const navigate = useNavigate();
 
@@ -26,6 +26,11 @@ export function SingInForm(){
 
     const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+        if (!formData.email || !formData.password) {
+        alert("All fields required!");
+        return;
+    }
 
     try {
 

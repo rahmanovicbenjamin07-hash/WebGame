@@ -31,9 +31,13 @@ export function SignUpForm(){
     
     const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (!formData.email || !formData.firstname || !formData.lastname || !formData.password || !formData.confirmpassword) {
+        alert("All fields required!");
+        return;
+    }
 
         if (formData.password !== formData.confirmpassword) {
-        alert("Lozinke se ne podudaraju!");
+        alert("Passwords must be same!");
         return;
     }            
 
