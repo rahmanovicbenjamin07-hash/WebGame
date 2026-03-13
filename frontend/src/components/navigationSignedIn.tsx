@@ -14,9 +14,7 @@ export function NavigationSignedIn(){
 
             const response = await fetch("http://localhost:3001/user/signout", {
                 method:"POST",
-                headers:{
-                    "Content-Type": "application/json",
-                },
+                credentials: "include",
             })
 
             const result = await response.json();
@@ -41,7 +39,7 @@ export function NavigationSignedIn(){
                 <Link  to="/home/signed-in" className="text-dark text-[16px] font-normal font-poppins cursor-pointer">Home</Link>
                 <button className="text-dark text-[16px] font-normal font-poppins cursor-pointer" onClick={handleLogOut}>Logout</button>
                 <Link to="/profile">
-                    <img src={ProfileImage} className="cursor-pointer"/>
+                    <img src={ProfileImage}/>
                 </Link>
             </div>
         </div>

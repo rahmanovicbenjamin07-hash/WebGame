@@ -6,10 +6,9 @@ import { NUMBER } from 'sequelize';
 import { error } from 'console';
 import { compare, hash } from 'bcryptjs';
 import { sign } from "hono/jwt";
-import { setCookie } from "hono/cookie";
+import { deleteCookie, setCookie } from "hono/cookie";
 import { authMiddleware } from '../../middleware/middleware.js';
 import "dotenv/config";
-import { findUserIdByEmail } from '../../helper/userFindByEmail.js';
 
 const usersRoute = new Hono()
 
@@ -152,8 +151,13 @@ usersRoute.post("/signin", async (c) => {
 {/* "Security" route to redirect */}
 
 usersRoute.post("/signout", (c) => {
-  setCookie(c, "session", "", { expires: new Date(0) });
-  return c.json({ message: "Logged out" });
+  deleteCookie(c, "session", {
+        httpOnly: true,
+        secure: false,
+        sameSite: "Lax",
+        path: "/",
+    });
+    return c.json({ message: "Signed out successfully" });
 });
 
 

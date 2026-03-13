@@ -7,15 +7,15 @@ import { useState, useEffect } from "react";
 import { fetchUser } from "@/authentication/auth";
 import { GuessingTab } from "./GuessingTab";
 
-type Guess = {
+interface Guess {
     id: number;
     missMeters: number;
     imageUrl: string
 }
 
-type NewUpload = {
+interface NewUpload {
     id: number;
-    imageUrl:string;
+    imageUrl: string;
 }
 
 interface userData {
@@ -25,17 +25,6 @@ interface userData {
     lastname:string,
 } 
 
-const newUploads = async ():Promise<NewUpload[]> => {
-        const res = await fetch("http://localhost:3001/location/new");
-
-        if(!res.ok){
-            throw new Error("Failed to fetch new uploads");
-        }
-
-        const data:NewUpload[] = await res.json();
-        return data;
-    }
-
 export function HeroHomeSignedIn(){
     const [open, setOpen] = useState(false);
     const [selectedLocationId, setSelectedLocationId] = useState<number | null>(null);
@@ -44,21 +33,28 @@ export function HeroHomeSignedIn(){
     const [uploads, setUploads] = useState<NewUpload[]>([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-    newUploads().then(setUploads);
-    fetchUser().then((data) => {
-            if (data) {
-                setUser(data);                
-            }else {
-            setLoading(false); 
-        }
-        });
-    }, []);
+
 
     useEffect(() => {
-            if (!user?.id) return;
-    
-            const fetchGuesses = async () => {
+    const load = async () => {
+        const res = await fetch("http://localhost:3001/location/new");
+        if (!res.ok) throw new Error("Failed to fetch new uploads");
+        const data: NewUpload[] = await res.json();
+        setUploads(data);
+    };
+    load();
+
+    fetchUser().then((data) => {
+        if (data) {
+            setUser(data);
+        } else {
+            setLoading(false);
+        }
+    });
+        }, []);
+
+    const fetchGuesses = async () => {
+        if (!user) return;
                 try {
                     const res = await fetch(`http://localhost:3001/guess/bestGuesses/${user.id}`);
                     if(!res.ok) {
@@ -72,7 +68,9 @@ export function HeroHomeSignedIn(){
                     setLoading(false);
                 }
             };
-    
+
+    useEffect(() => {
+            if (!user?.id) return;
             fetchGuesses();
         }, [user?.id]);
       
@@ -85,7 +83,7 @@ export function HeroHomeSignedIn(){
 
     return(   
         <>
-        <GuessingTab open={open} setOpen={setOpen} locationId={selectedLocationId} />
+        <GuessingTab open={open} setOpen={setOpen} locationId={selectedLocationId} onGuessSumbit={fetchGuesses}/>
 
         <div className="max-w-325 mx-auto mb-11.75">
             <NavigationSignedIn/>

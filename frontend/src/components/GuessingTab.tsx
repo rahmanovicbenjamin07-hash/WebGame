@@ -32,9 +32,10 @@ interface GuessingTabProps {
     open: boolean;
     setOpen: (open: boolean) => void;
     locationId: number | null;
+    onGuessSumbit: () => void;
 }
 
-export function GuessingTab({open,setOpen,locationId}: GuessingTabProps) {
+export function GuessingTab({open,setOpen,locationId,onGuessSumbit}: GuessingTabProps) {
     const [location, setLocation] = useState<locationData | null>(null);
     const [user, setUser] = useState<userData | null>(null);
     const [lat, setLat] = useState<number>(0);
@@ -81,7 +82,7 @@ export function GuessingTab({open,setOpen,locationId}: GuessingTabProps) {
         { latitude: location.lat, longitude: location.lng },  
         { latitude: lat, longitude: lng }                      
         );
-        setMissedMeter(JSON.stringify(missMeters));
+        setMissedMeter(JSON.stringify(missMeters)+"m");
         try {
 
         const res = await fetch(`http://localhost:3001/guess/${user?.id}` , { 
@@ -98,7 +99,8 @@ export function GuessingTab({open,setOpen,locationId}: GuessingTabProps) {
           });
           const result = await res.json();
           if(res.ok){
-                console.log(result);   
+                console.log(result);  
+                onGuessSumbit(); 
             }
           }catch (error) {
           console.error(error);
@@ -132,7 +134,7 @@ export function GuessingTab({open,setOpen,locationId}: GuessingTabProps) {
                         <div className="flex gap-7.25 w-full">
                             <div className="flex flex-col gap-2.5 w-53">
                                 <label className="font-poppins font-normal text-[16px] leading-[100%]">Error distance</label>
-                                <InputNoBorder placeholder={`${missedMeters}m`} readOnly/>
+                                <InputNoBorder placeholder={`${missedMeters}`} readOnly/>
                             </div>
                             <div className="flex flex-col gap-2.5 w-92.75">
                                 <label className="font-poppins font-normal text-[16px] leading-[100%]">Guessed location</label>
@@ -140,7 +142,7 @@ export function GuessingTab({open,setOpen,locationId}: GuessingTabProps) {
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button type="submit" className="cursor-pointer">Guess</Button>
+                            <Button type="submit">Guess</Button>
                         </DialogFooter>
                     </form>
                 </div>
