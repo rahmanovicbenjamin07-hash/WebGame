@@ -18,6 +18,7 @@ export function NewLocationForm(){
         const fileList = event.target.files;
         if(fileList && fileList.length > 0){
             setFile(fileList[0]);
+            setMessage(null);
         }else {
             setFile(null);
         }
@@ -34,7 +35,6 @@ export function NewLocationForm(){
         return;
     }
 
-
     const formData = new FormData();
     formData.append("image", file);
     formData.append("location", locationName);
@@ -46,7 +46,6 @@ export function NewLocationForm(){
         method: "POST",
         body: formData,
     });
-
         if (!res.ok) {
             setMessage("There was an error adding location!");
             setIsLoading(false);
@@ -55,21 +54,26 @@ export function NewLocationForm(){
             setMessage("Location added successfully!");
         }
     } catch (err) {
-        setMessage("Greška pri dodavanju lokacije.");
+        setMessage("Failed to add!");
     } finally {
         setIsLoading(false);
     }
-
 }
 
     return(
         
-        <div className="max-w-105 min-h-189.75 my-auto shadow-[0_0_10px_0_rgba(0,0,0,0.2)] px-6 pb-6 rounded-2xl pt-4">
-            {message && (
-            <p className={message.includes("uspješno") ? "text-green-500" : "text-red-500"}>
-                {message}
-            </p>
-        )}
+        <div className="relative max-w-105 min-h-189.75 my-auto shadow-[0_0_10px_0_rgba(0,0,0,0.2)] px-6 pb-6 rounded-2xl pt-4">
+           <div className="-top-16 absolute left-0 right-0">
+                {message && (
+                <div className={`w-full px-4 py-3 rounded-2xl text-sm font-medium text-center flex items-center justify-between
+                        ${message.includes("successfully") 
+                        ? "bg-green-100 text-green-700 border border-green-200" 
+                        : "bg-red-100 text-red-700 border border-red-200"}`}>
+                        <span>{message}</span>
+                    <button onClick={() => setMessage(null)} className="ml-2 text-current opacity-60 hover:opacity-100 cursor-pointer">✕</button>
+                </div>
+                )}
+            </div> 
             <form onSubmit={handleSubmit} className="flex flex-col items- gap-6">
                 <label htmlFor="file-upload" className="cursor-pointer group">
                     <p className="text-[16px] font-medium mb-2">Upload image:</p>
