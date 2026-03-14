@@ -1,11 +1,32 @@
+import { useState,useEffect } from "react";
 import Logo from "../assets/Logo.png";
 import { Link } from '@tanstack/react-router';
 import ProfileImage from "../assets/ProfileImageSmall.png";
 import { useNavigate } from '@tanstack/react-router';
+import menuIcon from "../assets/MenuIcon.svg";
+import { fetchUser } from "@/authentication/auth";
+import arrowDark from "../assets/ArrowBlack.svg"
+import arrowGradient from "../assets/ArrowGradient.svg"
+
+interface userData {
+    email: string,
+    firstname:string,
+    id:number;
+    lastname:string,
+} 
 
 export function NavigationSignedIn(){
-
+    const [openMenu, setOpenMenu] = useState<boolean>(false);
+    const [user,setUser] = useState<userData| null>(null);
     const navigate = useNavigate();
+
+    useEffect(()=>{
+        fetchUser().then((data) => {
+        if (data) {
+            setUser(data);
+        }
+    });
+    },[])
 
     const handleLogOut = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
@@ -23,25 +44,51 @@ export function NavigationSignedIn(){
                 console.log(result);
                 navigate({ to: '/home/signed-out' }); 
             }
-          
         } catch (err) {
-
+            console.log(err);
         }
-
     }
     
     return(
-        <div className="flex flex-row justify-between pt-11.5 pb-20.75 md:shadow-none shadow-md">
+        <div className="bg-foreground-primary flex flex-row justify-between items-center pt-11.5 lg:pb-0 py-[31.5px] lg:px-0 px-8.75 md:shadow-none shadow-md z-50 max-w-325 mx-auto">
             <Link to="/home/signed-in">
                 <img src={Logo} alt=""/>
             </Link>
-            <div className="flex gap-12 items-center">
+            <div className="md:flex gap-12 items-center  hidden">
                 <Link  to="/home/signed-in" className="text-dark text-[16px] font-normal font-poppins cursor-pointer">Home</Link>
                 <button className="text-dark text-[16px] font-normal font-poppins cursor-pointer" onClick={handleLogOut}>Logout</button>
                 <Link to="/profile">
                     <img src={ProfileImage}/>
                 </Link>
             </div>
+            <div className="md:hidden block cursor-pointer" onClick={() => {setOpenMenu(true)}}>
+                <img src={menuIcon}/>
+            </div>
+            {openMenu && (
+                <div className="absolute top-0 left-0 right-0 bg-foreground-primary h-75 pt-20 px-8.75 pb-8.75 flex flex-col gap-12.5 shadow-md">
+                    <button className="absolute top-10.5 right-10.5 text-primary text-xl cursor-pointer" onClick={() => setOpenMenu(false)}>✕</button>
+                    <div className="flex flex-row gap-7.5 items-center">
+                        <img src={ProfileImage}></img>
+                        {user && (
+                            <h5 className="text-dark text-2xl font-raleway">{user?.firstname} {user?.lastname}</h5>
+                            )}
+                    </div>
+                    <div className="flex flex-col items-stretch gap-6">
+                        <div className="flex flex-row justify-between items-center">
+                            <Link  to="/home/signed-in" className="cursor-pointer">
+                               <h5 className="font-normal font-raleway">Home</h5>
+                            </Link>
+                            <img src={arrowDark} className="mr-4"/>
+                        </div>
+                        <div className="flex flex-row justify-between items-center">
+                            <button onClick={handleLogOut}>
+                                <h5 className="text-primary font-normal font-raleway" >Logout</h5>
+                            </button>
+                            <img src={arrowGradient} className="mr-4"/>
+                        </div>
+                    </div>    
+                </div>             
+            )}
         </div>
     )
 
