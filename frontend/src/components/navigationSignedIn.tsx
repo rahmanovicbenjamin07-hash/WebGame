@@ -18,15 +18,35 @@ interface userData {
 export function NavigationSignedIn(){
     const [openMenu, setOpenMenu] = useState<boolean>(false);
     const [user,setUser] = useState<userData| null>(null);
+    const [userAvatar, setUserAvatar] = useState<string | null>(null);
     const navigate = useNavigate();
 
     useEffect(()=>{
         fetchUser().then((data) => {
-        if (data) {
-            setUser(data);
-        }
-    });
+            if (data) {
+                setUser(data);
+            }
+        });
     },[])
+
+    const fetchUserAvatar = async ()=>{
+        try {
+            const res = await fetch(`http://localhost:3001/user/${user?.id}`)
+            if(!res.ok) {
+                throw new Error("Failed to get the avatar");
+            }
+
+            const data = await res.json();
+            setUserAvatar(data[0].image);            
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    useEffect(()=>{
+        if (!user?.id) return;
+        fetchUserAvatar();
+    },[user?.id])
 
     const handleLogOut = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
@@ -58,7 +78,7 @@ export function NavigationSignedIn(){
                 <Link  to="/home/signed-in" className="text-dark text-[16px] font-normal font-poppins cursor-pointer">Home</Link>
                 <button className="text-dark text-[16px] font-normal font-poppins cursor-pointer" onClick={handleLogOut}>Logout</button>
                 <Link to="/profile">
-                    <img src={ProfileImage}/>
+                    <img src={userAvatar ?? ProfileImage} className="h-10 w-10 overflow-hidden rounded-full"/>
                 </Link>
             </div>
             <div className="md:hidden block cursor-pointer" onClick={() => {setOpenMenu(true)}}>
@@ -68,7 +88,7 @@ export function NavigationSignedIn(){
                 <div className="absolute top-0 left-0 right-0 bg-foreground-primary h-75 pt-20 px-8.75 pb-8.75 flex flex-col gap-12.5 shadow-md">
                     <button className="absolute top-10.5 right-10.5 text-primary text-xl cursor-pointer" onClick={() => setOpenMenu(false)}>✕</button>
                     <div className="flex flex-row gap-7.5 items-center">
-                        <img src={ProfileImage}></img>
+                        <img src={userAvatar ?? ProfileImage}></img>
                         {user && (
                             <h5 className="text-dark text-2xl font-raleway">{user?.firstname} {user?.lastname}</h5>
                             )}

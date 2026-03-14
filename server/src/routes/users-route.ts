@@ -9,6 +9,7 @@ import { sign } from "hono/jwt";
 import { deleteCookie, setCookie } from "hono/cookie";
 import { authMiddleware } from '../../middleware/middleware.js';
 import "dotenv/config";
+import supabase from "../db/supabase.js";
 
 const usersRoute = new Hono()
 
@@ -22,16 +23,47 @@ usersRoute.get('/', async (c) => {
 {/* Sign up route */}
 
 usersRoute.post("/signup", async (c) => {
+    const body = await c.req.parseBody();
+    const firstname = body["firstname"] as string;
+    const lastname = body["lastname"] as string;
+    const email = body["email"] as string;
+    const password = body["password"] as string;
+    const avatar = body["avatar"] as File | undefined;
 
-    const {firstname,lastname,email,password,image} = await c.req.json();
-    const hashedPassword = await hash(password,10);
+    let image: string | null = null;
 
+if (avatar && avatar instanceof File) {
+    const fileName = `${Date.now()}-${avatar.name}`;
+    const arrayBuffer = await avatar.arrayBuffer();
+    const buffer = new Uint8Array(arrayBuffer);
+
+    const { data: uploadData, error } = await supabase.storage
+        .from("avatars")
+        .upload(fileName, buffer, {
+            contentType: avatar.type,
+        });
+
+    console.log("Upload error:", error);
+    console.log("Upload data:", uploadData);
+
+    if (!error) {
+        const { data } = supabase.storage
+            .from("avatars")
+            .getPublicUrl(fileName);
+        image = data.publicUrl;
+        console.log("Public URL:", image);
+    }
+}
+    const hashedPassword = await hash(password, 10);
+    
     const [newUser] = await db.insert(usersTable).values({
-    firstname,
-    lastname,
-    email,
-    password: hashedPassword, 
-  }).returning();
+        firstname,
+        lastname,
+        email,
+        password: hashedPassword,
+        image: image,
+    }).returning();
+
 
   const tokenData = {
         userId: newUser.id,
@@ -89,13 +121,43 @@ usersRoute.get("/:id", async (c) => {
 
 usersRoute.put("/update/:id",async (c) => {
     const {id} = c.req.param();
-    const {firstname,lastname,email,password,image} = await c.req.json();
-    const [user] = await db.select().from(usersTable).where(eq(usersTable.email, email));
+    const body = await c.req.parseBody();
+    const firstname = body["firstname"] as string;
+    const lastname = body["lastname"] as string;
+    const email = body["email"] as string;
+    const password = body["password"] as string;
+    const avatar = body["avatar"] as File | undefined
+    const [user] = await db.select().from(usersTable).where(eq(usersTable.id, Number(id)));
 
     const isPasswordSame = await compare(password, user.password);
     if (!isPasswordSame) return c.json({ error: "Invalid credentials" }, 401);
 
-    const response = await db.update(usersTable).set({firstname,lastname,image}).where(eq(usersTable.id, Number(id)));
+    let image: string | null = user.image;
+
+    if (avatar && avatar instanceof File) {
+    const fileName = `${Date.now()}-${avatar.name}`;
+    const arrayBuffer = await avatar.arrayBuffer();
+    const buffer = new Uint8Array(arrayBuffer);
+
+    const { data: uploadData, error } = await supabase.storage
+        .from("avatars")
+        .upload(fileName, buffer, {
+            contentType: avatar.type,
+        });
+
+    console.log("Upload error:", error);
+    console.log("Upload data:", uploadData);
+
+    if (!error) {
+        const { data } = supabase.storage
+            .from("avatars")
+            .getPublicUrl(fileName);
+        image = data.publicUrl;
+        console.log("Public URL:", image);
+    }
+}
+
+    const response = await db.update(usersTable).set({firstname,lastname,image: image,}).where(eq(usersTable.id, Number(id)));
     
     if(!response){
         return c.json({error:"User not found"}, 404);

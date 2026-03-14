@@ -76,7 +76,7 @@ export function NewLocationForm(){
             </div> 
             <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                 <label htmlFor="file-upload" className="cursor-pointer group">
-                    <p className="text-[16px] font-medium lg:mb-2 mb-4">Upload image:</p>
+                    <p className="text-[16px] font-medium lg:mb- mb-4 leading-[150%]">Upload image:</p>
                     <ImagePreview file={file} />
                 </label>             
                 <input

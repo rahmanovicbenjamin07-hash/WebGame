@@ -10,7 +10,7 @@ export function NavigationSignedOut(){
     const [openMenu, setOpenMenu] = useState<boolean>(false);
 
     return(
-        <div className="bg-foreground-primary flex flex-row justify-between lg:pt-11.5 pt-0 lg:mb-20.75 max-w-325 lg:pb-0 py-[31.5px] lg:px-0 px-8.75 mx-auto md:shadow-none shadow-md z-50 relative">
+        <div className=" flex flex-row justify-between lg:pt-11.5 pt-0 lg:mb-20.75 max-w-325 lg:pb-0 py-[31.5px] lg:px-0 px-8.75 mx-auto md:shadow-none shadow-md z-50 relative">
             <Link to="/home/signed-out">
                 <img src={Logo} alt=""/>
             </Link>
