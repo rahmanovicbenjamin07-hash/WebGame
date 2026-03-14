@@ -59,11 +59,11 @@ export function SignInForm(){
   }
 
     return(
-        <div className="max-w-105 flex flex-col items-center gap-4 my-auto">
+        <div className="lg:max-w-105 max-w-86 flex flex-col items-center gap-4 my-auto relative z-10 lg:bg-transparent bg-foreground-primary lg:px-0 lg:py-0 px-7.5 py-5 lg:rounded-none rounded-4xl">
             {/* Heading wrapper */}
 
                 <div className="flex flex-col items-center gap-2">
-                    <h3 className="leading-18.5 text-dark">Sign in</h3>
+                    <h3 className="lg:leading-18.5 text-dark lg:text-[49px] lg:font-medium text-[35px] leading-13.25 font-normal">Sign in</h3>
                     <p className="text-foreground-dark text-center">Welcome back to Geotagger. We are glad that you are back.</p>
                 </div>
 

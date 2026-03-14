@@ -56,9 +56,9 @@ export function ClosesGuesesProfile(){
     if (loading) return <div>Loading...</div>;
 
     return (
-        <div className="flex flex-col justify-between">
+        <div className="flex flex-col justify-between lg:gap-0 gap-6">
             {guesses.map((guess) => 
-                <CloseGuess key={guess.id} meters={guess.missMeters} imageUrl={guess.imageUrl} />
+                <CloseGuess key={guess.id} meters={guess.missMeters} imageUrl={guess.imageUrl}/>
             )}
         </div>
     )

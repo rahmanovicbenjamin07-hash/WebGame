@@ -62,8 +62,8 @@ export function NewLocationForm(){
 
     return(
         
-        <div className="relative max-w-105 min-h-189.75 my-auto shadow-[0_0_10px_0_rgba(0,0,0,0.2)] px-6 pb-6 rounded-2xl pt-4">
-           <div className="-top-16 absolute left-0 right-0">
+        <div className="relative lg:max-w-105 lg:min-h-189.75 my-auto shadow-[0_0_10px_0_rgba(0,0,0,0.2)] px-6 pb-6 rounded-2xl pt-4">
+           <div className="-top-16 lg:absolute left-0 right-0 lg:mb-0 mb-6">
                 {message && (
                 <div className={`w-full px-4 py-3 rounded-2xl text-sm font-medium text-center flex items-center justify-between
                         ${message.includes("successfully") 
@@ -74,9 +74,9 @@ export function NewLocationForm(){
                 </div>
                 )}
             </div> 
-            <form onSubmit={handleSubmit} className="flex flex-col items- gap-6">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                 <label htmlFor="file-upload" className="cursor-pointer group">
-                    <p className="text-[16px] font-medium mb-2">Upload image:</p>
+                    <p className="text-[16px] font-medium lg:mb-2 mb-4">Upload image:</p>
                     <ImagePreview file={file} />
                 </label>             
                 <input
