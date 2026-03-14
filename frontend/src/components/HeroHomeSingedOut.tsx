@@ -17,7 +17,7 @@ export function HeroHomeSignedOut(){
 
     useEffect(()=> {
         const load = async () => {
-            const res = await fetch("http://localhost:3001/location/new");
+            const res = await fetch("http://localhost:3001/location/new/signed-out");
             
             if(!res.ok) throw new Error("Failed to fetch Uploads");
             const data: NewUpload[] = await res.json();
@@ -30,11 +30,12 @@ export function HeroHomeSignedOut(){
         <>
             <div>
                 <NavigationSignedOut/>
-                <div className="relative ">
-                    <img src={BgImg} className="absolute right-0 z-0"/>
-                    <div className="relative z-10 flex flex-col gap-4 max-w-309.5 mx-auto pt-42.5">
-                        <div className="flex flex-col gap-4">
-                           <h1 className="text-primary text-[61px]">Explore the <br></br>world with <br></br>Geotagger!</h1>
+                <div className="lg:relative flex flex-col gap-10.5 lg:pl-0 lg:pr-0 pl-2.75 pr-5.25">
+                    <img src={BgImg} className="lg:absolute static lg:right-0 lg:z-0 order-2"/>
+                    <div className="relative z-10 flex lg:text-left text-justify lg:items-left items-center flex-col gap-8 lg:gap-4 lg:max-w-309.5 max-w-85.25 mx-auto lg:pt-42.5 pt-12 order-1">
+                        <div className="flex flex-col gap-4 lg:items-left items-center">
+                           <h1 className="text-primary text-[61px] md:block hidden">Explore the <br></br>world with <br></br>Geotagger!</h1>
+                           <h4 className="text-primary md:hidden block text-center leading-[150%]">Explore the world with Geotagger!</h4>
                             <p className="max-w-105">Geotagger is webiste that allowes you to post picture and tag it on the map. Other user than try to locate it via Google Maps. </p>     
                         </div>                   
                         <Link to="/signup">
@@ -43,12 +44,12 @@ export function HeroHomeSignedOut(){
                     </div>
                 </div>
 
-                <div className="max-w-324.5 mx-auto relative z-1 flex flex-col items-center mt-56">
-                    <div className="flex flex-col gap-4">
-                        <h4 className="text-primary leading-[100%] text-center">Try yourself at Geotagger!</h4>
+                <div className="lg:max-w-324.5 max-w-86.25 mx-auto relative z-1 flex flex-col items-center lg:mt-56 mt-21.75 ">
+                    <div className="flex flex-col lg:gap-4 gap-2">
+                        <h4 className="text-primary lg:leading-[100%] leading-[150%] text-center lg:text-[35px] text-2xl">Try yourself at Geotagger!</h4>
                         <p className="text-dark max-w-146.75 text-center">Try to guess the location of image by selecting position on the map. When you guess it, it gives you the error distance.</p>
                     </div>
-                    <div className="flex gap-5 mt-16 mb-20">
+                    <div className="flex lg:flex-row flex-col lg:gap-5 gap-6 lg:mt-16 mt-18 lg:mb-20 mb-10.5 px-8.75 lg:px-0 items-stretch">
                         {NewUpload.map((upload)=>
                             <LockGuess imageUrl={upload.imageUrl}></LockGuess>
                         )}
@@ -57,7 +58,7 @@ export function HeroHomeSignedOut(){
                         <Button variant="default">Sign up</Button>
                     </Link>                  
                 </div>
-                <div className="mt-27">
+                <div className="lg:mt-27 mt-9.75">
                     <Footer/>
                 </div>               
             </div>

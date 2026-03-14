@@ -6,6 +6,7 @@ import { NavigationSignedIn } from '../components/navigationSignedIn'
 import { useState, useEffect } from "react";
 import { fetchUser } from "@/authentication/auth";
 import { GuessingTab } from "./GuessingTab";
+import { useIsMobile } from "@/utils/isMobile";
 
 interface Guess {
     id: number;
@@ -32,16 +33,18 @@ export function HeroHomeSignedIn(){
     const [guesses, setGuesses] = useState<Guess[]>([]);
     const [uploads, setUploads] = useState<NewUpload[]>([]);
     const [loading, setLoading] = useState(true);
+    const isMobile = useIsMobile();
+    const limit = isMobile ? 3 : 9;
 
     const loadmoreUploads = async ()=> {
-        const res = await fetch(`http://localhost:3001/location/new?offset=${uploads.length}`)
+        const res = await fetch(`http://localhost:3001/location/new?offset=${uploads.length}&limit=${limit}`)
         const data: NewUpload[] = await res.json();
         setUploads(prev=>[...prev,...data]);
     }
 
     useEffect(() => {
     const load = async () => {
-        const res = await fetch("http://localhost:3001/location/new");
+        const res = await fetch(`http://localhost:3001/location/new?limit=${limit}`);
         if (!res.ok) throw new Error("Failed to fetch new uploads");
         const data: NewUpload[] = await res.json();
         setUploads(data);
@@ -89,27 +92,32 @@ export function HeroHomeSignedIn(){
         <>
         <GuessingTab open={open} setOpen={setOpen} locationId={selectedLocationId} onGuessSumbit={fetchGuesses}/>
 
-        <div className="max-w-325 mx-auto mb-11.75">
+        <div className="max-w-325 lg:mx-auto lg:mb-11.75 mb-12.75 mx-8.75">
             <NavigationSignedIn/>
-            <div className="flex flex-col gap-2">
-                <h4 className="text-primary font-poppins leading-13.25">Personal best guesses</h4>
+
+            <div className="flex flex-col lg:gap-2 gap-4 lg:mt-0 mt-14">
+                <h4 className="text-primary font-poppins lg:leading-13.25 leading-[150%]">Personal best guesses</h4>
                 <p>Your personal best guesses appear here. Go on and try to beat your personal records or set new!</p>
-                <div className="flex gap-5 mt-6">
+                <div className="flex lg:gap-5 lg:mt-6 gap-4.25 mt-4 overflow-x-visible scrollbar-hide scroll-smooth snap-x snap-mandatory touch-pan-x">
                     {guesses.map((guess) => 
-                        <CloseGuess key={guess.id} meters={guess.missMeters} imageUrl={guess.imageUrl} />
+                        <div key={guess.id} className="snap-start shrink-0">
+                        <CloseGuess meters={guess.missMeters} imageUrl={guess.imageUrl} />
+                        </div>
                     )}
                 </div>
             </div>
-            <div className="mt-16 flex flex-col gap-11">
+
+            <div className="mt-16 flex flex-col lg:gap-11 gap-12.75">
                 <div className="flex flex-col gap-2">
                     <h4 className="text-primary font-poppins leading-13.25">New uploads</h4>
                     <p>New uploads from users. Try to guess all the locations by pressing on a picture.</p>
-                    <div className="grid grid-cols-3 gap-5 mt-6">
+                    <div className="grid grid-cols-1 gap-6 mt-14 lg:grid-cols-3 lg:gap-5 lg:mt-6">
                         {uploads.map((upload) => 
                             <NewUploads imageUrl={upload.imageUrl} key={upload.id} onClick={() => getLocationData(upload.id)} />
                         )}
                     </div>
                 </div>
+
                 <Button variant="outline" className="mx-auto" onClick={loadmoreUploads}>
                     Load more
                 </Button>

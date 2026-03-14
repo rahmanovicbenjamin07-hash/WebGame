@@ -8,7 +8,7 @@ interface GuessData{
 
 const CloseGuess: React.FC<GuessData> = ({ meters, imageUrl }) => {
     return(
-        <div className="w-105 h-59 relative flex items-center justify-center overflow-hidden">
+        <div className="lg:w-105 w-86.25 lg:h-59 h-48.5 relative flex items-center justify-center overflow-hidden">
             <img src={imageUrl} alt={`Guess at ${meters} meters`} className="object-cover w-full h-full rounded-2xl z-0 absolute"/>
             <img src={GradientOverlay} className="object-cover w-full h-full rounded-2xl z-1 top-0 absolute"/>
             {meters && 

@@ -31,7 +31,7 @@ export function NavigationSignedIn(){
     }
     
     return(
-        <div className="flex flex-row justify-between pt-11.5 pb-20.75">
+        <div className="flex flex-row justify-between pt-11.5 pb-20.75 md:shadow-none shadow-md">
             <Link to="/home/signed-in">
                 <img src={Logo} alt=""/>
             </Link>

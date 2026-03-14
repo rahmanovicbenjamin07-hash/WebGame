@@ -56,16 +56,32 @@ locationRoute.post("/newLocation", async (c) => {
     }     
 })
 
-{/* Get the newest locations */}
+{/* Get the newest locations - limit 9*/}
 
 locationRoute.get("/new", async (c) => {
+    const offset = Number(c.req.query("offset") || 0)
+    const limit = Number(c.req.query("limit") || 9)
+    const newestLocations = await db
+    .select({id: locationsTable.id,imageUrl: locationsTable.locationImage})
+    .from(locationsTable)
+    .orderBy(desc(locationsTable.createdAt))
+    .limit(limit)
+    .offset(offset);
+    return c.json(newestLocations);
+})
+
+
+{/* Get the newest locations - limit 3 */}
+
+locationRoute.get("/new/signed-out", async (c) => {
+
     const offset = Number(c.req.query("offset") || 0)
 
     const newestLocations = await db
     .select({id: locationsTable.id,imageUrl: locationsTable.locationImage})
     .from(locationsTable)
     .orderBy(desc(locationsTable.createdAt))
-    .limit(9)
+    .limit(3)
     .offset(offset);
     return c.json(newestLocations);
 })

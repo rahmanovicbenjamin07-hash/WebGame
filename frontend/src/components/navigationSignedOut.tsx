@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 
 export function NavigationSignedOut(){
     return(
-        <div className="flex flex-row justify-between pt-11.5 pb-20.75 max-w-325 mx-auto">
+        <div className="flex flex-row justify-between pt-11.5 pb-20.75 max-w-325 mx-auto md:shadow-none shadow-md">
             <Link to="/home/signed-out">
                 <img src={Logo} alt=""/>
             </Link>
