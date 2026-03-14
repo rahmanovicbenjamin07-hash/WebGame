@@ -80,18 +80,18 @@ export function ProfileForm(){
       }
 
     return (
-        <div className="max-w-105 min-h-189.75 flex flex-col items-center justify-end gap-6 my-auto shadow-[0_0_10px_0_rgba(0,0,0,0.2)] px-8 pb-6 rounded-2xl">
+        <div className="max-w-105 lg:min-h-189.75 flex flex-col items-center justify-end gap-6 my-auto shadow-[0_0_10px_0_rgba(0,0,0,0.2)] px-8 pb-6 rounded-2xl">
             {/* Heading wrapper */}
 
             <div>              
-                <img src={ProfileImage} className="h-20 w-20"></img>
+                <img src={ProfileImage} className="h-20 w-20 lg:mt-0 mt-24.25"></img>
             </div>
 
             <h4>Jacob Jones</h4>
 
             {/* Form wrapper */}
 
-            <form className="flex flex-col gap-4 w-full" onSubmit={handleSubmit}>
+            <form className="flex flex-col lg:gap-4 gap-6 w-full" onSubmit={handleSubmit}>
                 <div className="flex flex-col gap-2">
                     <p className="text-[16px] weight-[500]! leading-[150%]">Name</p>
                     <InputNoBorder placeholder={formData.firstname} name="firstname" onChange={handleInputChange}/>
@@ -119,7 +119,7 @@ export function ProfileForm(){
                     <InputNoBorder placeholder="••••••••••••••••" type="password" name="password" onChange={handleInputChange}/>
                 </div>
 
-            <Button className="w-full mt-23.5" type="submit">Save Profile</Button>
+            <Button className="w-full lg:mt-23.5" type="submit">Save Profile</Button>
             </form>
         </div>
     )
