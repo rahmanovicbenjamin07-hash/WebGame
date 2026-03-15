@@ -22,6 +22,7 @@ export function ProfileForm(){
     const [message,setMessage] = useState<string | null>(null);
     const [user, setUser] = useState<userData | null>(null);
     const [userAvatar, setUserAvatar] = useState<File | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const [formData,setFormData] = useState<ProfileFormState>({
             email:"",
@@ -31,62 +32,55 @@ export function ProfileForm(){
                     
         })
 
-    const handleAvatarChange = (e:React.ChangeEvent<HTMLInputElement>) => {
+    const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if(file) {
+        if (file) {
             setUserAvatar(file);
             setAvatarPreview(URL.createObjectURL(file));
         }
     }
 
     useEffect(() => {
-        fetchUser().then((data) => {
-            if (data) {
-                setUser(data);
-                setFormData(prev => ({
-                    ...prev,
-                    email: data.email,
-                    firstname: data.firstname,
-                    lastname: data.lastname,
-                }));
+        const loadUser = async () => {
+            const data = await fetchUser();
+            if (!data) return;
+
+            setUser(data);
+            setFormData(prev => ({
+                ...prev,
+                email: data.email,
+                firstname: data.firstname,
+                lastname: data.lastname,
+            }));
+
+            try {
+                const res = await fetch(`http://localhost:3001/user/${data.id}`);
+                if (res.ok) {
+                    const userData = await res.json();
+                    if (userData[0]?.image) setAvatarPreview(userData[0].image);
+                }
+            } catch (error) {
+                console.error(error);
             }
-        });
+        };
+
+        loadUser();
     }, []);
     
-    const fetchUserAvatar = async ()=>{
-        try {
-            const res = await fetch(`http://localhost:3001/user/${user?.id}`)
-            if(!res.ok) throw new Error("Failed to get the avatar");
-
-            const data = await res.json();
-            setAvatarPreview(data[0].image);            
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    useEffect(()=>{
-        if (!user?.id) return;
-        fetchUserAvatar();
-    },[user?.id])
 
     const handleInputChange = (e:React.ChangeEvent<HTMLInputElement>) => {
         const {name,value} = e.target;
         setFormData(prevData => ({...prevData,[name]:value}))
     }
     
-    const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();               
+        console.log("Button is pressed!");
+        if (!formData.email.trim()) { setMessage("Email is required!"); return; }
+        if (!formData.password.trim()) { setMessage("Password is required to save changes!"); return; }
+        if (!user?.id) return;
 
-        if (!formData.email.trim()) {
-        setMessage("Email is required!");
-        return;
-        }
-
-        if (!formData.password.trim()) {
-        setMessage("Password is required to save changes!");
-        return;
-    }
+        setIsLoading(true)
 
         const data = new FormData();
         data.append("email", formData.email);
@@ -95,8 +89,6 @@ export function ProfileForm(){
         data.append("lastname", formData.lastname);
         if (userAvatar) data.append("avatar", userAvatar);
 
-        if (!user?.id) return;
-
         try {
 
             const response = await fetch(`http://localhost:3001/user/update/${user.id}`, {
@@ -104,25 +96,27 @@ export function ProfileForm(){
                 credentials: "include",
                 body: data,
             })
-
+            
             const result = await response.json();
-
+            console.log(response);
 
             if (response.ok) {
-            setMessage("Profile updated successfully!");
-            if (result.image) setAvatarPreview(result.image);
-                setUserAvatar(null);
+                setMessage("Profile updated successfully!");
+                if (result.image) setAvatarPreview(result.image);
             } else {
                 setMessage(result.error || "Failed to update profile!");
-             }
-
-            setUserAvatar(null); 
+            }
             
         }catch (error) {
-          console.error(error);
-        }
+            console.error(error);
+            setMessage("Something went wrong!");
+        } finally {
+            setIsLoading(false);
+            setUserAvatar(null); 
+        
       }
-
+ 
+}
     return (
         <div className="relative max-w-105 lg:min-h-189.75 flex flex-col items-center justify-end gap-6 my-auto shadow-[0_0_10px_0_rgba(0,0,0,0.2)] px-8 pb-6 rounded-2xl">
         
@@ -183,7 +177,9 @@ export function ProfileForm(){
                     <InputNoBorder placeholder="••••••••••••••••" type="password" name="password" onChange={handleInputChange}/>
                 </div>
 
-            <Button className="w-full lg:mt-23.5" type="submit">Save Profile</Button>
+            <Button className="w-full lg:mt-23.5" type="submit">
+                {isLoading ? "Saving..." : "Save Profile"}
+            </Button>
             </form>
         </div>
     )
