@@ -92,7 +92,8 @@ export function HeroHomeSignedIn(){
         <>
         <GuessingTab open={open} setOpen={setOpen} locationId={selectedLocationId} onGuessSumbit={fetchGuesses}/>
         <NavigationSignedIn/>
-        <div className="max-w-325 lg:mx-auto lg:mb-11.75 mb-12.75 mx-8.75 lg:mt-20.75 mt-0">
+        <div className="relative lg:pb-26.5 pb-29">
+        <div className="max-w-325 lg:mx-auto  mx-8.75 lg:mt-20.75 mt-0">
             <div className="flex flex-col lg:gap-2 gap-4 lg:mt-0 mt-14">
                 <h4 className="text-primary font-poppins lg:leading-13.25 leading-[150%]">Personal best guesses</h4>
                 <p>Your personal best guesses appear here. Go on and try to beat your personal records or set new!</p>
@@ -121,8 +122,10 @@ export function HeroHomeSignedIn(){
                 </Button>
             </div>           
         </div>
-        <Footer></Footer>
+            <div className="absolute left-0 right-0 bottom-0">
+                    <Footer/>
+                </div>               
+           </div>             
         </>
     )
-
 }

@@ -29,7 +29,7 @@ export function HeroHomeSignedOut(){
     return(
         <>
             <NavigationSignedOut/>
-            <div>        
+            <div className="relative lg:pb-42 pb-26">        
                 <div className="lg:relative flex lg:flex-row flex-col lg:items-start gap-10.5 lg:pl-0 lg:pr-0 pl-2.75 pr-5.25">
                     <img src={BgImg} className="lg:absolute static lg:right-0 lg:z-0 order-2"/>
                     <div className="lg:min-w-334.75 mx-auto max-w-85.25">
@@ -60,7 +60,7 @@ export function HeroHomeSignedOut(){
                         <Button variant="default">Sign up</Button>
                     </Link>                  
                 </div>
-                <div className="lg:mt-27 mt-9.75">
+                <div className="absolute left-0 right-0 bottom-0">
                     <Footer/>
                 </div>               
             </div>

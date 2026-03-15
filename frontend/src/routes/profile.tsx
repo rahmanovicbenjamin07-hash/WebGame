@@ -19,16 +19,18 @@ export const Route = createFileRoute('/profile')({
 
 function RouteComponent() {
   return (
-    <>
+    <div className='relative'>
      <div className='max-w-325 mx-auto'>
         <NavigationSignedIn/>
-        <div className='grid lg:gap-5 lg:mt-12.5 mt-0 gap-10.5 items-stretch lg:grid-cols-3 grid-cols-1 lg:pb-17 pb-15.5 lg:pt-0 pt-8 lg:px-0 px-8.75'>
+        <div className='grid lg:gap-5 lg:mt-12.5 mt-0 gap-10.5 items-stretch lg:grid-cols-3 grid-cols-1 lg:pb-32 pb-31.75 lg:pt-0 pt-8 lg:px-0 px-8.75'>
           <ProfileForm/>
           <NewLocationForm/>
           <ClosesGuesesProfile/>
         </div>    
       </div>
-      <Footer/>
-    </>  
+      <div className='absolute left-0 right-0 bottom-0'>
+        <Footer/>
+      </div>
+    </div>  
   )
 }

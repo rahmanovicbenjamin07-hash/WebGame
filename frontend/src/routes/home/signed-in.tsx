@@ -20,6 +20,5 @@ function RouteComponent() {
     <div className=' mx-auto'>
       <HeroHomeSignedIn/>
     </div>
-
   )
 }
