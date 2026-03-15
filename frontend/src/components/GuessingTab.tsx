@@ -111,15 +111,15 @@ export function GuessingTab({open,setOpen,locationId,onGuessSumbit}: GuessingTab
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="lg:max-w-325 w-[91.30%] bg-foreground-primary">
+        <DialogContent className="lg:max-w-325 lg:max-h-99 w-[91.30%] bg-foreground-primary">
             <DialogTitle/>
            <div className="flex gap-7.25 lg:flex-row flex-col">
-                <div className="lg:min-h-87 min-h-46.25 lg:w-[50%]">
+                <div className="lg:max-h-87 min-h-46.25 lg:w-[50%]">
                     <img src={location?.imageUrl} className="rounded-2xl w-full h-full object-cover"/>
                 </div>
                 <div className="flex flex-col lg:gap-4 gap-7.25 lg:w-[50%] justify-stretch items-stretch">
                     <div>
-                        <MapContainer center={[44.6131, 17.9867]} zoomControl={false} zoom={7} className="w-full lg:h-63.75 h-46.25 rounded-[19px] z-0">
+                        <MapContainer center={[44.6131, 17.9867]} zoomControl={false} zoom={7} className="w-full lg:h-50.25 h-46.25 rounded-[19px] z-0">
                             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />                                                              
                             <LocationPicker onLocationSelect={async (lat, lng) => {
                                 setLat(lat);
@@ -134,15 +134,15 @@ export function GuessingTab({open,setOpen,locationId,onGuessSumbit}: GuessingTab
                         <div className="flex lg:gap-7.25 gap-2.5 w-full lg:flex-row flex-col">
                             <div className="flex flex-col gap-2.5 lg:w-53">
                                 <label className="font-poppins font-normal text-[16px] leading-[100%]">Error distance</label>
-                                <InputNoBorder placeholder={`${missedMeters}`} readOnly className="w-full"/>
+                                <InputNoBorder placeholder={`${missedMeters}`} readOnly className="lg:w-auto w-full"/>
                             </div>
-                            <div className="flex flex-col gap-2.5 lg:w-92.75 min-w-full items-stretch">
+                            <div className="flex flex-col gap-2.5 lg:min-w-0 lg:w-92.75 min-w-full items-stretch">
                                 <label className="font-poppins font-normal text-[16px] leading-[100%]">Guessed location</label>
-                                <InputNoBorder value={locationName} readOnly className="w-full"/>
+                                <InputNoBorder value={locationName} readOnly className="lg:w-auto w-full"/>
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button type="submit" className="lg:w-auto w-full">Guess</Button>
+                            <Button type="submit" className="lg:w-34.25 w-full">Guess</Button>
                         </DialogFooter>
                     </form>
                 </div>
