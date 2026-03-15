@@ -25,15 +25,15 @@ export function NewLocationForm(){
     }
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setIsLoading(true);
-    setMessage(null);    
+    event.preventDefault();   
 
     if (!file) {
         setMessage("No image");
-        setIsLoading(false);
         return;
     }
+
+    setIsLoading(true);
+    setMessage(null);
 
     const formData = new FormData();
     formData.append("image", file);
@@ -46,18 +46,21 @@ export function NewLocationForm(){
         method: "POST",
         body: formData,
     });
-        if (!res.ok) {
-            setMessage("There was an error adding location!");
+    
+    if (!res.ok) {
+                setMessage("There was an error adding location!");
+            } else {
+                setMessage("Location added successfully!");
+                setFile(null);
+                setLat(0);
+                setLng(0);
+                setLocationName("");
+            }
+        } catch (err) {
+            setMessage("Failed to add!");
+        } finally {
             setIsLoading(false);
-            return;
-        }else{
-            setMessage("Location added successfully!");
         }
-    } catch (err) {
-        setMessage("Failed to add!");
-    } finally {
-        setIsLoading(false);
-    }
 }
 
     return(
