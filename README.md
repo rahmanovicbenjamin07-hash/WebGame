@@ -1,8 +1,8 @@
-# 📍 Geotagger
+# Geotagger
 
 Geotagger is a web application where users can upload geotagged photos and challenge others to guess the location using an interactive map. The closer your guess, the better your score!
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -52,7 +52,7 @@ The server will be available at `http://localhost:3001`
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 geotagger/
@@ -71,7 +71,7 @@ geotagger/
 
 ---
 
-## 🔑 Environment Variables
+## Environment Variables
 
 Create a `.env` file in the backend directory:
 
