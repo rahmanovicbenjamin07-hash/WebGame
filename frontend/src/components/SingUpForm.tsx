@@ -50,6 +50,11 @@ export function SignUpForm(){
         data.append("lastname", formData.lastname);
         if (avatar) data.append("avatar", avatar);
 
+        if (formData.password.length < 8) {
+        alert("Password must be at least 8 characters!");
+        return;
+    }
+
         if (formData.password !== formData.confirmpassword) {
         alert("Passwords must be same!");
         return;

@@ -17,7 +17,7 @@ export const Route = createFileRoute('/home/signed-in')({
 function RouteComponent() {
   return (
 
-    <div className=' mx-auto'>
+    <div className='mx-auto 2xl:px-0 md:px-8.75'>
       <HeroHomeSignedIn/>
     </div>
   )

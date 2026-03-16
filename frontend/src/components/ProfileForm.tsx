@@ -118,7 +118,7 @@ export function ProfileForm(){
  
 }
     return (
-        <div className="relative max-w-105 lg:min-h-189.75 flex flex-col items-center justify-end gap-6 my-auto shadow-[0_0_10px_0_rgba(0,0,0,0.2)] px-8 pb-6 rounded-2xl">
+        <div className="relative xl:max-w-105 lg:min-h-189.75 flex flex-col items-center justify-end gap-6 my-auto shadow-[0_0_10px_0_rgba(0,0,0,0.2)] px-8 pb-6 rounded-2xl">
         
             <div className="bottom-24 lg:absolute left-8.75 right-8.75 lg:mb-0 mb-6">
                 {message && (

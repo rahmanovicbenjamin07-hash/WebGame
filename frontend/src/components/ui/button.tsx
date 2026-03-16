@@ -11,7 +11,7 @@ const buttonVariants = cva(
       variant: {
         default: "cursor-pointer bg-gradient w-[137px] min-h-[40px] text-foreground-primary rounded-full font-poppins text-[16px] leading-[100%] font-normal",
         outline:
-          "cursor-pointer bg-transparent w-[137px] min-h-[40px] text-foreground-green rounded-full font-poppins text-[16px] weight-[400] border-2 border-foreground-secondary border-solid leading-[24px]  font-normal",
+          "cursor-pointer bg-foreground-primary hover:bg-gradient hover:text-foreground-primary w-[137px] min-h-[40px] text-foreground-green rounded-full font-poppins text-[16px] weight-[400] border-2 border-foreground-secondary border-solid leading-[24px]  font-normal",
         dark:
           "cursor-pointer bg-dark w-[137px] min-h-[40px] text-foreground-primary rounded-full font-poppins text-[16px] leading-[100%] weight-[400]  font-normal",
       },

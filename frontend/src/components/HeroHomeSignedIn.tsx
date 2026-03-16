@@ -97,9 +97,9 @@ export function HeroHomeSignedIn(){
             <div className="flex flex-col lg:gap-2 gap-4 lg:mt-0 mt-14">
                 <h4 className="text-primary font-poppins lg:leading-13.25 leading-[150%]">Personal best guesses</h4>
                 <p>Your personal best guesses appear here. Go on and try to beat your personal records or set new!</p>
-                <div className="flex lg:gap-5 lg:mt-6 gap-4.25 mt-4 overflow-x-visible scrollbar-hide scroll-smooth snap-x snap-mandatory touch-pan-x lg:max-w-none">
+                <div className="flex lg:gap-5 lg:mt-6 gap-4.25 mt-4 lg:overflow-visible overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory touch-pan-x">
                     {guesses.map((guess) => 
-                        <div key={guess.id} className="snap-start shrink-0">
+                        <div key={guess.id} className="snap-start shrink-0 w-72 h-48.5 lg:flex-1 lg:w-auto lg:h-59">
                         <CloseGuess meters={guess.missMeters} imageUrl={guess.imageUrl} />
                         </div>
                     )}
@@ -110,7 +110,7 @@ export function HeroHomeSignedIn(){
                 <div className="flex flex-col gap-2">
                     <h4 className="text-primary font-poppins leading-13.25">New uploads</h4>
                     <p>New uploads from users. Try to guess all the locations by pressing on a picture.</p>
-                    <div className="grid grid-cols-1 gap-6 mt-14 lg:grid-cols-3 lg:gap-5 lg:mt-6">
+                    <div className="grid grid-cols-1 gap-6 mt-14 sm:grid-cols-2  lg:grid-cols-3 lg:gap-5 lg:mt-6">
                         {uploads.map((upload) => 
                             <NewUploads imageUrl={upload.imageUrl} key={upload.id} onClick={() => getLocationData(upload.id)} />
                         )}
