@@ -20,7 +20,7 @@ export function NavigationSignedOut(){
                 <Link to="/signup">
                     <Button variant="default" className="lg:flex hidden">Sign up</Button>
                 </Link>  
-                <div className="md:hidden block cursor-pointer" onClick={() => {setOpenMenu(true)}}>
+                <div className="lg:hidden block cursor-pointer" onClick={() => {setOpenMenu(true)}}>
                     <img src={menuIcon}/>
                 </div>
 

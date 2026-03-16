@@ -10,7 +10,7 @@ export const Route = createFileRoute('/signup')({
 
 function SignUpPage() {
   return (
-    <div className="lg:pt-0 pt-38 flex flex-row lg:max-h-screen max-h-none gap-22 overflow-hidden lg:items-stretch lg:justify-end items-center justify-center w-full lg:min-h-0 min-h-screen">
+    <div className="lg:pt-0 lg:pl-8.75 2xl:pl-0 pt-38 flex flex-row lg:max-h-screen max-h-none gap-22 overflow-hidden lg:items-stretch lg:justify-end items-center justify-center w-full lg:min-h-none min-h-screen">
             <div className='absolute z-50 top-0 left-0 right-0 lg:hidden'>
                 <NavigationSignedOut/>
             </div>

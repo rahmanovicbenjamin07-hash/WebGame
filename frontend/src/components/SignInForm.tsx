@@ -71,7 +71,7 @@ export function SignInForm(){
 
             <form className="flex flex-col gap-4 w-full" onSubmit={handleSubmit}>
                 <div className="flex flex-col gap-2">
-                    <p className="text-[12px] weight-[500]! leading-none text-dark">Email</p>
+                    <p className="text-[12px] weight-[500]! text-dark lg:leading-[150%]">Email</p>
                     <Input placeholder="example@net.com" type="email" name="email" onChange={handleInputChange}></Input>
                 </div>
 
@@ -79,15 +79,15 @@ export function SignInForm(){
             {/* Password input wrapper */}
 
                 <div className="flex flex-col gap-2">
-                    <p className="text-[12px] weight-[500]! leading-none text-dark">Password</p>
+                    <p className="text-[12px] weight-[500]! leading-none text-dark lg:leading-[150%]">Password</p>
                     <Input placeholder="••••••••••••••••" type="password" name="password" onChange={handleInputChange}></Input>
                 </div>
 
             <Button variant="outline" className="w-full" type="submit">Sign In</Button>
 
                 <div className="flex justify-between items-center">
-                    <p className="leading-6">Do you want to create an account?</p>
-                    <Link  to="/signup" className="text-primary text-[16px] font-normal">Sign up</Link>
+                    <p className="lg:leading-[150%]">Do you want to create an account?</p>
+                    <Link  to="/signup" className="text-primary text-[16px] font-normal text-nowrap">Sign up</Link>
                 </div>
             </form>
 

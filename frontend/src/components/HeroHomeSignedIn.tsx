@@ -97,7 +97,7 @@ export function HeroHomeSignedIn(){
             <div className="flex flex-col lg:gap-2 gap-4 lg:mt-0 mt-14">
                 <h4 className="text-primary font-poppins lg:leading-13.25 leading-[150%]">Personal best guesses</h4>
                 <p>Your personal best guesses appear here. Go on and try to beat your personal records or set new!</p>
-                <div className="flex lg:gap-5 lg:mt-6 gap-4.25 mt-4 overflow-x-visible scrollbar-hide scroll-smooth snap-x snap-mandatory touch-pan-x">
+                <div className="flex lg:gap-5 lg:mt-6 gap-4.25 mt-4 overflow-x-visible scrollbar-hide scroll-smooth snap-x snap-mandatory touch-pan-x lg:max-w-none">
                     {guesses.map((guess) => 
                         <div key={guess.id} className="snap-start shrink-0">
                         <CloseGuess meters={guess.missMeters} imageUrl={guess.imageUrl} />

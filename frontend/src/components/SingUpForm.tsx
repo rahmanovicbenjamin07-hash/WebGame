@@ -13,6 +13,8 @@ interface SignUpFormState  {
   confirmpassword:string,
 }
 
+const isMobile = window.innerWidth < 1024;
+
 export function SignUpForm(){
     const navigate = useNavigate();
     const [avatar, setAvatar] = useState<File | null>(null);
@@ -81,17 +83,16 @@ export function SignUpForm(){
 
             <div className="flex flex-col items-center gap-4">
                 <div className="flex flex-col items-center gap-2">
-                    <h3 className="leading-18.5 text-dark">Sign up</h3>
+                    <h3 className="lg:leading-18.5 text-dark lg:text-[49px] lg:font-medium text-[35px] leading-13.25 font-normal">Sign up</h3>
                     <p className="text-foreground-dark text-center">Your name will appear on posts and your public profle.</p>
                 </div>          
             </div>
 
             {/* Form wrapper */}
 
-
             {/* Email input wrapper */}
             <label htmlFor="file-upload" className="cursor-pointer">
-                    <ProfileImagePreview avatarPreview={avatarPreview}/>
+                    <ProfileImagePreview avatarPreview={avatarPreview} isMobile={isMobile} />
                 </label>
                 <input
                     id="file-upload"
@@ -104,7 +105,7 @@ export function SignUpForm(){
 
             <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
                 <div className="flex flex-col gap-2">
-                    <p className="text-[12px] weight-[500]! leading-none text-dark">Email</p>
+                    <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Email</p>
                     <Input placeholder="example@net.com" type="email" name="email" onChange={handleInputChange}></Input>
                 </div>
 
@@ -112,11 +113,11 @@ export function SignUpForm(){
 
                 <div className="flex gap-4">
                     <div className="flex flex-col gap-2">
-                        <p className="text-[12px] weight-[500]! text-dark">First Name</p>
+                        <p className="text-[12px] weight-[500]! leading-[150%] text-dark">First Name</p>
                         <Input placeholder="Jacob" name="firstname" onChange={handleInputChange}></Input>
                     </div>
                     <div className="flex flex-col gap-2">
-                        <p className="text-[12px] weight-[500]! text-dark">Last Name</p>
+                        <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Last Name</p>
                         <Input placeholder="Jones" name="lastname" onChange={handleInputChange}></Input>
                     </div>
                 </div>
@@ -124,14 +125,14 @@ export function SignUpForm(){
             {/* Password input wrapper */}
 
                 <div className="flex flex-col gap-2">
-                    <p className="text-[12px] weight-[500]! leading-none text-dark">Password</p>
+                    <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Password</p>
                     <Input placeholder="••••••••••••••••" type="password" name="password" onChange={handleInputChange}></Input>
                 </div>
 
             {/* Confirm password input wrapper */}
 
                 <div className="flex flex-col gap-2">
-                    <p className="text-[12px] weight-[500]! leading-none text-dark">Confirm password</p>
+                    <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Confirm password</p>
                     <Input placeholder="••••••••••••••••" type="password" name="confirmpassword" onChange={handleInputChange}></Input>
                 </div>
 
