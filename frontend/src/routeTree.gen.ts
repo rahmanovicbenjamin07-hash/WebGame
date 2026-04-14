@@ -9,128 +9,38 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SignupRouteImport } from './routes/signup'
-import { Route as SigninRouteImport } from './routes/signin'
-import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as HomeSignedOutRouteImport } from './routes/home/signed-out'
-import { Route as HomeSignedInRouteImport } from './routes/home/signed-in'
 
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SigninRoute = SigninRouteImport.update({
-  id: '/signin',
-  path: '/signin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProfileRoute = ProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HomeSignedOutRoute = HomeSignedOutRouteImport.update({
-  id: '/home/signed-out',
-  path: '/home/signed-out',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HomeSignedInRoute = HomeSignedInRouteImport.update({
-  id: '/home/signed-in',
-  path: '/home/signed-in',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/profile': typeof ProfileRoute
-  '/signin': typeof SigninRoute
-  '/signup': typeof SignupRoute
-  '/home/signed-in': typeof HomeSignedInRoute
-  '/home/signed-out': typeof HomeSignedOutRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/profile': typeof ProfileRoute
-  '/signin': typeof SigninRoute
-  '/signup': typeof SignupRoute
-  '/home/signed-in': typeof HomeSignedInRoute
-  '/home/signed-out': typeof HomeSignedOutRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/profile': typeof ProfileRoute
-  '/signin': typeof SigninRoute
-  '/signup': typeof SignupRoute
-  '/home/signed-in': typeof HomeSignedInRoute
-  '/home/signed-out': typeof HomeSignedOutRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/profile'
-    | '/signin'
-    | '/signup'
-    | '/home/signed-in'
-    | '/home/signed-out'
+  fullPaths: '/'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/profile'
-    | '/signin'
-    | '/signup'
-    | '/home/signed-in'
-    | '/home/signed-out'
-  id:
-    | '__root__'
-    | '/'
-    | '/profile'
-    | '/signin'
-    | '/signup'
-    | '/home/signed-in'
-    | '/home/signed-out'
+  to: '/'
+  id: '__root__' | '/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ProfileRoute: typeof ProfileRoute
-  SigninRoute: typeof SigninRoute
-  SignupRoute: typeof SignupRoute
-  HomeSignedInRoute: typeof HomeSignedInRoute
-  HomeSignedOutRoute: typeof HomeSignedOutRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/signin': {
-      id: '/signin'
-      path: '/signin'
-      fullPath: '/signin'
-      preLoaderRoute: typeof SigninRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/profile': {
-      id: '/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -138,30 +48,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/home/signed-out': {
-      id: '/home/signed-out'
-      path: '/home/signed-out'
-      fullPath: '/home/signed-out'
-      preLoaderRoute: typeof HomeSignedOutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/home/signed-in': {
-      id: '/home/signed-in'
-      path: '/home/signed-in'
-      fullPath: '/home/signed-in'
-      preLoaderRoute: typeof HomeSignedInRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ProfileRoute: ProfileRoute,
-  SigninRoute: SigninRoute,
-  SignupRoute: SignupRoute,
-  HomeSignedInRoute: HomeSignedInRoute,
-  HomeSignedOutRoute: HomeSignedOutRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
