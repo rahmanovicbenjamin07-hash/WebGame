@@ -1,0 +1,153 @@
+import { Input } from "../components/ui/input"
+import { Button } from "../components/ui/button"
+import { useState } from "react";
+import { useNavigate } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
+import ProfileImagePreview from "./ui/profileImagePreview";
+
+interface SignUpFormState  {
+  email: string,
+  firstname:string,
+  lastname:string,
+  password: string,
+  confirmpassword:string,
+}
+
+const isMobile = window.innerWidth < 1024;
+
+export function SignUpForm(){
+    const navigate = useNavigate();
+    const [avatar, setAvatar] = useState<File | null>(null);
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+    const [formData,setFormData] = useState<SignUpFormState>({
+            email:"",
+            firstname:"",
+            lastname:"",
+            password:"",
+            confirmpassword:"",         
+        })
+    
+    const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+        setAvatar(file);
+        setAvatarPreview(URL.createObjectURL(file));
+        }
+    };    
+
+    const handleInputChange = (e:React.ChangeEvent<HTMLInputElement>) => {
+        const {name,value} = e.target;
+        setFormData(prevData => ({...prevData,[name]:value}))
+    }
+    
+    const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        
+        const data = new FormData();
+        data.append("email", formData.email);
+        data.append("password", formData.password);
+        data.append("firstname", formData.firstname);
+        data.append("lastname", formData.lastname);
+        if (avatar) data.append("avatar", avatar);
+
+        if (formData.password.length < 8) {
+        alert("Password must be at least 8 characters!");
+        return;
+    }
+
+        if (formData.password !== formData.confirmpassword) {
+        alert("Passwords must be same!");
+        return;
+    }            
+
+        try {
+
+            const response = await fetch("http://localhost:3001/user/signup", {
+                method:"POST",
+                credentials: "include",
+                body: data,
+            })
+
+            const result = await response.json();
+
+            if(response.ok){
+                console.log(result);
+                navigate({ to: '/home/signed-in' }); 
+            }
+          
+        }catch (error) {
+          console.error(error);
+        }
+      }
+
+    
+
+    return (
+        <div className="lg:max-w-105 max-w-86 flex flex-col items-center gap-4 my-auto relative z-10 lg:bg-transparent bg-foreground-primary lg:px-0 lg:py-0 px-7.5 py-5 lg:rounded-none rounded-4xl">
+            {/* Heading wrapper */}
+
+            <div className="flex flex-col items-center gap-4">
+                <div className="flex flex-col items-center gap-2">
+                    <h3 className="lg:leading-18.5 text-dark lg:text-[49px] lg:font-medium text-[35px] leading-13.25 font-normal">Sign up</h3>
+                    <p className="text-foreground-dark text-center">Your name will appear on posts and your public profle.</p>
+                </div>          
+            </div>
+
+            {/* Form wrapper */}
+
+            {/* Email input wrapper */}
+            <label htmlFor="file-upload" className="cursor-pointer">
+                    <ProfileImagePreview avatarPreview={avatarPreview} isMobile={isMobile} />
+                </label>
+                <input
+                    id="file-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                    className="hidden h-16 w-16"
+                />
+
+
+            <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+                <div className="flex flex-col gap-2">
+                    <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Email</p>
+                    <Input placeholder="example@net.com" type="email" name="email" onChange={handleInputChange}></Input>
+                </div>
+
+            {/* Name input wrapper */}
+
+                <div className="flex gap-4">
+                    <div className="flex flex-col gap-2">
+                        <p className="text-[12px] weight-[500]! leading-[150%] text-dark">First Name</p>
+                        <Input placeholder="Jacob" name="firstname" onChange={handleInputChange}></Input>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Last Name</p>
+                        <Input placeholder="Jones" name="lastname" onChange={handleInputChange}></Input>
+                    </div>
+                </div>
+
+            {/* Password input wrapper */}
+
+                <div className="flex flex-col gap-2">
+                    <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Password</p>
+                    <Input placeholder="••••••••••••••••" type="password" name="password" onChange={handleInputChange}></Input>
+                </div>
+
+            {/* Confirm password input wrapper */}
+
+                <div className="flex flex-col gap-2">
+                    <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Confirm password</p>
+                    <Input placeholder="••••••••••••••••" type="password" name="confirmpassword" onChange={handleInputChange}></Input>
+                </div>
+
+            <Button className="w-full" type="submit">Sign Up</Button>
+
+                <div className="flex justify-between items-center">
+                    <p className="leading-6">Already have an account?</p>
+                    <Link  to="/signin" className="text-primary text-[16px] font-normal">Sign in</Link>
+                </div>
+            </form>
+        </div>
+    )
+}
