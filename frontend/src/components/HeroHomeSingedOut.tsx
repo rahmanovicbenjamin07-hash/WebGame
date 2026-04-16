@@ -10,20 +10,7 @@ import { loadUploadSignedOut } from "@/utils/querys/locations-query";
 
 
 export function HeroHomeSignedOut(){
-    /*
-    const [NewUpload,setNewUpload] = useState<NewUpload[]>([]);
-
-    useEffect(()=> {
-        const load = async () => {
-            const res = await fetch("http://localhost:3001/location/new/signed-out");
-            
-            if(!res.ok) throw new Error("Failed to fetch Uploads");
-            const data: NewUpload[] = await res.json();
-            setNewUpload(data);
-    };
-    load();
-},[])
-*/
+    
     const query = useQuery({
         queryKey:['uploadsSigneOut'],
         queryFn: async () => await loadUploadSignedOut()

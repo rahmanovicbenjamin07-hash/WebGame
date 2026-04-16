@@ -8,19 +8,19 @@ import { fetchUser } from "@/authentication/auth";
 import { GuessingTab } from "./GuessingTab";
 import { useIsMobile } from "@/utils/isMobile";
 import { fetchGuesses } from '@/lib/queries/guesses-query'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery,useQueryClient } from '@tanstack/react-query'
+import { fetchLocations } from "@/utils/querys/locations-query";
+
 
 interface Guess {
     id: number;
     missMeters: number;
     imageUrl: string
 }
-
 interface NewUpload {
-    id: number;
-    imageUrl: string;
+    id:number,
+    imageUrl:string
 }
-
 interface userData {
     email: string,
     firstname:string,
@@ -43,14 +43,6 @@ export function HeroHomeSignedIn(){
     }
 
     useEffect(() => {
-    const load = async () => {
-        const res = await fetch(`http://localhost:3001/location/new?limit=${limit}`);
-        if (!res.ok) throw new Error("Failed to fetch new uploads");
-        const data: NewUpload[] = await res.json();
-        setUploads(data);
-    };
-    load();
-
     fetchUser().then((data) => {
         if (data) {
             setUser(data);
@@ -58,27 +50,54 @@ export function HeroHomeSignedIn(){
     });
         }, []);
 
+    /*Querys*/
+
+    const locationsQuery = useQuery({
+        queryKey:['locationsUploads'],
+        queryFn: async () => await fetchLocations(limit)
+    })
+
     const query = useQuery({
     queryKey:['bestGuesses'],
     queryFn: async () => await fetchGuesses(user?.id!)
     })
 
+    /*Query error handling*/
+
     if(query.isError){
         return <p>{query.error.message}</p>
+    }else if(locationsQuery.isError){
+         return <p>{locationsQuery.error.message}</p>
     }
 
-    if(query.isPending) {
-        return <p>Loading...</p>
+    if (locationsQuery.isPending || query.isPending) {
+        return <p>Loading...</p>;
     }
 
+    /*Query error handling*/
+
+    const guesses = query.data || [];
+    const locations = locationsQuery.data || [];
     const getLocationData = (id: number) => {
     setSelectedLocationId(id);
     setOpen(true);
 }
 
+    const queryClient = useQueryClient();
+
+    const handleGuessSubmit = async () => {
+        if (!user) return;
+
+        await fetchGuesses(user.id);
+
+    queryClient.invalidateQueries({
+        queryKey: ['bestGuesses']
+        });
+    };
+
     return(   
         <>
-        <GuessingTab open={open} setOpen={setOpen} locationId={selectedLocationId} onGuessSumbit={fetchGuesses}/>
+        <GuessingTab open={open} setOpen={setOpen} locationId={selectedLocationId} onGuessSumbit={handleGuessSubmit}/>
         <NavigationSignedIn/>
         <div className="relative lg:pb-26.5 pb-29">
         <div className="max-w-325 lg:mx-auto  mx-8.75 lg:mt-20.75 mt-0">
@@ -99,8 +118,8 @@ export function HeroHomeSignedIn(){
                     <h4 className="text-primary font-poppins leading-13.25">New uploads</h4>
                     <p>New uploads from users. Try to guess all the locations by pressing on a picture.</p>
                     <div className="grid grid-cols-1 gap-6 mt-14 sm:grid-cols-2  lg:grid-cols-3 lg:gap-5 lg:mt-6">
-                        {uploads.map((upload) => 
-                            <NewUploads imageUrl={upload.imageUrl} key={upload.id} onClick={() => getLocationData(upload.id)} />
+                        {locations.map((location) => 
+                            <NewUploads imageUrl={location.imageUrl} key={location.id} onClick={() => getLocationData(location.id)} />
                         )}
                     </div>
                 </div>
