@@ -8,19 +8,9 @@ import { fetchUser } from "@/authentication/auth";
 import { GuessingTab } from "./GuessingTab";
 import { useIsMobile } from "@/utils/isMobile";
 import { fetchGuesses } from '@/lib/queries/guesses-query'
-import { useQuery,useQueryClient } from '@tanstack/react-query'
-import { fetchLocations } from "@/utils/querys/locations-query";
+import { useQuery,useQueryClient, useInfiniteQuery} from '@tanstack/react-query'
+import { fetchLocationsList } from "@/utils/querys/locations-query";
 
-
-interface Guess {
-    id: number;
-    missMeters: number;
-    imageUrl: string
-}
-interface NewUpload {
-    id:number,
-    imageUrl:string
-}
 interface userData {
     email: string,
     firstname:string,
@@ -31,16 +21,9 @@ interface userData {
 export function HeroHomeSignedIn(){
     const [open, setOpen] = useState(false);
     const [selectedLocationId, setSelectedLocationId] = useState<number | null>(null);
-    const [user, setUser] = useState<userData | null>(null);
-    const [uploads, setUploads] = useState<NewUpload[]>([]);
+    const [user, setUser] = useState<userData | null>(null);  
     const isMobile = useIsMobile();
     const limit = isMobile ? 3 : 9;
-
-    const loadmoreUploads = async ()=> {
-        const res = await fetch(`http://localhost:3001/location/new?offset=${uploads.length}&limit=${limit}`)
-        const data: NewUpload[] = await res.json();
-        setUploads(prev=>[...prev,...data]);
-    }
 
     useEffect(() => {
     fetchUser().then((data) => {
@@ -52,9 +35,21 @@ export function HeroHomeSignedIn(){
 
     /*Querys*/
 
-    const locationsQuery = useQuery({
-        queryKey:['locationsUploads'],
-        queryFn: async () => await fetchLocations(limit)
+    const {
+        data: locationsData,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isPending: isLocationsPending,
+        isError: isLocationsError,
+        error: locationsError
+    } = useInfiniteQuery({
+        queryKey:['LocationsLoading', limit],
+        queryFn: ({ pageParam }) => fetchLocationsList({ pageParam, limit }),
+        initialPageParam: 0,
+        getNextPageParam: (lastPage, allPages) => {
+            return lastPage.length === limit ? allPages.length * limit : undefined;
+        },
     })
 
     const query = useQuery({
@@ -64,20 +59,16 @@ export function HeroHomeSignedIn(){
 
     /*Query error handling*/
 
-    if(query.isError){
-        return <p>{query.error.message}</p>
-    }else if(locationsQuery.isError){
-         return <p>{locationsQuery.error.message}</p>
-    }
+    if (query.isError) return <p>{query.error.message}</p>;
+    if (isLocationsError) return <p>{locationsError.message}</p>;
 
-    if (locationsQuery.isPending || query.isPending) {
-        return <p>Loading...</p>;
-    }
+    if (isLocationsPending || query.isPending) return <p>Loading...</p>;
 
     /*Query error handling*/
 
     const guesses = query.data || [];
-    const locations = locationsQuery.data || [];
+    const locations = locationsData?.pages.flat() || [];
+
     const getLocationData = (id: number) => {
     setSelectedLocationId(id);
     setOpen(true);
@@ -123,10 +114,13 @@ export function HeroHomeSignedIn(){
                         )}
                     </div>
                 </div>
-
-                <Button variant="outline" className="mx-auto" onClick={loadmoreUploads}>
-                    Load more
-                </Button>
+                {hasNextPage && (
+                    <Button variant="outline" className="mx-auto" onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
+                        {isFetchingNextPage ? "Loading more..." : "Load more"}
+                    </Button>
+                    
+                )}
+                
             </div>           
         </div>
             <div className="absolute left-0 right-0 bottom-0">
