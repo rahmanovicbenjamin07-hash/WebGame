@@ -7,6 +7,8 @@ import { useState, useEffect } from "react";
 import { fetchUser } from "@/authentication/auth";
 import { GuessingTab } from "./GuessingTab";
 import { useIsMobile } from "@/utils/isMobile";
+import { fetchGuesses } from '@/lib/queries/guesses-query'
+import { useQuery } from '@tanstack/react-query'
 
 interface Guess {
     id: number;
@@ -30,9 +32,7 @@ export function HeroHomeSignedIn(){
     const [open, setOpen] = useState(false);
     const [selectedLocationId, setSelectedLocationId] = useState<number | null>(null);
     const [user, setUser] = useState<userData | null>(null);
-    const [guesses, setGuesses] = useState<Guess[]>([]);
     const [uploads, setUploads] = useState<NewUpload[]>([]);
-    const [loading, setLoading] = useState(true);
     const isMobile = useIsMobile();
     const limit = isMobile ? 3 : 9;
 
@@ -54,34 +54,22 @@ export function HeroHomeSignedIn(){
     fetchUser().then((data) => {
         if (data) {
             setUser(data);
-        } else {
-            setLoading(false);
         }
     });
         }, []);
 
-    const fetchGuesses = async () => {
-        if (!user) return;
-                try {
-                    const res = await fetch(`http://localhost:3001/guess/bestGuesses/${user.id}`);
-                    if(!res.ok) {
-                        throw new Error("Failed to get the guesses");
-                    }
-                    const data: Guess[] = await res.json();
-                    setGuesses(data);
-                } catch (error) {
-                    console.error(error);
-                } finally {
-                    setLoading(false);
-                }
-            };
+    const query = useQuery({
+    queryKey:['bestGuesses'],
+    queryFn: async () => await fetchGuesses(user?.id!)
+    })
 
-    useEffect(() => {
-            if (!user?.id) return;
-            fetchGuesses();
-        }, [user?.id]);
-      
-    if (loading) return <div>Loading...</div>;    
+    if(query.isError){
+        return <p>{query.error.message}</p>
+    }
+
+    if(query.isPending) {
+        return <p>Loading...</p>
+    }
 
     const getLocationData = (id: number) => {
     setSelectedLocationId(id);

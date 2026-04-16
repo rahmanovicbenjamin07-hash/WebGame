@@ -1,18 +1,16 @@
-import { useState,useEffect } from "react";
+import { useState,useEffect, use } from "react";
 import { NavigationSignedOut } from "./navigationSignedOut";
 import { Button } from "./ui/button";
 import BgImg from "../assets/HeroSignedOutBg.png"
 import LockGuess from "./ui/LockedGuess";
 import { Footer } from "./footer";
 import { Link } from "@tanstack/react-router";
+import { useQuery } from '@tanstack/react-query'
+import { loadUploadSignedOut } from "@/utils/querys/locations-query";
 
-interface NewUpload {
-    id:number,
-    imageUrl:string
-}
 
 export function HeroHomeSignedOut(){
-
+    /*
     const [NewUpload,setNewUpload] = useState<NewUpload[]>([]);
 
     useEffect(()=> {
@@ -25,6 +23,19 @@ export function HeroHomeSignedOut(){
     };
     load();
 },[])
+*/
+    const query = useQuery({
+        queryKey:['uploadsSigneOut'],
+        queryFn: async () => await loadUploadSignedOut()
+    })
+
+    if(query.isError){
+    return <p>{query.error.message}</p>
+  }
+
+  if(query.isPending) {
+    return <p>Loading...</p>
+  }
 
     return(
         <>
@@ -52,7 +63,7 @@ export function HeroHomeSignedOut(){
                         <p className="text-dark max-w-146.75 text-center">Try to guess the location of image by selecting position on the map. When you guess it, it gives you the error distance.</p>
                     </div>
                     <div className="flex lg:flex-row flex-col lg:gap-5 gap-6 lg:mt-16 mt-18 lg:mb-20 mb-10.5 lg:px-8.75 2xl:px-0 items-stretch">
-                        {NewUpload.map((upload)=>
+                        {query.data.map((upload)=>
                             <LockGuess imageUrl={upload.imageUrl}></LockGuess>
                         )}
                     </div>

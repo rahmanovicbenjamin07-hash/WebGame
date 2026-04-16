@@ -22,24 +22,31 @@ export function ClosesGuesesProfile() {
     })
   }, [])
 
-  const { data, isPending, isError } = useQuery({
-    queryKey: ['guesses'],
-    queryFn: async () => await fetchGuesses(user?.id!),
+
+  const query = useQuery({
+    queryKey:['bestGuesses'],
+    queryFn: async () => await fetchGuesses(user?.id!)
   })
 
-  if (isPending) return <div>Loading...</div>
-
-  if (isError) {
-    return <p>Something went wrong</p>
+  if(query.isError){
+    return <p>{query.error.message}</p>
   }
 
+  if(query.isPending) {
+    return <p>Loading...</p>
+  }
+ 
   return (
     <div className="max-w-full flex-1 w-auto flex flex-col justify-between lg:gap-0 gap-6">
-      {data?.map((guess) => (
+      {query.data && query.data?.length > 0 
+      
+      ? query.data?.map((guess) => (
         <div key={guess.id} className="flex-1 w-full min-h-0">
-          <CloseGuess meters={guess.missMeters} imageUrl={guess.imageUrl} />
+          <CloseGuess meters={guess.missMeters} imageUrl={guess.imageUrl}/>
         </div>
-      ))}
+      )) 
+      
+      : <p>No active Guesses!</p>}
     </div>
   )
 }
