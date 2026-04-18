@@ -61,6 +61,13 @@ export function NavigationSignedIn(){
 
     const userAvatar = userQuery.data;
 
+    if(userQuery.isError){
+    return <p>{userQuery.error.message}</p>
+  }
+
+    if(userQuery.isPending) {
+    return <p>Loading...</p>
+    }
 
     return(
         <div className="bg-foreground-primary flex flex-row justify-between items-center pt-11.5 lg:pb-0 py-[31.5px] lg:px-0 px-8.75 md:shadow-none shadow-md z-500 max-w-325 mx-auto">
