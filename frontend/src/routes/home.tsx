@@ -1,7 +1,7 @@
-import { HeroHomeSignedOut } from '../../../components/HeroHomeSingedOut'
+import { HeroHomeSignedOut } from '@/components/HeroHomeSingedOut'
 import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/_authenticated/home/signed-out')({
+export const Route = createFileRoute('/home')({
   component: RouteComponent,
 })
 

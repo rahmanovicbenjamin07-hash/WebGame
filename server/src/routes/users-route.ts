@@ -164,7 +164,6 @@ usersRoute.delete("/:id", async (c) => {
 usersRoute.post("/signin", async (c) => {
     const {email,password} = await c.req.json();
     const [user] = await db.select().from(usersTable).where(eq(usersTable.email, email));
-    console.log(email,password);
     if(!user) {
         return c.json({error:"Invalid credentials"},401);
     }
@@ -180,10 +179,8 @@ usersRoute.post("/signin", async (c) => {
     }
 
     const secret = process.env.AUTH_SECRET!;
-    console.log("Secret:", secret); 
 
     const token = await sign(tokenData,secret, "HS256");
-    console.log("Token:", token); 
 
     setCookie(c, "session", token, {
     httpOnly: true,

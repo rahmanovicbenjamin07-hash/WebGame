@@ -46,7 +46,7 @@ export function NavigationSignedIn(){
 
             if(response.ok){
                 console.log(result);
-                navigate({ to: '/home/signed-out' }); 
+                navigate({ to: '/home' }); 
             }
         } catch (err) {
             console.log(err);
