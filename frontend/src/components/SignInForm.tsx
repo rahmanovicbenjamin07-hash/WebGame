@@ -3,6 +3,7 @@ import { Button } from "../components/ui/button";
 import { useState } from "react";
 import { useNavigate } from '@tanstack/react-router';
 import { Link } from '@tanstack/react-router';
+import { signIn } from "@/authentication/auth";
 
 interface SignUpFormState  {
   email: string;
@@ -27,37 +28,27 @@ export function SignInForm(){
     const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-        if (!formData.email || !formData.password) {
+    if (!formData.email || !formData.password) {
         alert("All fields required!");
         return;
     }
 
-    
-    s
     try {
+        const result = await (signIn as any)({ 
+    data: { 
+        email: formData.email, 
+        password: formData.password,
+    } 
+})
 
-            const response = await fetch("http://localhost:3001/user/signin", {
-                method:"POST",
-                headers:{
-                    "Content-Type": "application/json",
-                },
-                credentials: 'include',
-                body: JSON.stringify({
-                email: formData.email,
-                password: formData.password,
-                }),
-            })
-
-            const result = await response.json();
-
-            if(response.ok){
-                console.log(result);
-                navigate({ to: '/home/signed-in' }); 
-            }
-          
-        }catch (error) {
-          console.error(error);
+        if (result) {
+            await navigate({ to: '/home/signed-in' });
+        } else {
+            alert("Invalid credentials");
         }
+    } catch (error) {
+        console.error(error);
+    }
   }
 
     return(

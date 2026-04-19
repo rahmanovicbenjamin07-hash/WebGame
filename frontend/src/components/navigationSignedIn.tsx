@@ -56,7 +56,8 @@ export function NavigationSignedIn(){
         
     const userQuery = useQuery({
     queryKey:['userAvatar'],
-    queryFn: async () => await fetchUserAvatar(user?.id!)
+    queryFn: async () => await fetchUserAvatar(user?.id!),
+    enabled: !!user?.id
     })
 
     const userAvatar = userQuery.data;

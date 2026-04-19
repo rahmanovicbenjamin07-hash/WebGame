@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import { fetchUser } from "@/authentication/auth";
 import { GuessingTab } from "./GuessingTab";
 import { useIsMobile } from "@/utils/isMobile";
-import { fetchGuesses } from '@/lib/queries/guesses-query'
+import { fetchGuesses } from "@/utils/querys/guesses-query";
 import { useQuery,useQueryClient, useInfiniteQuery} from '@tanstack/react-query'
 import { fetchLocationsList } from "@/utils/querys/locations-query";
 
@@ -27,6 +27,7 @@ export function HeroHomeSignedIn(){
 
     useEffect(() => {
     fetchUser().then((data) => {
+        console.log('User data:', data)
         if (data) {
             setUser(data);
         }
@@ -54,7 +55,8 @@ export function HeroHomeSignedIn(){
 
     const query = useQuery({
     queryKey:['bestGuesses'],
-    queryFn: async () => await fetchGuesses(user?.id!)
+    queryFn: async () => await fetchGuesses(user?.id!),
+    enabled: !!user?.id
     })
 
     /*Query error handling*/
@@ -62,7 +64,7 @@ export function HeroHomeSignedIn(){
     if (query.isError) return <p>{query.error.message}</p>;
     if (isLocationsError) return <p>{locationsError.message}</p>;
 
-    if (isLocationsPending || query.isPending) return <p>Loading...</p>;
+    if (isLocationsPending || (query.isPending && !!user?.id)) return <p>Loading...</p>;
 
     /*Query error handling*/
 

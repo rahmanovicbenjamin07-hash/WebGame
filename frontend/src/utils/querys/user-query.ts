@@ -6,7 +6,7 @@ export const fetchUserAvatar = async (userId: number)=>{
             }
 
             const data = await res.json();
-            return data;            
+            return data[0]?.image ?? null;            
         } catch (error) {
             console.log(error);
         }

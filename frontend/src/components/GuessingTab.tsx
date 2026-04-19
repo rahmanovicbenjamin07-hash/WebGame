@@ -13,19 +13,14 @@ import {LocationPicker} from "../components/ui/MapLocationPicke"
 import { defaultIcon } from "./ui/MapDeafultsIcon"; 
 import { fetchUser } from "@/authentication/auth";
 import { getLocationName } from "@/utils/LocationName";
+import { useQuery } from "@tanstack/react-query";
+import { fetchLocation } from "@/utils/querys/locations-query";
 
 interface userData {
     email: string,
     firstname:string,
     id:number;
     lastname:string,
-}
-
-interface locationData{
-    imageUrl:string,
-    locationId:number,
-    lat:number,
-    lng:number;
 }
 
 interface GuessingTabProps {
@@ -36,7 +31,6 @@ interface GuessingTabProps {
 }
 
 export function GuessingTab({open,setOpen,locationId,onGuessSumbit}: GuessingTabProps) {
-    const [location, setLocation] = useState<locationData | null>(null);
     const [user, setUser] = useState<userData | null>(null);
     const [lat, setLat] = useState<number>(0);
     const [lng, setLng] = useState<number>(0);
@@ -51,27 +45,19 @@ export function GuessingTab({open,setOpen,locationId,onGuessSumbit}: GuessingTab
         })
     }, [])
 
-    useEffect(() => {
-        if (!locationId) return;
+    const locationQuery = useQuery({
+        queryKey: ['location', locationId],
+        queryFn: () => fetchLocation(locationId!),
+    enabled: !!locationId,
+    select: (data) => data[0] ? {
+        imageUrl: data[0].locationImage,
+        locationId: data[0].id,
+        lat: data[0].lat,
+        lng: data[0].lng,
+    } : null,
+    });
 
-        const fetchLocationData = async () => {
-
-        const res = await fetch(`http://localhost:3001/location/${locationId}`);
-        const data = await res.json();
-
-        if (data && data[0]) {
-            setLocation({
-                imageUrl:data[0].locationImage,
-                locationId: data[0].id,
-                lat: data[0].lat,
-                lng: data[0].lng,
-            });
-        }
-    };
-    fetchLocationData();
-
-    }, [locationId])
-  
+    const location = locationQuery.data;
 
     const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();

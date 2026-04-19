@@ -64,7 +64,6 @@ export function SignUpForm(){
 
             const response = await fetch("http://localhost:3001/user/signup", {
                 method:"POST",
-                credentials: "include",
                 body: data,
             })
 

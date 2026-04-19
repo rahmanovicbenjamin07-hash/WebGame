@@ -30,3 +30,9 @@ export const fetchLocationsList = async ({ pageParam = 0, limit=9 }: LocationsLi
     if (!res.ok) throw new Error("Failed to fetch locations");
     return res.json() as Promise<NewUpload[]>;
 }
+
+export const fetchLocation = async (locationId: number) => {
+  const res = await fetch(`http://localhost:3001/location/${locationId}`);
+  if (!res.ok) throw new Error('Failed to fetch location');
+  return res.json();
+};

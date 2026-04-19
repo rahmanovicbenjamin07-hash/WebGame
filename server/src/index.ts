@@ -5,6 +5,7 @@ import locationRoute from "./routes/locations-route.js"
 import guessesRoute from "./routes/guess-routes.js"
 import { cors } from 'hono/cors' 
 import { authMiddleware } from '../middleware/middleware.js'
+import 'dotenv/config'
 
 const app = new Hono()
 app.use('/user/me', authMiddleware);
