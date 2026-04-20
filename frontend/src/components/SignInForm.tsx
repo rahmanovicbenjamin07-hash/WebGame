@@ -85,7 +85,7 @@ export function SignInForm(){
                     <Input placeholder="••••••••••••••••" type="password" name="password" onChange={handleInputChange}></Input>
                 </div>
 
-            <Button variant="outline" className="w-full" type="submit">Sign In</Button>
+            <Button variant="outline" className="w-full" type="submit" disabled={SignInMutation.isPending}>{SignInMutation.isPending ? "Signing in..." : "Sign In"}</Button>
 
                 <div className="flex justify-between items-center">
                     <p className="lg:leading-[150%]">Do you want to create an account?</p>
