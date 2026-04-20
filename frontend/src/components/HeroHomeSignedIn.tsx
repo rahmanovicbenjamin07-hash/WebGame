@@ -8,7 +8,7 @@ import { fetchUser } from "@/authentication/auth";
 import { GuessingTab } from "./GuessingTab";
 import { useIsMobile } from "@/utils/isMobile";
 import { fetchGuesses } from "@/utils/querys/guesses-query";
-import { useQuery,useQueryClient, useInfiniteQuery} from '@tanstack/react-query'
+import { useQuery, useInfiniteQuery} from '@tanstack/react-query'
 import { fetchLocationsList } from "@/utils/querys/locations-query";
 
 export function HeroHomeSignedIn(){
