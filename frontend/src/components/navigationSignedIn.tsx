@@ -7,6 +7,8 @@ import menuIcon from "../assets/MenuIcon.svg";
 import { fetchUser } from "@/authentication/auth";
 import arrowDark from "../assets/ArrowBlack.svg"
 import arrowGradient from "../assets/ArrowGradient.svg"
+import { fetchUserAvatar } from "@/utils/querys/user-query";
+import { useQuery } from "@tanstack/react-query";
 
 interface userData {
     email: string,
@@ -18,7 +20,7 @@ interface userData {
 export function NavigationSignedIn(){
     const [openMenu, setOpenMenu] = useState<boolean>(false);
     const [user,setUser] = useState<userData| null>(null);
-    const [userAvatar, setUserAvatar] = useState<string | null>(null);
+
     const navigate = useNavigate();
 
     useEffect(()=>{
@@ -28,25 +30,7 @@ export function NavigationSignedIn(){
             }
         });
     },[])
-
-    const fetchUserAvatar = async ()=>{
-        try {
-            const res = await fetch(`http://localhost:3001/user/${user?.id}`)
-            if(!res.ok) {
-                throw new Error("Failed to get the avatar");
-            }
-
-            const data = await res.json();
-            setUserAvatar(data[0].image);            
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    useEffect(()=>{
-        if (!user?.id) return;
-        fetchUserAvatar();
-    },[user?.id])
+    
 
     const handleLogOut = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
@@ -62,13 +46,30 @@ export function NavigationSignedIn(){
 
             if(response.ok){
                 console.log(result);
-                navigate({ to: '/home/signed-out' }); 
+                navigate({ to: '/home' }); 
             }
         } catch (err) {
             console.log(err);
         }
     }
     
+        
+    const userQuery = useQuery({
+    queryKey:['userAvatar'],
+    queryFn: async () => await fetchUserAvatar(user?.id!),
+    enabled: !!user?.id
+    })
+
+    const userAvatar = userQuery.data;
+
+    if(userQuery.isError){
+    return <p>{userQuery.error.message}</p>
+  }
+
+    if(userQuery.isPending) {
+    return <p>Loading...</p>
+    }
+
     return(
         <div className="bg-foreground-primary flex flex-row justify-between items-center pt-11.5 lg:pb-0 py-[31.5px] lg:px-0 px-8.75 md:shadow-none shadow-md z-500 max-w-325 mx-auto">
             <Link to="/home/signed-in">

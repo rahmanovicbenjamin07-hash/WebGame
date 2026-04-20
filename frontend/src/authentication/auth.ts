@@ -1,5 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getRequest } from '@tanstack/react-start/server'
+import { getRequest, setResponseHeader } from '@tanstack/react-start/server'
 
 interface userData {
   email: string
@@ -16,9 +16,7 @@ export const fetchUser = createServerFn({ method: 'GET' }).handler(async () => {
 
   try {
     const res = await fetch('http://localhost:3001/user/me', {
-      headers: {
-        Cookie: cookieHeader,
-      },
+      headers: { Cookie: cookieHeader },
     })
 
     if (!res.ok) return null
@@ -27,4 +25,24 @@ export const fetchUser = createServerFn({ method: 'GET' }).handler(async () => {
   } catch (e) {
     return null
   }
+})
+
+export const signIn = createServerFn({ method: 'POST' }).handler(async (ctx: any) => {
+  const data = ctx.data as { email: string; password: string }
+
+  const res = await fetch('http://localhost:3001/user/signin', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+
+  if (!res.ok) return null
+
+  const setCookieHeader = res.headers.get('set-cookie')
+  
+  if (setCookieHeader) {
+    setResponseHeader('set-cookie', setCookieHeader)
+  }
+
+  return await res.json()
 })

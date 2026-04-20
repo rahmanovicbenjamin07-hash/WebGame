@@ -28,8 +28,7 @@ export function ProfileForm(){
             email:"",
             firstname:"",
             lastname:"",
-            password:"",
-                    
+            password:"",                    
         })
 
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -112,8 +111,7 @@ export function ProfileForm(){
             setMessage("Something went wrong!");
         } finally {
             setIsLoading(false);
-            setUserAvatar(null); 
-        
+            setUserAvatar(null);         
       }
  
 }

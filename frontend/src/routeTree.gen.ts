@@ -15,7 +15,6 @@ import { Route as HomeRouteImport } from './routes/home'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
-import { Route as AuthenticatedHomeSignedOutRouteImport } from './routes/_authenticated/home/signed-out'
 import { Route as AuthenticatedHomeSignedInRouteImport } from './routes/_authenticated/home/signed-in'
 
 const SignupRoute = SignupRouteImport.update({
@@ -47,12 +46,6 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedHomeSignedOutRoute =
-  AuthenticatedHomeSignedOutRouteImport.update({
-    id: '/home/signed-out',
-    path: '/home/signed-out',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 const AuthenticatedHomeSignedInRoute =
   AuthenticatedHomeSignedInRouteImport.update({
     id: '/home/signed-in',
@@ -67,7 +60,6 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/home/signed-in': typeof AuthenticatedHomeSignedInRoute
-  '/home/signed-out': typeof AuthenticatedHomeSignedOutRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -76,7 +68,6 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/home/signed-in': typeof AuthenticatedHomeSignedInRoute
-  '/home/signed-out': typeof AuthenticatedHomeSignedOutRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -87,7 +78,6 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/home/signed-in': typeof AuthenticatedHomeSignedInRoute
-  '/_authenticated/home/signed-out': typeof AuthenticatedHomeSignedOutRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -98,16 +88,8 @@ export interface FileRouteTypes {
     | '/signup'
     | '/profile'
     | '/home/signed-in'
-    | '/home/signed-out'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/home'
-    | '/signin'
-    | '/signup'
-    | '/profile'
-    | '/home/signed-in'
-    | '/home/signed-out'
+  to: '/' | '/home' | '/signin' | '/signup' | '/profile' | '/home/signed-in'
   id:
     | '__root__'
     | '/'
@@ -117,7 +99,6 @@ export interface FileRouteTypes {
     | '/signup'
     | '/_authenticated/profile'
     | '/_authenticated/home/signed-in'
-    | '/_authenticated/home/signed-out'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -172,13 +153,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/home/signed-out': {
-      id: '/_authenticated/home/signed-out'
-      path: '/home/signed-out'
-      fullPath: '/home/signed-out'
-      preLoaderRoute: typeof AuthenticatedHomeSignedOutRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/home/signed-in': {
       id: '/_authenticated/home/signed-in'
       path: '/home/signed-in'
@@ -192,13 +166,11 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedHomeSignedInRoute: typeof AuthenticatedHomeSignedInRoute
-  AuthenticatedHomeSignedOutRoute: typeof AuthenticatedHomeSignedOutRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedHomeSignedInRoute: AuthenticatedHomeSignedInRoute,
-  AuthenticatedHomeSignedOutRoute: AuthenticatedHomeSignedOutRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

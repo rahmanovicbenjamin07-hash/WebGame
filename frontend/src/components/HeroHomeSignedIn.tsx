@@ -7,17 +7,9 @@ import { useState, useEffect } from "react";
 import { fetchUser } from "@/authentication/auth";
 import { GuessingTab } from "./GuessingTab";
 import { useIsMobile } from "@/utils/isMobile";
-
-interface Guess {
-    id: number;
-    missMeters: number;
-    imageUrl: string
-}
-
-interface NewUpload {
-    id: number;
-    imageUrl: string;
-}
+import { fetchGuesses } from "@/utils/querys/guesses-query";
+import { useQuery,useQueryClient, useInfiniteQuery} from '@tanstack/react-query'
+import { fetchLocationsList } from "@/utils/querys/locations-query";
 
 interface userData {
     email: string,
@@ -29,68 +21,76 @@ interface userData {
 export function HeroHomeSignedIn(){
     const [open, setOpen] = useState(false);
     const [selectedLocationId, setSelectedLocationId] = useState<number | null>(null);
-    const [user, setUser] = useState<userData | null>(null);
-    const [guesses, setGuesses] = useState<Guess[]>([]);
-    const [uploads, setUploads] = useState<NewUpload[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState<userData | null>(null);  
     const isMobile = useIsMobile();
     const limit = isMobile ? 3 : 9;
 
-    const loadmoreUploads = async ()=> {
-        const res = await fetch(`http://localhost:3001/location/new?offset=${uploads.length}&limit=${limit}`)
-        const data: NewUpload[] = await res.json();
-        setUploads(prev=>[...prev,...data]);
-    }
-
     useEffect(() => {
-    const load = async () => {
-        const res = await fetch(`http://localhost:3001/location/new?limit=${limit}`);
-        if (!res.ok) throw new Error("Failed to fetch new uploads");
-        const data: NewUpload[] = await res.json();
-        setUploads(data);
-    };
-    load();
-
     fetchUser().then((data) => {
+        console.log('User data:', data)
         if (data) {
             setUser(data);
-        } else {
-            setLoading(false);
         }
     });
         }, []);
 
-    const fetchGuesses = async () => {
-        if (!user) return;
-                try {
-                    const res = await fetch(`http://localhost:3001/guess/bestGuesses/${user.id}`);
-                    if(!res.ok) {
-                        throw new Error("Failed to get the guesses");
-                    }
-                    const data: Guess[] = await res.json();
-                    setGuesses(data);
-                } catch (error) {
-                    console.error(error);
-                } finally {
-                    setLoading(false);
-                }
-            };
+    /*Querys*/
 
-    useEffect(() => {
-            if (!user?.id) return;
-            fetchGuesses();
-        }, [user?.id]);
-      
-    if (loading) return <div>Loading...</div>;    
+    const {
+        data: locationsData,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isPending: isLocationsPending,
+        isError: isLocationsError,
+        error: locationsError
+    } = useInfiniteQuery({
+        queryKey:['LocationsLoading', limit],
+        queryFn: ({ pageParam }) => fetchLocationsList({ pageParam, limit }),
+        initialPageParam: 0,
+        getNextPageParam: (lastPage, allPages) => {
+            return lastPage.length === limit ? allPages.length * limit : undefined;
+        },
+    })
+
+    const query = useQuery({
+    queryKey:['bestGuesses'],
+    queryFn: async () => await fetchGuesses(user?.id!),
+    enabled: !!user?.id
+    })
+
+    /*Query error handling*/
+
+    if (query.isError) return <p>{query.error.message}</p>;
+    if (isLocationsError) return <p>{locationsError.message}</p>;
+
+    if (isLocationsPending || (query.isPending && !!user?.id)) return <p>Loading...</p>;
+
+    /*Query error handling*/
+
+    const guesses = query.data || [];
+    const locations = locationsData?.pages.flat() || [];
 
     const getLocationData = (id: number) => {
     setSelectedLocationId(id);
     setOpen(true);
 }
 
+    const queryClient = useQueryClient();
+
+    const handleGuessSubmit = async () => {
+        if (!user) return;
+
+        await fetchGuesses(user.id);
+
+    queryClient.invalidateQueries({
+        queryKey: ['bestGuesses']
+        });
+    };
+
     return(   
         <>
-        <GuessingTab open={open} setOpen={setOpen} locationId={selectedLocationId} onGuessSumbit={fetchGuesses}/>
+        <GuessingTab open={open} setOpen={setOpen} locationId={selectedLocationId} onGuessSumbit={handleGuessSubmit}/>
         <NavigationSignedIn/>
         <div className="relative lg:pb-26.5 pb-29">
         <div className="max-w-325 lg:mx-auto  mx-8.75 lg:mt-20.75 mt-0">
@@ -111,15 +111,18 @@ export function HeroHomeSignedIn(){
                     <h4 className="text-primary font-poppins leading-13.25">New uploads</h4>
                     <p>New uploads from users. Try to guess all the locations by pressing on a picture.</p>
                     <div className="grid grid-cols-1 gap-6 mt-14 sm:grid-cols-2  lg:grid-cols-3 lg:gap-5 lg:mt-6">
-                        {uploads.map((upload) => 
-                            <NewUploads imageUrl={upload.imageUrl} key={upload.id} onClick={() => getLocationData(upload.id)} />
+                        {locations.map((location) => 
+                            <NewUploads imageUrl={location.imageUrl} key={location.id} onClick={() => getLocationData(location.id)} />
                         )}
                     </div>
                 </div>
-
-                <Button variant="outline" className="mx-auto" onClick={loadmoreUploads}>
-                    Load more
-                </Button>
+                {hasNextPage && (
+                    <Button variant="outline" className="mx-auto" onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
+                        {isFetchingNextPage ? "Loading more..." : "Load more"}
+                    </Button>
+                    
+                )}
+                
             </div>           
         </div>
             <div className="absolute left-0 right-0 bottom-0">

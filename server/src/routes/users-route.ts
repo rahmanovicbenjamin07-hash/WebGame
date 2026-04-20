@@ -29,7 +29,6 @@ usersRoute.post("/signup", async (c) => {
     const email = body["email"] as string;
     const password = body["password"] as string;
     const avatar = body["avatar"] as File | undefined;
-
     let image: string | null = null;
 
 if (avatar && avatar instanceof File) {
@@ -63,23 +62,6 @@ if (avatar && avatar instanceof File) {
         password: hashedPassword,
         image: image,
     }).returning();
-
-
-  const tokenData = {
-        userId: newUser.id,
-        email: newUser.email,
-        exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24,
-    };
-
-    const secret = process.env.AUTH_SECRET!;
-    const token = await sign(tokenData, secret, "HS256");
-
-    setCookie(c, "session", token, {
-        httpOnly: true,
-        secure: false, 
-        sameSite: "Lax",
-        path: "/",
-    });
 
     return c.json({ message: "User created and signed in", user: newUser }, 201);
 })
@@ -182,7 +164,6 @@ usersRoute.delete("/:id", async (c) => {
 usersRoute.post("/signin", async (c) => {
     const {email,password} = await c.req.json();
     const [user] = await db.select().from(usersTable).where(eq(usersTable.email, email));
-    
     if(!user) {
         return c.json({error:"Invalid credentials"},401);
     }
@@ -198,6 +179,7 @@ usersRoute.post("/signin", async (c) => {
     }
 
     const secret = process.env.AUTH_SECRET!;
+
     const token = await sign(tokenData,secret, "HS256");
 
     setCookie(c, "session", token, {
@@ -205,6 +187,7 @@ usersRoute.post("/signin", async (c) => {
     secure: false, 
     sameSite: "Lax", 
     path: "/",
+    domain: "localhost",
   });
 
     return c.json({ message: "Signed in successfully" });
