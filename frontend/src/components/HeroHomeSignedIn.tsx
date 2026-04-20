@@ -21,20 +21,14 @@ interface userData {
 export function HeroHomeSignedIn(){
     const [open, setOpen] = useState(false);
     const [selectedLocationId, setSelectedLocationId] = useState<number | null>(null);
-    const [user, setUser] = useState<userData | null>(null);  
     const isMobile = useIsMobile();
     const limit = isMobile ? 3 : 9;
 
-    useEffect(() => {
-    fetchUser().then((data) => {
-        console.log('User data:', data)
-        if (data) {
-            setUser(data);
-        }
+    const userQuery = useQuery({
+    queryKey: ['user'],
+    queryFn: fetchUser,
     });
-        }, []);
-
-    /*Querys*/
+    const user = userQuery.data;
 
     const {
         data: locationsData,
@@ -80,12 +74,8 @@ export function HeroHomeSignedIn(){
 
     const handleGuessSubmit = async () => {
         if (!user) return;
-
         await fetchGuesses(user.id);
-
-    queryClient.invalidateQueries({
-        queryKey: ['bestGuesses']
-        });
+        queryClient.invalidateQueries({ queryKey: ['bestGuesses'] });
     };
 
     return(   

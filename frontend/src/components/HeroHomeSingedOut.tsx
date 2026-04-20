@@ -11,7 +11,7 @@ import { loadUploadSignedOut } from "@/utils/querys/locations-query";
 export function HeroHomeSignedOut(){
     
     const query = useQuery({
-        queryKey:['uploadsSigneOut'],
+        queryKey:['uploadsSignedOut'],
         queryFn: async () => await loadUploadSignedOut()
     })
 

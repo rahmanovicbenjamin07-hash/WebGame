@@ -5,9 +5,10 @@ import { MapContainer, TileLayer, Marker} from "react-leaflet";
 import {LocationPicker} from "../components/ui/MapLocationPicke"
 import { defaultIcon } from "./ui/MapDeafultsIcon";
 import { getLocationName } from "@/utils/LocationName";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 
 export function NewLocationForm(){
-    const [isLoading, setIsLoading] = useState(false);
+    const queryClient = useQueryClient();
     const [message, setMessage] = useState<string | null>(null);
     const [file, setFile] = useState<File | null>(null);
     const [lat, setLat] = useState<number>(0);
@@ -24,44 +25,47 @@ export function NewLocationForm(){
         }
     }
 
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();   
+    const newLocationMutation = useMutation({
+        mutationFn: async () => {
+            const formData = new FormData();
+            formData.append("image", file!);
+            formData.append("location", locationName);
+            formData.append("lat", String(lat));
+            formData.append("lng", String(lng));            
 
-    if (!file) {
-        setMessage("No image");
-        return;
-    }
+            const response = await fetch("http://localhost:3001/location/newLocation", {
+            method: "POST",
+            body: formData,
+            })
 
-    setIsLoading(true);
-    setMessage(null);
+            const result = await response.json();
+            if(!response.ok) throw new Error(result.error || "Failed to add new location!");
+            return result;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['LocationsLoading'] });
+            setMessage("Location added successfully!");
+            setFile(null);
+            setLat(0);
+            setLng(0);
+            setLocationName("");
+        },
+        onError: (error) => {
+            setMessage(error.message);
+        },
+    })
 
-    const formData = new FormData();
-    formData.append("image", file);
-    formData.append("location", locationName);
-    formData.append("lat", String(lat));
-    formData.append("lng", String(lng));
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
 
-    try {
-        const res = await fetch("http://localhost:3001/location/newLocation", {
-        method: "POST",
-        body: formData,
-    });
-    
-    if (!res.ok) {
-                setMessage("There was an error adding location!");
-            } else {
-                setMessage("Location added successfully!");
-                setFile(null);
-                setLat(0);
-                setLng(0);
-                setLocationName("");
-            }
-        } catch (err) {
-            setMessage("Failed to add!");
-        } finally {
-            setIsLoading(false);
+        if (!file) {
+            setMessage("No image");
+            return;
         }
-}
+
+        newLocationMutation.mutate();
+    };
+
 
     return(
         
@@ -105,7 +109,7 @@ export function NewLocationForm(){
                         <textarea value={locationName} readOnly placeholder="2118 Thornridge Cir. Syracuse, Connecticut 35624" className="file:text-foreground shadow-[0_0_10px_0_rgba(0,0,0,0.2)] py-2 placeholder:leading-[150%] px-4 placeholder:text-dark placeholder:text-[12px] placeholder:font-medium placeholder:font-poppins  selection:text-primary-foreground h-10 w-full min-w-0 border-2 border-transparent bg-transparent text-base transition-[color,box-shadow] outline-none file:inline-flex file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed md:text-sm min-h-16 rounded-2xl aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive"/>
                     </div>
                                     
-                    <Button variant="default" type="submit" className="w-full cursor-pointer" disabled={isLoading}>{isLoading ? "Adding..." : "Add Location"}</Button>
+                    <Button variant="default" type="submit" className="w-full cursor-pointer" disabled={newLocationMutation.isPending}>{newLocationMutation.isPending ? "Adding..." : "Add Location"}</Button>
                 </div>
             </form>
         </div>
