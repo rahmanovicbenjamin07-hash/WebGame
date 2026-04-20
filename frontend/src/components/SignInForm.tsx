@@ -1,39 +1,20 @@
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
-import { useState } from "react";
 import { useNavigate } from '@tanstack/react-router';
 import { Link } from '@tanstack/react-router';
 import { signIn } from "@/authentication/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-
-interface SignUpFormState  {
-  email: string;
-  password: string
-}
+import { useForm } from "@tanstack/react-form";
 
 export function SignInForm(){
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    const [formData,setFormData] = useState<SignUpFormState>({
-        email:"",
-        password:""
-    })
-
-    
-    const handleInputChange = (e:React.ChangeEvent<HTMLInputElement>) => {
-        const {name,value} = e.target;
-        setFormData(prevData => ({...prevData,[name]:value}))
-    }
-
     const SignInMutation = useMutation({
-        mutationFn: async () => {
+        mutationFn: async (values: { email: string; password: string }) => {
             
             const result = await (signIn as any)({
-                data: {
-                    email: formData.email,
-                    password: formData.password,
-                }
+                data: { email: values.email, password: values.password }
             });
 
             if (!result) throw new Error("Invalid credentials");
@@ -48,17 +29,15 @@ export function SignInForm(){
         },
     })
 
-
-    const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!formData.email || !formData.password) {
-            alert("All fields required!");
-            return;
-    }
-
-    SignInMutation.mutate();
-  }
+    const form = useForm({
+        defaultValues: {
+            email:'',
+            password:'',
+        },
+        onSubmit: ({value}) => {
+            SignInMutation.mutate(value);
+        }
+    })
 
     return(
         <div className="lg:max-w-105 max-w-86 flex flex-col items-center gap-4 my-auto relative z-10 lg:bg-transparent bg-foreground-primary lg:px-0 lg:py-0 px-7.5 py-5 lg:rounded-none rounded-4xl">
@@ -68,31 +47,80 @@ export function SignInForm(){
                     <h3 className="lg:leading-18.5 text-dark lg:text-[49px] lg:font-medium text-[35px] leading-13.25 font-normal">Sign in</h3>
                     <p className="text-foreground-dark text-center">Welcome back to Geotagger. We are glad that you are back.</p>
                 </div>
+            <form
+                className="flex flex-col gap-4 w-full"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    form.handleSubmit();
+                }}
+            >
+                <form.Field
+                    name="email"
+                    validators={{
+                        onChange: ({ value }) =>
+                            !value ? 'Email is required' :
+                            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? 'Invalid email address' :
+                            undefined,
+                    }}
+                    children={(field) => (
+                        <div className="flex flex-col gap-2">
+                            <p className="text-[12px] weight-[500]! text-dark lg:leading-[150%]">Email</p>
+                            <Input
+                                placeholder="example@net.com"
+                                type="email"
+                                value={field.state.value}
+                                onChange={(e) => field.handleChange(e.target.value)}
+                                onBlur={field.handleBlur}
+                            />
+                            {field.state.meta.errors[0] && (
+                                <p className="text-red-500 text-[11px]">{field.state.meta.errors[0]}</p>
+                            )}
+                        </div>
+                    )}
+                />
 
-             {/* Email input wrapper */}
+                <form.Field
+                    name="password"
+                    validators={{
+                        onChange: ({ value }) =>
+                            !value ? 'Password is required' : undefined,
+                    }}
+                    children={(field) => (
+                        <div className="flex flex-col gap-2">
+                            <p className="text-[12px] weight-[500]! leading-none text-dark lg:leading-[150%]">Password</p>
+                            <Input
+                                placeholder="••••••••••••••••"
+                                type="password"
+                                value={field.state.value}
+                                onChange={(e) => field.handleChange(e.target.value)}
+                                onBlur={field.handleBlur}
+                            />
+                            {field.state.meta.errors[0] && (
+                                <p className="text-red-500 text-[11px]">{field.state.meta.errors[0]}</p>
+                            )}
+                        </div>
+                    )}
+                />
 
-            <form className="flex flex-col gap-4 w-full" onSubmit={handleSubmit}>
-                <div className="flex flex-col gap-2">
-                    <p className="text-[12px] weight-[500]! text-dark lg:leading-[150%]">Email</p>
-                    <Input placeholder="example@net.com" type="email" name="email" onChange={handleInputChange}></Input>
-                </div>
-
-
-            {/* Password input wrapper */}
-
-                <div className="flex flex-col gap-2">
-                    <p className="text-[12px] weight-[500]! leading-none text-dark lg:leading-[150%]">Password</p>
-                    <Input placeholder="••••••••••••••••" type="password" name="password" onChange={handleInputChange}></Input>
-                </div>
-
-            <Button variant="outline" className="w-full" type="submit" disabled={SignInMutation.isPending}>{SignInMutation.isPending ? "Signing in..." : "Sign In"}</Button>
+                <form.Subscribe
+                    selector={(state) => [state.canSubmit, state.isSubmitting]}
+                    children={([canSubmit, isSubmitting]) => (
+                        <Button
+                            variant="outline"
+                            className="w-full"
+                            type="submit"
+                            disabled={!canSubmit || isSubmitting}
+                        >
+                            {isSubmitting ? "Signing in..." : "Sign In"}
+                        </Button>
+                    )}
+                />
 
                 <div className="flex justify-between items-center">
                     <p className="lg:leading-[150%]">Do you want to create an account?</p>
-                    <Link  to="/signup" className="text-primary text-[16px] font-normal text-nowrap">Sign up</Link>
+                    <Link to="/signup" className="text-primary text-[16px] font-normal text-nowrap">Sign up</Link>
                 </div>
             </form>
-
         </div>
     )
 }

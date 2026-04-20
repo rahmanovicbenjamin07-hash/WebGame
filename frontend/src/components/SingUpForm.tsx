@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useNavigate } from '@tanstack/react-router';
 import { Link } from '@tanstack/react-router';
 import ProfileImagePreview from "./ui/profileImagePreview";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation} from "@tanstack/react-query";
 
 interface SignUpFormState  {
   email: string,
