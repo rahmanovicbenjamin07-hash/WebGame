@@ -3,20 +3,13 @@ import CloseGuess  from "../components/ui/CloseGuess";
 import { Footer } from "./footer";
 import NewUploads from "../components/ui/NewUploads";
 import { NavigationSignedIn } from '../components/navigationSignedIn'
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { fetchUser } from "@/authentication/auth";
 import { GuessingTab } from "./GuessingTab";
 import { useIsMobile } from "@/utils/isMobile";
 import { fetchGuesses } from "@/utils/querys/guesses-query";
 import { useQuery,useQueryClient, useInfiniteQuery} from '@tanstack/react-query'
 import { fetchLocationsList } from "@/utils/querys/locations-query";
-
-interface userData {
-    email: string,
-    firstname:string,
-    id:number;
-    lastname:string,
-} 
 
 export function HeroHomeSignedIn(){
     const [open, setOpen] = useState(false);
@@ -70,17 +63,10 @@ export function HeroHomeSignedIn(){
     setOpen(true);
 }
 
-    const queryClient = useQueryClient();
-
-    const handleGuessSubmit = async () => {
-        if (!user) return;
-        await fetchGuesses(user.id);
-        queryClient.invalidateQueries({ queryKey: ['bestGuesses'] });
-    };
 
     return(   
         <>
-        <GuessingTab open={open} setOpen={setOpen} locationId={selectedLocationId} onGuessSumbit={handleGuessSubmit}/>
+        <GuessingTab open={open} setOpen={setOpen} locationId={selectedLocationId}/>
         <NavigationSignedIn/>
         <div className="relative lg:pb-26.5 pb-29">
         <div className="max-w-325 lg:mx-auto  mx-8.75 lg:mt-20.75 mt-0">

@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getDistance } from "geolib";
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog"
 import { InputNoBorder } from "./ui/inputNoBorder"
@@ -13,37 +12,28 @@ import {LocationPicker} from "../components/ui/MapLocationPicke"
 import { defaultIcon } from "./ui/MapDeafultsIcon"; 
 import { fetchUser } from "@/authentication/auth";
 import { getLocationName } from "@/utils/LocationName";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchLocation } from "@/utils/querys/locations-query";
-
-interface userData {
-    email: string,
-    firstname:string,
-    id:number;
-    lastname:string,
-}
 
 interface GuessingTabProps {
     open: boolean;
     setOpen: (open: boolean) => void;
     locationId: number | null;
-    onGuessSumbit: () => void;
 }
 
-export function GuessingTab({open,setOpen,locationId,onGuessSumbit}: GuessingTabProps) {
-    const [user, setUser] = useState<userData | null>(null);
+export function GuessingTab({open,setOpen,locationId}: GuessingTabProps) {
+    const queryClient = useQueryClient();
     const [lat, setLat] = useState<number>(0);
     const [lng, setLng] = useState<number>(0);
     const [missedMeters,setMissedMeter] = useState<string>("");
     const [locationName,setLocationName] = useState<string>("");
 
-    useEffect(()=>{
-        fetchUser().then((data) => {
-            if (data) {
-                setUser(data);
-            }
-        })
-    }, [])
+    const userQuery = useQuery({
+        queryKey:['user'],
+        queryFn:fetchUser,
+    })
+
+    const user = userQuery.data;
 
     const locationQuery = useQuery({
         queryKey: ['location', locationId],
@@ -59,19 +49,14 @@ export function GuessingTab({open,setOpen,locationId,onGuessSumbit}: GuessingTab
 
     const location = locationQuery.data;
 
-    const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
-        if (!location) return;        
-
-        const missMeters = getDistance(
-        { latitude: location.lat, longitude: location.lng },  
-        { latitude: lat, longitude: lng }                      
+    const guessMutation = useMutation({
+        mutationFn: async () => {
+            const missMeters = getDistance(
+            { latitude: location!.lat, longitude: location!.lng },  
+            { latitude: lat, longitude: lng }                      
         );
-        setMissedMeter(JSON.stringify(missMeters)+"m");
-        try {
 
-        const res = await fetch(`http://localhost:3001/guess/${user?.id}` , { 
+        const response = await fetch(`http://localhost:3001/guess/${user?.id}` , { 
             method:"POST",
             headers:{
                     "Content-Type": "application/json",
@@ -83,16 +68,24 @@ export function GuessingTab({open,setOpen,locationId,onGuessSumbit}: GuessingTab
                 missMeters:missMeters
                 }),
           });
-          const result = await res.json();
-          if(res.ok){
-                console.log(result);  
-                onGuessSumbit(); 
-            }
-          }catch (error) {
-          console.error(error);
-        }
 
-        
+          const result = await response.json();
+            if (!response.ok) throw new Error(result.error || "Guess failed");
+            return { result, missMeters };
+        },
+        onSuccess: ({missMeters}) => {
+            queryClient.invalidateQueries({ queryKey: ['bestGuesses'] });
+            setMissedMeter(JSON.stringify(missMeters) + "m");
+        },
+        onError: (error) => {
+            console.error(error);
+        },
+    })
+
+    const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (!location) return;        
+        guessMutation.mutate();
     }
 
   return (
@@ -127,9 +120,9 @@ export function GuessingTab({open,setOpen,locationId,onGuessSumbit}: GuessingTab
                                 <InputNoBorder value={locationName} readOnly className="lg:w-auto w-full"/>
                             </div>
                         </div>
-                        <DialogFooter>
-                            <Button type="submit" className="lg:w-34.25 w-full">Guess</Button>
-                        </DialogFooter>
+                        <Button type="submit" className="lg:w-34.25 w-full" disabled={guessMutation.isPending}>
+                            {guessMutation.isPending ? "Guessing..." : "Guess"}
+                        </Button>
                     </form>
                 </div>
             </div>      
