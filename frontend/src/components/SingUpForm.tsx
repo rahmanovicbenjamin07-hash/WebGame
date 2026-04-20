@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useNavigate } from '@tanstack/react-router';
 import { Link } from '@tanstack/react-router';
 import ProfileImagePreview from "./ui/profileImagePreview";
+import { useMutation } from "@tanstack/react-query";
 
 interface SignUpFormState  {
   email: string,
@@ -40,16 +41,37 @@ export function SignUpForm(){
         setFormData(prevData => ({...prevData,[name]:value}))
     }
     
+    const SignUpMutation = useMutation({
+        mutationFn: async () => {
+            const data = new FormData();
+            data.append("email", formData.email);
+            data.append("password", formData.password);
+            data.append("firstname", formData.firstname);
+            data.append("lastname", formData.lastname);
+            if (avatar) data.append("avatar", avatar);
+        
+            const response = await fetch("http://localhost:3001/user/signup", {
+                method: "POST",
+                body: data,
+            });
+
+            if (!response.ok) throw new Error("Sign up failed");
+            return response.json();
+
+        },
+        onSuccess: () => {
+            navigate({ to: '/home/signed-in' });
+        },
+        onError: (error) => {
+            alert(error.message);
+        },    
+    })
+
+
+
     const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
         
-        const data = new FormData();
-        data.append("email", formData.email);
-        data.append("password", formData.password);
-        data.append("firstname", formData.firstname);
-        data.append("lastname", formData.lastname);
-        if (avatar) data.append("avatar", avatar);
-
         if (formData.password.length < 8) {
         alert("Password must be at least 8 characters!");
         return;
@@ -60,23 +82,7 @@ export function SignUpForm(){
         return;
     }            
 
-        try {
-
-            const response = await fetch("http://localhost:3001/user/signup", {
-                method:"POST",
-                body: data,
-            })
-
-            const result = await response.json();
-
-            if(response.ok){
-                console.log(result);
-                navigate({ to: '/home/signed-in' }); 
-            }
-          
-        }catch (error) {
-          console.error(error);
-        }
+       SignUpMutation.mutate();
       }
 
     
