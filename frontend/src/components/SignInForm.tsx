@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useNavigate } from '@tanstack/react-router';
 import { Link } from '@tanstack/react-router';
 import { signIn } from "@/authentication/auth";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface SignUpFormState  {
   email: string;
@@ -11,8 +12,8 @@ interface SignUpFormState  {
 }
 
 export function SignInForm(){
-
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
     const [formData,setFormData] = useState<SignUpFormState>({
         email:"",
@@ -25,30 +26,38 @@ export function SignInForm(){
         setFormData(prevData => ({...prevData,[name]:value}))
     }
 
+    const SignInMutation = useMutation({
+        mutationFn: async () => {
+            
+            const result = await (signIn as any)({
+                data: {
+                    email: formData.email,
+                    password: formData.password,
+                }
+            });
+
+            if (!result) throw new Error("Invalid credentials");
+            return result;    
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['user'] });
+            navigate({ to: '/home/signed-in' });
+        },
+        onError: (error) => {
+            alert(error.message);
+        },
+    })
+
+
     const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!formData.email || !formData.password) {
-        alert("All fields required!");
-        return;
+            alert("All fields required!");
+            return;
     }
 
-    try {
-        const result = await (signIn as any)({ 
-    data: { 
-        email: formData.email, 
-        password: formData.password,
-    } 
-})
-
-        if (result) {
-            await navigate({ to: '/home/signed-in' });
-        } else {
-            alert("Invalid credentials");
-        }
-    } catch (error) {
-        console.error(error);
-    }
+    SignInMutation.mutate();
   }
 
     return(
