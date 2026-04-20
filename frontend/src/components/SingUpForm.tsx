@@ -146,7 +146,7 @@ export function SignUpForm(){
                     <Input placeholder="••••••••••••••••" type="password" name="confirmpassword" onChange={handleInputChange}></Input>
                 </div>
 
-            <Button className="w-full" type="submit">Sign Up</Button>
+            <Button className="w-full" type="submit" disabled={SignUpMutation.isPending}>{SignUpMutation.isPending ? "Signing up..." : "Sign Up"}</Button>
 
                 <div className="flex justify-between items-center">
                     <p className="leading-6">Already have an account?</p>
