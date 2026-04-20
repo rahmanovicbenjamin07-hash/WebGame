@@ -1,4 +1,4 @@
-import { useState,useEffect } from "react";
+import { useState } from "react";
 import Logo from "../assets/Logo.png";
 import { Link } from '@tanstack/react-router';
 import ProfileImage from "../assets/ProfileImageSmall.png";
@@ -8,65 +8,58 @@ import { fetchUser } from "@/authentication/auth";
 import arrowDark from "../assets/ArrowBlack.svg"
 import arrowGradient from "../assets/ArrowGradient.svg"
 import { fetchUserAvatar } from "@/utils/querys/user-query";
-import { useQuery } from "@tanstack/react-query";
-
-interface userData {
-    email: string,
-    firstname:string,
-    id:number;
-    lastname:string,
-} 
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function NavigationSignedIn(){
-    const [openMenu, setOpenMenu] = useState<boolean>(false);
-    const [user,setUser] = useState<userData| null>(null);
-
+    const [openMenu, setOpenMenu] = useState<boolean>(false);;
+    const queryClient = useQueryClient();
     const navigate = useNavigate();
 
-    useEffect(()=>{
-        fetchUser().then((data) => {
-            if (data) {
-                setUser(data);
-            }
-        });
-    },[])
-    
+    const userQuery = useQuery({
+        queryKey: ['user'],
+        queryFn: fetchUser,
+    });
 
-    const handleLogOut = async (e: React.MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
+    const user = userQuery.data;
 
-        try {
-
+    const userAvatarQuery = useQuery({
+    queryKey:['userAvatar'],
+    queryFn: async () => await fetchUserAvatar(user?.id!),
+    enabled: !!user?.id
+    })   
+   
+    const logOutMutation = useMutation({
+        mutationFn: async () => {
             const response = await fetch("http://localhost:3001/user/signout", {
                 method:"POST",
                 credentials: "include",
             })
 
-            const result = await response.json();
+            if (!response.ok) throw new Error("Sign out failed");
+            return response.json();
+        },
 
-            if(response.ok){
-                console.log(result);
-                navigate({ to: '/home' }); 
-            }
-        } catch (err) {
-            console.log(err);
-        }
-    }
-    
-        
-    const userQuery = useQuery({
-    queryKey:['userAvatar'],
-    queryFn: async () => await fetchUserAvatar(user?.id!),
-    enabled: !!user?.id
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['user'] });
+            navigate({ to: '/home' });
+        },
+        onError: (error) => {
+            console.error("Logout failed:", error.message);
+        },
     })
 
-    const userAvatar = userQuery.data;
+    const handleLogOut = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        logOutMutation.mutate();
+    };
+    
+    const userAvatar = userAvatarQuery.data;
 
-    if(userQuery.isError){
-    return <p>{userQuery.error.message}</p>
+    if(userAvatarQuery.isError){
+    return <p>{userAvatarQuery.error.message}</p>
   }
 
-    if(userQuery.isPending) {
+    if(userAvatarQuery.isPending) {
     return <p>Loading...</p>
     }
 
