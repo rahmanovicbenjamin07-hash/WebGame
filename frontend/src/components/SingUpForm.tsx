@@ -5,14 +5,8 @@ import { useNavigate } from '@tanstack/react-router';
 import { Link } from '@tanstack/react-router';
 import ProfileImagePreview from "./ui/profileImagePreview";
 import { useMutation} from "@tanstack/react-query";
-
-interface SignUpFormState  {
-  email: string,
-  firstname:string,
-  lastname:string,
-  password: string,
-  confirmpassword:string,
-}
+import { useForm } from "@tanstack/react-form";
+import { z } from "zod";
 
 const isMobile = window.innerWidth < 1024;
 
@@ -20,14 +14,7 @@ export function SignUpForm(){
     const navigate = useNavigate();
     const [avatar, setAvatar] = useState<File | null>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-    const [formData,setFormData] = useState<SignUpFormState>({
-            email:"",
-            firstname:"",
-            lastname:"",
-            password:"",
-            confirmpassword:"",         
-        })
-    
+  
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -35,19 +22,16 @@ export function SignUpForm(){
         setAvatarPreview(URL.createObjectURL(file));
         }
     };    
-
-    const handleInputChange = (e:React.ChangeEvent<HTMLInputElement>) => {
-        const {name,value} = e.target;
-        setFormData(prevData => ({...prevData,[name]:value}))
-    }
-    
+  
     const SignUpMutation = useMutation({
-        mutationFn: async () => {
+        mutationFn: async (values: { email: string; firstname: string; lastname: string; password: string; confirmpassword: string;}) => {
+            
             const data = new FormData();
-            data.append("email", formData.email);
-            data.append("password", formData.password);
-            data.append("firstname", formData.firstname);
-            data.append("lastname", formData.lastname);
+
+            data.append("email", values.email);
+            data.append("password", values.password);
+            data.append("firstname", values.firstname);
+            data.append("lastname", values.lastname);
             if (avatar) data.append("avatar", avatar);
         
             const response = await fetch("http://localhost:3001/user/signup", {
@@ -67,25 +51,27 @@ export function SignUpForm(){
         },    
     })
 
-
-
-    const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        
-        if (formData.password.length < 8) {
-        alert("Password must be at least 8 characters!");
-        return;
-    }
-
-        if (formData.password !== formData.confirmpassword) {
-        alert("Passwords must be same!");
-        return;
-    }            
-
-       SignUpMutation.mutate();
-      }
-
-    
+    const form = useForm({
+        defaultValues: {
+            email:'',
+            firstname:'',
+            lastname:'',
+            password:'',
+            confirmpassword:'',
+        },
+        validators: {
+            onChange: z.object({
+                email: z.string().email(),
+                firstname: z.string(),
+                lastname: z.string(),
+                password: z.string(),
+                confirmpassword: z.string().min(1, "Password is required"),
+            }),
+        },
+        onSubmit: ({value}) => {
+            SignUpMutation.mutate(value);
+        }
+    })
 
     return (
         <div className="lg:max-w-105 max-w-86 flex flex-col items-center gap-4 my-auto relative z-10 lg:bg-transparent bg-foreground-primary lg:px-0 lg:py-0 px-7.5 py-5 lg:rounded-none rounded-4xl">
@@ -112,45 +98,154 @@ export function SignUpForm(){
                     className="hidden h-16 w-16"
                 />
 
+            
+            <form
+                className="flex flex-col gap-4"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    form.handleSubmit();
+                }}
+            >
+                {/* Email */}
+                <form.Field
+                    name="email"
+                    validators={{
+                        onChange: z.string().email('Invalid email address'),
+                    }}
+                    children={(field) => (
+                        <div className="flex flex-col gap-2">
+                            <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Email</p>
+                            <Input
+                                placeholder="example@net.com"
+                                type="email"
+                                value={field.state.value}
+                                onChange={(e) => field.handleChange(e.target.value)}
+                                onBlur={field.handleBlur}
+                            />
+                            {field.state.meta.errors[0] && (
+                                <p className="text-red-500 text-[11px]">{field.state.meta.errors[0].message}</p>
+                            )}
+                        </div>
+                    )}
+                />
 
-            <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-                <div className="flex flex-col gap-2">
-                    <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Email</p>
-                    <Input placeholder="example@net.com" type="email" name="email" onChange={handleInputChange}></Input>
-                </div>
-
-            {/* Name input wrapper */}
-
+                {/* First name + Last name */}
                 <div className="flex gap-4">
-                    <div className="flex flex-col gap-2">
-                        <p className="text-[12px] weight-[500]! leading-[150%] text-dark">First Name</p>
-                        <Input placeholder="Jacob" name="firstname" onChange={handleInputChange}></Input>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Last Name</p>
-                        <Input placeholder="Jones" name="lastname" onChange={handleInputChange}></Input>
-                    </div>
+                    <form.Field
+                        name="firstname"
+                        validators={{
+                            onChange: z.string().min(1, 'First name is required'),
+                        }}
+                        children={(field) => (
+                            <div className="flex flex-col gap-2">
+                                <p className="text-[12px] weight-[500]! leading-[150%] text-dark">First Name</p>
+                                <Input
+                                    placeholder="Jacob"
+                                    value={field.state.value}
+                                    onChange={(e) => field.handleChange(e.target.value)}
+                                    onBlur={field.handleBlur}
+                                />
+                                {field.state.meta.errors[0] && (
+                                    <p className="text-red-500 text-[11px]">{field.state.meta.errors[0].message}</p>
+                                )}
+                            </div>
+                        )}
+                    />
+                    <form.Field
+                        name="lastname"
+                        validators={{
+                            onChange: z.string().min(1, 'Last name is required'),
+                        }}
+                        children={(field) => (
+                            <div className="flex flex-col gap-2">
+                                <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Last Name</p>
+                                <Input
+                                    placeholder="Jones"
+                                    value={field.state.value}
+                                    onChange={(e) => field.handleChange(e.target.value)}
+                                    onBlur={field.handleBlur}
+                                />
+                                {field.state.meta.errors[0] && (
+                                    <p className="text-red-500 text-[11px]">{field.state.meta.errors[0].message}</p>
+                                )}
+                            </div>
+                        )}
+                    />
                 </div>
 
-            {/* Password input wrapper */}
+                {/* Password */}
+                <form.Field
+                    name="password"
+                    validators={{
+                        onChange: z.string().min(8, 'Password must be at least 8 characters'),
+                    }}
+                    children={(field) => (
+                        <div className="flex flex-col gap-2">
+                            <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Password</p>
+                            <Input
+                                placeholder="••••••••••••••••"
+                                type="password"
+                                value={field.state.value}
+                                onChange={(e) => field.handleChange(e.target.value)}
+                                onBlur={field.handleBlur}
+                            />
+                            {field.state.meta.errors[0] && (
+                                <p className="text-red-500 text-[11px]">{field.state.meta.errors[0].message}</p>
+                            )}
+                        </div>
+                    )}
+                />
 
-                <div className="flex flex-col gap-2">
-                    <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Password</p>
-                    <Input placeholder="••••••••••••••••" type="password" name="password" onChange={handleInputChange}></Input>
-                </div>
+                {/* Confirm password */}
+                <form.Field
+                    name="confirmpassword"
+                    validators={{
+                        onChangeListenTo: ['password'],
+                        onChange: ({ value, fieldApi }) => {
+                            const parsed = z.string().min(1, 'Please confirm your password').safeParse(value);
+                            if (!parsed.success) return parsed.error.issues[0].message;
+                            if (value !== fieldApi.form.getFieldValue('password')) return 'Passwords must match';
+                            return undefined;
+                        },
+                    }}
+                    children={(field) => (
+                        <div className="flex flex-col gap-2">
+                            <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Confirm password</p>
+                            <Input
+                                placeholder="••••••••••••••••"
+                                type="password"
+                                value={field.state.value}
+                                onChange={(e) => field.handleChange(e.target.value)}
+                                onBlur={field.handleBlur}
+                            />
+                            {field.state.meta.errors[0] && (
+                                <p className="text-red-500 text-[11px]">
+                                    {typeof field.state.meta.errors[0] === 'string' 
+                                    ? field.state.meta.errors[0] 
+                                    : field.state.meta.errors[0].message}
+                                </p>
+                            )}
+                        </div>
+                    )}
+                />
 
-            {/* Confirm password input wrapper */}
-
-                <div className="flex flex-col gap-2">
-                    <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Confirm password</p>
-                    <Input placeholder="••••••••••••••••" type="password" name="confirmpassword" onChange={handleInputChange}></Input>
-                </div>
-
-            <Button className="w-full" type="submit" disabled={SignUpMutation.isPending}>{SignUpMutation.isPending ? "Signing up..." : "Sign Up"}</Button>
+                {/* Submit */}
+                <form.Subscribe
+                    selector={(state) => [state.canSubmit, state.isSubmitting]}
+                    children={([canSubmit, isSubmitting]) => (
+                        <Button
+                            className="w-full"
+                            type="submit"
+                            disabled={!canSubmit || isSubmitting}
+                        >
+                            {isSubmitting ? "Signing up..." : "Sign Up"}
+                        </Button>
+                    )}
+                />
 
                 <div className="flex justify-between items-center">
                     <p className="leading-6">Already have an account?</p>
-                    <Link  to="/signin" className="text-primary text-[16px] font-normal">Sign in</Link>
+                    <Link to="/signin" className="text-primary text-[16px] font-normal">Sign in</Link>
                 </div>
             </form>
         </div>
