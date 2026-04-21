@@ -7,7 +7,7 @@ interface userData {
   id: number
   lastname: string
 }
-
+/*
 export const fetchUser = createServerFn({ method: 'GET' }).handler(async () => {
   const req = getRequest()
   const cookieHeader = req.headers.get('Cookie')
@@ -46,3 +46,4 @@ export const signIn = createServerFn({ method: 'POST' }).handler(async (ctx: any
 
   return await res.json()
 })
+*/
