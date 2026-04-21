@@ -5,6 +5,7 @@ import { Link } from '@tanstack/react-router';
 import { signIn } from "@/authentication/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
+import { z } from "zod";
 
 export function SignInForm(){
     const navigate = useNavigate();
@@ -34,6 +35,12 @@ export function SignInForm(){
             email:'',
             password:'',
         },
+        validators: {
+            onChange: z.object({
+                email: z.string().email(),
+                password: z.string().min(1, "Password is required"),
+            }),
+        },
         onSubmit: ({value}) => {
             SignInMutation.mutate(value);
         }
@@ -55,13 +62,7 @@ export function SignInForm(){
                 }}
             >
                 <form.Field
-                    name="email"
-                    validators={{
-                        onChange: ({ value }) =>
-                            !value ? 'Email is required' :
-                            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? 'Invalid email address' :
-                            undefined,
-                    }}
+                    name="email"                    
                     children={(field) => (
                         <div className="flex flex-col gap-2">
                             <p className="text-[12px] weight-[500]! text-dark lg:leading-[150%]">Email</p>
@@ -72,8 +73,10 @@ export function SignInForm(){
                                 onChange={(e) => field.handleChange(e.target.value)}
                                 onBlur={field.handleBlur}
                             />
-                            {field.state.meta.errors[0] && (
-                                <p className="text-red-500 text-[11px]">{field.state.meta.errors[0]}</p>
+                            {field.state.meta.errors?.[0]?.message && (
+                                    <p className="text-red-500 text-[11px]">
+                                    {field.state.meta.errors[0].message}
+                                </p>
                             )}
                         </div>
                     )}
@@ -81,10 +84,6 @@ export function SignInForm(){
 
                 <form.Field
                     name="password"
-                    validators={{
-                        onChange: ({ value }) =>
-                            !value ? 'Password is required' : undefined,
-                    }}
                     children={(field) => (
                         <div className="flex flex-col gap-2">
                             <p className="text-[12px] weight-[500]! leading-none text-dark lg:leading-[150%]">Password</p>
@@ -95,8 +94,10 @@ export function SignInForm(){
                                 onChange={(e) => field.handleChange(e.target.value)}
                                 onBlur={field.handleBlur}
                             />
-                            {field.state.meta.errors[0] && (
-                                <p className="text-red-500 text-[11px]">{field.state.meta.errors[0]}</p>
+                            {field.state.meta.errors?.[0]?.message && (
+                                <p className="text-red-500 text-[11px]">
+                                    {field.state.meta.errors[0].message}
+                                </p>
                             )}
                         </div>
                     )}
