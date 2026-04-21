@@ -3,26 +3,27 @@ import { Button } from "../components/ui/button";
 import { useNavigate } from '@tanstack/react-router';
 import { Link } from '@tanstack/react-router';
 import { signIn } from "@/authentication/auth";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation} from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
+import { setStoredUser, type User } from "@/authentication/userContext";
+
+type LoginResponse = {
+    data: User,
+    message:string
+}
 
 export function SignInForm(){
     const navigate = useNavigate();
-    const queryClient = useQueryClient();
 
     const SignInMutation = useMutation({
-        mutationFn: async (values: { email: string; password: string }) => {
-            
-            const result = await (signIn as any)({
-                data: { email: values.email, password: values.password }
-            });
-
+        mutationFn: async (values: { email: string; password: string }) => {           
+            const result = await signIn({email: values.email, password: values.password });
             if (!result) throw new Error("Invalid credentials");
             return result;    
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['user'] });
+        onSuccess: (response: LoginResponse) => {
+            setStoredUser(response.data)
             navigate({ to: '/home/signed-in' });
         },
         onError: (error) => {

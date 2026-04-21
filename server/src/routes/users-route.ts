@@ -190,7 +190,8 @@ usersRoute.post("/signin", async (c) => {
     domain: "localhost",
   });
 
-    return c.json({ message: "Signed in successfully" });
+
+    return c.json({ message: "Signed in successfully", data: { email: user.email ,firstname: user.firstname, lastname: user.lastname, id: user.id} });
 })
 
 {/* "Security" route to redirect */}

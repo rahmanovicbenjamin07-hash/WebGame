@@ -4,12 +4,16 @@ import { ClosesGuesesProfile } from '@/components/ProfileBestGuess'
 import { NewLocationForm } from '@/components/newLoactionForm'
 import { NavigationSignedIn } from '@/components/navigationSignedIn'
 import { Footer } from '@/components/footer'
+import { useUser } from '@/authentication/userContext'
 
 export const Route = createFileRoute('/_authenticated/profile')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const user = useUser();
+  console.log(user)
+
   return (
     <div className="relative md:px-8.75 h-full">
       <div className="max-w-325 mx-auto ">

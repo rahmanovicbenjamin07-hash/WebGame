@@ -1,49 +1,55 @@
-import { createServerFn } from '@tanstack/react-start'
-import { getRequest, setResponseHeader } from '@tanstack/react-start/server'
-
 interface userData {
   email: string
   firstname: string
   id: number
   lastname: string
 }
-/*
-export const fetchUser = createServerFn({ method: 'GET' }).handler(async () => {
-  const req = getRequest()
-  const cookieHeader = req.headers.get('Cookie')
 
-  if (!cookieHeader) return null
+export interface SignInInput {
+  email: string
+  password: string
+}
 
+
+export const fetchUser = async () => {
   try {
     const res = await fetch('http://localhost:3001/user/me', {
-      headers: { Cookie: cookieHeader },
+      method: 'GET',
+      credentials: 'include',
     })
 
-    if (!res.ok) return null
-    const data = await res.json()
-    return data.user as userData
-  } catch (e) {
+    if (!res.ok) {
+      throw new Error('Failed to fetch user')
+    }
+
+    const data = (await res.json()) as { user: userData }
+
+    return data.user
+  } catch (error) {
+    console.error(error)
     return null
   }
-})
+}
 
-export const signIn = createServerFn({ method: 'POST' }).handler(async (ctx: any) => {
-  const data = ctx.data as { email: string; password: string }
+export const signIn = async (data: SignInInput) => {
+  try {
+    const res = await fetch('http://localhost:3001/user/signin', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(data),
+    })
 
-  const res = await fetch('http://localhost:3001/user/signin', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  })
+    if (!res.ok) {
+      throw new Error('Invalid credentials')
+    }
 
-  if (!res.ok) return null
-
-  const setCookieHeader = res.headers.get('set-cookie')
-  
-  if (setCookieHeader) {
-    setResponseHeader('set-cookie', setCookieHeader)
+    return await res.json()
+  } catch (error) {
+    console.error(error)
+    return null
   }
+}
 
-  return await res.json()
-})
-*/
