@@ -4,6 +4,8 @@ import BgImage from '../assets/SignUpPageImage.png'
 import Logo from '../assets/Logo.png'
 import { NavigationSignedOut } from '@/components/navigationSignedOut'
 
+{/* Solve the problem of redirecting to this page after the refresh */}
+
 export const Route = createFileRoute('/signin')({
   component: SingInPage,
 })

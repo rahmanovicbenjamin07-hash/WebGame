@@ -23,7 +23,7 @@ usersRoute.get('/', async (c) => {
 {/* Sign up route */}
 
 usersRoute.post("/signup", async (c) => {
-    const body = await c.req.parseBody();
+    const body = await c.req.json();
     const firstname = body["firstname"] as string;
     const lastname = body["lastname"] as string;
     const email = body["email"] as string;
@@ -75,7 +75,8 @@ usersRoute.get("/me", authMiddleware, async (c) => {
             id: usersTable.id,
             email: usersTable.email,
             firstname: usersTable.firstname,
-            lastname: usersTable.lastname
+            lastname: usersTable.lastname,
+            image: usersTable.image,
         })
         .from(usersTable)
         .where(eq(usersTable.id, tokenData.userId));

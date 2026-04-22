@@ -18,10 +18,13 @@ const UserContext = createContext<UserContextType | undefined>(undefined)
 
 const key = 'tanstack.auth.user'
 
-export function getStoredUser() {
-
-  const stored = localStorage.getItem(key);
-  return stored ? JSON.parse(stored) : null;
+export function getStoredUser(): User | null {
+  try {
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : null;
+  } catch {
+    return null;
+  }
 }
 
 export function setStoredUser(user: User | null) {

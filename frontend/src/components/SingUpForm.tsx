@@ -8,6 +8,7 @@ import { useMutation} from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
 import { signUpSchema} from '@/schemas/SignUpSchema';
 import { FieldError } from "./ui/FieldError";
+import { sha256Hex } from "@/lib/crypto";
 
 const isMobile = window.innerWidth < 1024;
 
@@ -21,29 +22,38 @@ export function SignUpForm(){
     if (file) {
         setAvatar(file);
         setAvatarPreview(URL.createObjectURL(file));
-        }
+        }   
     };    
   
     const SignUpMutation = useMutation({
         mutationFn: async (values: { email: string; firstname: string; lastname: string; password: string; confirmpassword: string;}) => {
-            
-            const data = new FormData();
 
-            data.append("email", values.email);
-            data.append("password", values.password);
-            data.append("firstname", values.firstname);
-            data.append("lastname", values.lastname);
-            if (avatar) data.append("avatar", avatar);
-        
+            let avatarBase64: string | null = null;
+                if (avatar) {
+                    avatarBase64 = await new Promise<string>((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result as string);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(avatar);
+                });
+            }
+
             const response = await fetch("http://localhost:3001/user/signup", {
-                method: "POST",
-                body: data,
-            });
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                ...values,
+                avatar: avatarBase64, 
+                avatarName: avatar?.name,
+                avatarType: avatar?.type,
+                password: sha256Hex(values.password),
+                confirmpassword: sha256Hex(values.confirmpassword) ,
+            }),
+        });
 
-            if (!response.ok) throw new Error("Sign up failed");
-            return response.json();
-
-        },
+        if (!response.ok) throw new Error("Sign up failed");
+        return response.json();
+    },
         onSuccess: () => {
             navigate({ to: '/home/signed-in' });
         },

@@ -46,14 +46,11 @@ export function HeroHomeSignedIn(){
     enabled: !!user?.id
     })
 
-    /*Query error handling*/
 
     if (query.isError) return <p>{query.error.message}</p>;
     if (isLocationsError) return <p>{locationsError.message}</p>;
-
     if (isLocationsPending || (query.isPending && !!user?.id)) return <p>Loading...</p>;
 
-    /*Query error handling*/
 
     const guesses = query.data || [];
     const locations = locationsData?.pages.flat() || [];
@@ -62,7 +59,6 @@ export function HeroHomeSignedIn(){
     setSelectedLocationId(id);
     setOpen(true);
 }
-
 
     return(   
         <>

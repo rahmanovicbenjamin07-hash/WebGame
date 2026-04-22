@@ -1,9 +1,11 @@
-import { HeadContent, Scripts, createRootRoute, createRootRouteWithContext } from '@tanstack/react-router'
+import { HeadContent, Scripts, createRootRouteWithContext } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import appCss from '../styles.css?url'
 import { UserProvider, type UserContextType } from '@/authentication/userContext'
+import { fetchUser } from '@/authentication/auth'
+import { Toaster } from "@/components/ui/sonner"
 
 const queryClient = new QueryClient()
 
@@ -11,6 +13,15 @@ export const Route = createRootRouteWithContext<{
       queryClient:QueryClient,
       auth: UserContextType | null;
 }>()({
+  beforeLoad: async () => {
+  const user = await fetchUser().catch(() => null)  
+  return {
+    auth: {
+      isAuthenticated: !!user,
+      user,
+    }
+  }
+},
   head: () => ({
     meta: [
       {
@@ -44,6 +55,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         </head>
         <body>
             {children}
+            <Toaster />
             <TanStackDevtools
               config={{
                 position: 'bottom-right',
