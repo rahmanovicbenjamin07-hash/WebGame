@@ -7,6 +7,7 @@ import ProfileImagePreview from "./ui/profileImagePreview";
 import { useMutation} from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
 import { signUpSchema} from '@/schemas/SignUpSchema';
+import { FieldError } from "./ui/FieldError";
 
 const isMobile = window.innerWidth < 1024;
 
@@ -113,9 +114,7 @@ export function SignUpForm(){
                                 onChange={(e) => field.handleChange(e.target.value)}
                                 onBlur={field.handleBlur}
                             />
-                            {field.state.meta.errors[0] && (
-                                <p className="text-red-500 text-[11px]">{field.state.meta.errors[0].message}</p>
-                            )}
+                            <FieldError errors={field.state.meta.errors} />
                         </div>
                     )}
                 />
@@ -133,9 +132,7 @@ export function SignUpForm(){
                                     onChange={(e) => field.handleChange(e.target.value)}
                                     onBlur={field.handleBlur}
                                 />
-                                {field.state.meta.errors[0] && (
-                                    <p className="text-red-500 text-[11px]">{field.state.meta.errors[0].message}</p>
-                                )}
+                                <FieldError errors={field.state.meta.errors} />
                             </div>
                         )}
                     />
@@ -150,9 +147,7 @@ export function SignUpForm(){
                                     onChange={(e) => field.handleChange(e.target.value)}
                                     onBlur={field.handleBlur}
                                 />
-                                {field.state.meta.errors[0] && (
-                                    <p className="text-red-500 text-[11px]">{field.state.meta.errors[0].message}</p>
-                                )}
+                                <FieldError errors={field.state.meta.errors} />
                             </div>
                         )}
                     />
@@ -171,9 +166,7 @@ export function SignUpForm(){
                                 onChange={(e) => field.handleChange(e.target.value)}
                                 onBlur={field.handleBlur}
                             />
-                            {field.state.meta.errors[0] && (
-                                <p className="text-red-500 text-[11px]">{field.state.meta.errors[0].message}</p>
-                            )}
+                                <FieldError errors={field.state.meta.errors} />
                         </div>
                     )}
                 />
@@ -191,13 +184,7 @@ export function SignUpForm(){
                                 onChange={(e) => field.handleChange(e.target.value)}
                                 onBlur={field.handleBlur}
                             />
-                            {field.state.meta.errors[0] && (
-                                <p className="text-red-500 text-[11px]">
-                                    {typeof field.state.meta.errors[0] === 'string' 
-                                    ? field.state.meta.errors[0] 
-                                    : field.state.meta.errors[0].message}
-                                </p>
-                            )}
+                            <FieldError errors={field.state.meta.errors} />
                         </div>
                     )}
                 />

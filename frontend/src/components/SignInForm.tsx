@@ -5,9 +5,9 @@ import { Link } from '@tanstack/react-router';
 import { signIn } from "@/authentication/auth";
 import { useMutation} from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
-import { z } from "zod";
 import { setStoredUser, type User } from "@/authentication/userContext";
 import { signInSchema } from '@/schemas/SignInSchema';
+import { FieldError } from "./ui/FieldError";
 
 type LoginResponse = {
     data: User,
@@ -72,11 +72,7 @@ export function SignInForm(){
                                 onChange={(e) => field.handleChange(e.target.value)}
                                 onBlur={field.handleBlur}
                             />
-                            {field.state.meta.errors?.[0]?.message && (
-                                    <p className="text-red-500 text-[11px]">
-                                    {field.state.meta.errors[0].message}
-                                </p>
-                            )}
+                            <FieldError errors={field.state.meta.errors} />
                         </div>
                     )}
                 />
@@ -93,11 +89,7 @@ export function SignInForm(){
                                 onChange={(e) => field.handleChange(e.target.value)}
                                 onBlur={field.handleBlur}
                             />
-                            {field.state.meta.errors?.[0]?.message && (
-                                <p className="text-red-500 text-[11px]">
-                                    {field.state.meta.errors[0].message}
-                                </p>
-                            )}
+                            <FieldError errors={field.state.meta.errors} />
                         </div>
                     )}
                 />
