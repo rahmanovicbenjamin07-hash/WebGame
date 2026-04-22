@@ -14,6 +14,7 @@ import { fetchUser } from "@/authentication/auth";
 import { getLocationName } from "@/utils/LocationName";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchLocation } from "@/utils/querys/locations-query";
+import { toast } from "sonner"
 
 interface GuessingTabProps {
     open: boolean;
@@ -77,8 +78,8 @@ export function GuessingTab({open,setOpen,locationId}: GuessingTabProps) {
             queryClient.invalidateQueries({ queryKey: ['bestGuesses'] });
             setMissedMeter(JSON.stringify(missMeters) + "m");
         },
-        onError: (error) => {
-            console.error(error);
+        onError: (error: Error) => {
+            toast.error(error.message)
         },
     })
 
