@@ -25,10 +25,10 @@ export const fetchLocations = async (limit:number) => {
     return data;
 }
 
-export const fetchLocationsList = async ({ pageParam = 0, limit=9 }: LocationsList) => {
+export const fetchLocationsList = async ({ pageParam = 0, limit = 9 }: LocationsList): Promise<NewUpload[]> => {
     const res = await fetch(`http://localhost:3001/location/new?offset=${pageParam}&limit=${limit}`)
     if (!res.ok) throw new Error("Failed to fetch locations");
-    return res.json() as Promise<NewUpload[]>;
+    return res.json();
 }
 
 export const fetchLocation = async (locationId: number) => {
