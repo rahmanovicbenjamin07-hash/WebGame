@@ -7,6 +7,7 @@ import { useMutation} from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 import { setStoredUser, type User } from "@/authentication/userContext";
+import { signInSchema } from '@/schemas/SignInSchema';
 
 type LoginResponse = {
     data: User,
@@ -37,10 +38,7 @@ export function SignInForm(){
             password:'',
         },
         validators: {
-            onChange: z.object({
-                email: z.string().email(),
-                password: z.string().min(1, "Password is required"),
-            }),
+            onChange: signInSchema,
         },
         onSubmit: ({value}) => {
             SignInMutation.mutate(value);
