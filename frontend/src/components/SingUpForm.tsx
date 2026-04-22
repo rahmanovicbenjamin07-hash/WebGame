@@ -6,7 +6,7 @@ import { Link } from '@tanstack/react-router';
 import ProfileImagePreview from "./ui/profileImagePreview";
 import { useMutation} from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
-import { z } from "zod";
+import { signUpSchema} from '@/schemas/SignUpSchema';
 
 const isMobile = window.innerWidth < 1024;
 
@@ -60,13 +60,7 @@ export function SignUpForm(){
             confirmpassword:'',
         },
         validators: {
-            onChange: z.object({
-                email: z.string().email(),
-                firstname: z.string(),
-                lastname: z.string(),
-                password: z.string(),
-                confirmpassword: z.string().min(1, "Password is required"),
-            }),
+            onChange: signUpSchema,
         },
         onSubmit: ({value}) => {
             SignUpMutation.mutate(value);
