@@ -109,9 +109,6 @@ export function SignUpForm(){
                 {/* Email */}
                 <form.Field
                     name="email"
-                    validators={{
-                        onChange: z.string().email('Invalid email address'),
-                    }}
                     children={(field) => (
                         <div className="flex flex-col gap-2">
                             <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Email</p>
@@ -133,9 +130,6 @@ export function SignUpForm(){
                 <div className="flex gap-4">
                     <form.Field
                         name="firstname"
-                        validators={{
-                            onChange: z.string().min(1, 'First name is required'),
-                        }}
                         children={(field) => (
                             <div className="flex flex-col gap-2">
                                 <p className="text-[12px] weight-[500]! leading-[150%] text-dark">First Name</p>
@@ -153,9 +147,6 @@ export function SignUpForm(){
                     />
                     <form.Field
                         name="lastname"
-                        validators={{
-                            onChange: z.string().min(1, 'Last name is required'),
-                        }}
                         children={(field) => (
                             <div className="flex flex-col gap-2">
                                 <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Last Name</p>
@@ -176,9 +167,6 @@ export function SignUpForm(){
                 {/* Password */}
                 <form.Field
                     name="password"
-                    validators={{
-                        onChange: z.string().min(8, 'Password must be at least 8 characters'),
-                    }}
                     children={(field) => (
                         <div className="flex flex-col gap-2">
                             <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Password</p>
@@ -199,15 +187,6 @@ export function SignUpForm(){
                 {/* Confirm password */}
                 <form.Field
                     name="confirmpassword"
-                    validators={{
-                        onChangeListenTo: ['password'],
-                        onChange: ({ value, fieldApi }) => {
-                            const parsed = z.string().min(1, 'Please confirm your password').safeParse(value);
-                            if (!parsed.success) return parsed.error.issues[0].message;
-                            if (value !== fieldApi.form.getFieldValue('password')) return 'Passwords must match';
-                            return undefined;
-                        },
-                    }}
                     children={(field) => (
                         <div className="flex flex-col gap-2">
                             <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Confirm password</p>
