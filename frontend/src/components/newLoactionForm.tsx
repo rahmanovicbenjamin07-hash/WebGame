@@ -26,16 +26,27 @@ export function NewLocationForm(){
     }
 
     const newLocationMutation = useMutation({
-        mutationFn: async () => {
-            const formData = new FormData();
-            formData.append("image", file!);
-            formData.append("location", locationName);
-            formData.append("lat", String(lat));
-            formData.append("lng", String(lng));            
+        mutationFn: async (values: { lat: number; lng: number; locationName: string }) => {
 
+            let imageBase64: string | null = null;
+                if (file) {
+                    imageBase64 = await new Promise<string>((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result as string);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    });
+            }   
+                     
             const response = await fetch("http://localhost:3001/location/newLocation", {
             method: "POST",
-            body: formData,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                    ...values,           
+                    image: imageBase64,
+                    imageName: file?.name,
+                    imageType: file?.type,
+                }),
             })
 
             const result = await response.json();
@@ -63,7 +74,7 @@ export function NewLocationForm(){
             return;
         }
 
-        newLocationMutation.mutate();
+        newLocationMutation.mutate({ lat, lng, locationName });
     };
 
 
