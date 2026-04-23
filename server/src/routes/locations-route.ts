@@ -17,44 +17,71 @@ locationRoute.get('/', async (c) => {
 {/* Route for creating new location from profile */}
 
 locationRoute.post("/newLocation", async (c) => {
+  try {
+    const body = await c.req.json();
 
-    try {
-        const formData = await c.req.formData();
-        const file = formData.get("image") as File;
-        const location = formData.get("location") as string;
-        const lat = Number(formData.get("lat"));
-        const lng = Number(formData.get("lng"));
+    const location = body["locationName"] as string;
+    const lat = Number(body["lat"]);
+    const lng = Number(body["lng"]);
 
-        const arrayBuffer = await file.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-        const fileName = `${Date.now()}_${file.name}`;
+    const imageBase64 = body["image"] as string | null;
+    const imageName = body["imageName"] as string | undefined;
+    const imageType = body["imageType"] as string | undefined;
 
-        const { error: uploadError } = await supabase.storage
-            .from("GeoTagger")
-            .upload(fileName, buffer, { contentType: file.type });
+    if (!imageBase64) {
+      return c.json({ error: "Image is required" }, 400);
+    }
 
-        if (uploadError) {
-            console.error("Supabase error:", uploadError); 
-            return c.json({ error: uploadError.message }, 500);
-        }
+    const matches = imageBase64.match(/^data:(.+);base64,(.+)$/);
+    if (!matches) {
+      return c.json({ error: "Invalid image format" }, 400);
+    }
 
-        const { data } = supabase.storage
-            .from("GeoTagger")
-            .getPublicUrl(fileName);
+    const mimeType = matches[1];
+    const base64Data = matches[2];
+    const buffer = Buffer.from(base64Data, "base64");
 
-        const newLocation = await db.insert(locationsTable).values({
-            location,
-            locationImage: data.publicUrl,
-            lat,
-            lng,
-        });
+    const safeOriginalName = imageName?.replace(/\s+/g, "") ?? "image";
+    const fileExt = safeOriginalName.includes(".")
+      ? safeOriginalName.split(".").pop()
+      : mimeType.split("/")[1] || "jpg";
 
-        return c.json(newLocation);
-    } catch (err) {
-        console.error("Caught error:", err); 
-        return c.json({ error: String(err) }, 500);
-    }     
-})
+    const fileName = `${Date.now()}${crypto.randomUUID()}.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("GeoTagger")
+      .upload(fileName, buffer, {
+        contentType: imageType || mimeType,
+        upsert: false,
+      });
+
+    if (uploadError) {
+      console.error("Upload error:", uploadError);
+      return c.json({ error: uploadError.message }, 500);
+    }
+
+    const { data: publicData } = supabase.storage
+      .from("GeoTagger")
+      .getPublicUrl(fileName);
+
+    const publicUrl = publicData.publicUrl;
+
+    const newLocation = await db.insert(locationsTable).values({
+      location,
+      locationImage: publicUrl,
+      lat,
+      lng,
+    });
+
+    return c.json(newLocation);
+  } catch (err) {
+    console.error("Caught error:", err);
+    return c.json(
+      { error: err instanceof Error ? err.message : "Unknown error" },
+      500
+    );
+  }
+});
 
 {/* Get the newest locations - limit 9*/}
 
