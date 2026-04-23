@@ -36,7 +36,7 @@ export function setStoredUser(user: User | null) {
 }
 
 export function UserProvider({ children } : { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<User | null>(getStoredUser())
   const isAuthenticated = !!user;
 
   const logout = async () => {

@@ -4,23 +4,17 @@ import { Link } from '@tanstack/react-router';
 import ProfileImage from "../assets/ProfileImageSmall.png";
 import { useNavigate } from '@tanstack/react-router';
 import menuIcon from "../assets/MenuIcon.svg";
-import { fetchUser } from "@/authentication/auth";
 import arrowDark from "../assets/ArrowBlack.svg"
 import arrowGradient from "../assets/ArrowGradient.svg"
 import { fetchUserAvatar } from "@/utils/querys/user-query";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useUser } from "@/authentication/userContext";
 
 export function NavigationSignedIn(){
     const [openMenu, setOpenMenu] = useState<boolean>(false);;
     const queryClient = useQueryClient();
     const navigate = useNavigate();
-
-    const userQuery = useQuery({
-        queryKey: ['user'],
-        queryFn: fetchUser,
-    });
-
-    const user = userQuery.data;
+    const { user } = useUser();
 
     const userAvatarQuery = useQuery({
     queryKey:['userAvatar'],

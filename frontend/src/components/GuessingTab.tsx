@@ -10,11 +10,11 @@ import { InputNoBorder } from "./ui/inputNoBorder"
 import { MapContainer, TileLayer, Marker} from "react-leaflet";
 import {LocationPicker} from "../components/ui/MapLocationPicke"
 import { defaultIcon } from "./ui/MapDeafultsIcon"; 
-import { fetchUser } from "@/authentication/auth";
 import { getLocationName } from "@/utils/LocationName";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchLocation } from "@/utils/querys/locations-query";
 import { toast } from "sonner"
+import { useUser } from "@/authentication/userContext";
 
 interface GuessingTabProps {
     open: boolean;
@@ -28,13 +28,8 @@ export function GuessingTab({open,setOpen,locationId}: GuessingTabProps) {
     const [lng, setLng] = useState<number>(0);
     const [missedMeters,setMissedMeter] = useState<string>("");
     const [locationName,setLocationName] = useState<string>("");
-
-    const userQuery = useQuery({
-        queryKey:['user'],
-        queryFn:fetchUser,
-    })
-
-    const user = userQuery.data;
+    const { user } = useUser();
+   
 
     const locationQuery = useQuery({
         queryKey: ['location', locationId],

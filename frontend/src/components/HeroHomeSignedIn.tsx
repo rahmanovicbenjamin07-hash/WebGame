@@ -4,24 +4,19 @@ import { Footer } from "./footer";
 import NewUploads from "../components/ui/NewUploads";
 import { NavigationSignedIn } from '../components/navigationSignedIn'
 import { useState } from "react";
-import { fetchUser } from "@/authentication/auth";
 import { GuessingTab } from "./GuessingTab";
 import { useIsMobile } from "@/utils/isMobile";
 import { fetchGuesses } from "@/utils/querys/guesses-query";
 import { useQuery, useInfiniteQuery} from '@tanstack/react-query'
 import { fetchLocationsList } from "@/utils/querys/locations-query";
+import { useUser } from "@/authentication/userContext";
 
 export function HeroHomeSignedIn(){
     const [open, setOpen] = useState(false);
     const [selectedLocationId, setSelectedLocationId] = useState<number | null>(null);
     const isMobile = useIsMobile();
     const limit = isMobile ? 3 : 9;
-
-    const userQuery = useQuery({
-    queryKey: ['user'],
-    queryFn: fetchUser,
-    });
-    const user = userQuery.data;
+    const { user } = useUser();
 
     const {
         data: locationsData,
