@@ -1,35 +1,29 @@
+import React, { useState, useEffect } from "react";
 import { Button } from "../components/ui/button"
 import ProfileImage from "../assets/ProfileImageLarge.png";
-import React, { useState } from "react";
 import { InputNoBorder } from "./ui/inputNoBorder";
-import { fetchUser } from "@/authentication/auth";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
-interface ProfileFormState  {
-  email: string,
-  firstname:string,
-  lastname:string,
-  password: string,
-}
+import { useForm } from "@tanstack/react-form";
+import { Input } from "./ui/input";
+import { FieldError } from "./ui/FieldError";
+import { useUser } from "@/authentication/userContext";
+import { ProfileFormSchema } from "@/schemas/ProfileFormSchema";
 
 export function ProfileForm(){
     const queryClient = useQueryClient();
+    const { user } = useUser();
     const [message,setMessage] = useState<string | null>(null);
     const [userAvatar, setUserAvatar] = useState<File | null>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-    const [formData,setFormData] = useState<ProfileFormState>({
-            email:"",
-            firstname:"",
-            lastname:"",
-            password:"",                    
-        })
 
-    const userQuery = useQuery({
-        queryKey: ['user'],
-        queryFn: fetchUser,
-    })
-
-    const user = userQuery.data;
+    useEffect(() => {
+    if (user) {
+        form.setFieldValue("email", user.email);
+        form.setFieldValue("firstname", user.firstname);
+        form.setFieldValue("lastname", user.lastname);
+        form.setFieldValue("password", ""); 
+    }
+    }, [user]); 
 
     const userAvatarQuery = useQuery({
         queryKey: ['userAvatar', user?.id],
@@ -38,23 +32,15 @@ export function ProfileForm(){
 
             if (!res.ok) throw new Error("Failed to fetch avatar");
             const data = await res.json();
-            return data[0]?.image ?? null;
-               
+            return data[0]?.image ?? null;             
         },
 
         enabled: !!user?.id,
-        
+      
         select: (image) => {
-            if (user && !formData.email) {
-                setFormData({
-                    email: user.email,
-                    firstname: user.firstname,
-                    lastname: user.lastname,
-                    password: "",
-                });
-            }
             return image;
         }
+           
     })
 
     const displayAvatar = avatarPreview ?? userAvatarQuery.data ?? ProfileImage;
@@ -67,25 +53,29 @@ export function ProfileForm(){
         }
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData(prevData => ({ ...prevData, [name]: value }));
-    };
-
-
     const updateProfileMutation = useMutation({
-        mutationFn: async () => {
-            const data = new FormData();
-            data.append("email", formData.email);
-            data.append("password", formData.password);
-            data.append("firstname", formData.firstname);
-            data.append("lastname", formData.lastname);
-            if (userAvatar) data.append("avatar", userAvatar);
-
+        mutationFn: async (values :{email:string; password:string; firstname:string; lastname:string}) => {
+            
+            let avatarBase64: string | null = null;
+                if (userAvatar) {
+                    avatarBase64 = await new Promise<string>((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result as string);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(userAvatar);
+                });
+            }
+           
             const response = await fetch(`http://localhost:3001/user/update/${user?.id}`, {
                 method:"PUT",
                 credentials: "include",
-                body: data,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    ...values,
+                    avatar:avatarBase64,
+                    avatarName: userAvatar?.name,
+                    avatarType: userAvatar?.type,
+                }),
             })
 
             const result = await response.json();
@@ -93,7 +83,6 @@ export function ProfileForm(){
             return result;
         },
         onSuccess: (result) => {
-            queryClient.invalidateQueries({ queryKey: ['user'] });
             queryClient.invalidateQueries({ queryKey: ['userAvatar'] });
             if (result.image) setAvatarPreview(result.image);
             setMessage("Profile updated successfully!");
@@ -104,14 +93,21 @@ export function ProfileForm(){
         }
     })
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        if (!formData.email.trim()) { setMessage("Email is required!"); return; }
-        if (!formData.password.trim()) { setMessage("Password is required to save changes!"); return; }
-        if (!user?.id) return;
+    const form = useForm({
+        defaultValues: {
+            email:"",
+            password:"",
+            firstname:"",
+            lastname:"",          
+        },
+        validators: {
+            onChange: ProfileFormSchema,
+        },
+        onSubmit: ({value}) => {
+            updateProfileMutation.mutate(value);
+        }
+    })
 
-        updateProfileMutation.mutate();
-}
     return (
         <div className="relative xl:max-w-105 lg:min-h-189.75 flex flex-col items-center justify-end gap-6 my-auto shadow-[0_0_10px_0_rgba(0,0,0,0.2)] px-8 pb-6 rounded-2xl">
         
@@ -127,9 +123,11 @@ export function ProfileForm(){
                 )}
             </div>
 
-            {/* Form wrapper */}
-
-            <form className="flex flex-col lg:gap-4 gap-6 w-full" onSubmit={handleSubmit}>
+            <form className="flex flex-col lg:gap-4 gap-6 w-full" onSubmit={(e) => {
+                    e.preventDefault();
+                    form.handleSubmit();
+            }}
+            >            
                 <div className="mx-auto">
                     <label htmlFor="avatar-upload" className="cursor-pointer">
                     <img src={displayAvatar} className="h-20 w-20 lg:mt-0 mt-24.25 rounded-full object-cover"/>
@@ -142,39 +140,78 @@ export function ProfileForm(){
                 className="hidden"
                     />
             </div>
-
                  <h4 className="mx-auto text-center">{user?.firstname} {user?.lastname}</h4>
-
-                <div className="flex flex-col gap-2">
-                    <p className="text-[16px] weight-[500]! leading-[150%]">Name</p>
-                    <InputNoBorder placeholder={formData.firstname} name="firstname" onChange={handleInputChange}/>
-                </div>
-
-            {/* Name input wrapper */}
-
-                <div className="flex flex-col gap-2">
-                    <p className="text-[16px] weight-[500]! leading-[150%]">Last Name</p>
-                    <InputNoBorder placeholder={formData.lastname}  name="lastname" onChange={handleInputChange}/>
-                </div>
-
-
-            {/* Password input wrapper */}
-
-                <div className="flex flex-col gap-2">
-                    <p className="text-[16px] weight-[500]! leading-[150%]">Email</p>
-                    <InputNoBorder placeholder={formData.email} type="email" name="email" onChange={handleInputChange}/>
-                </div>
-
-            {/* Confirm password input wrapper */}
-
-                <div className="flex flex-col gap-2">
-                    <p className="text-[16px] weight-[500]! leading-[150%]">Password</p>
-                    <InputNoBorder placeholder="••••••••••••••••" type="password" name="password" onChange={handleInputChange}/>
-                </div>
-
-            <Button className="w-full lg:mt-23.5" type="submit">
-                {updateProfileMutation.isPending ? "Saving..." : "Save Profile"}
-            </Button>
+                <form.Field
+                name="email"
+                children={(field) => (
+                    <div className="flex flex-col gap-2">
+                        <p className="text-[16px] weight-[500]! leading-[150%]">Email</p>
+                            <InputNoBorder
+                            placeholder="example@net.com"  
+                            type="email" 
+                            value={field.state.value}
+                            onBlur={field.handleBlur}/>                       
+                    </div>               
+                )}
+                />
+                <form.Field
+                        name="firstname"
+                        children={(field) => (
+                            <div className="flex flex-col gap-2">
+                                <p className="text-[12px] weight-[500]! leading-[150%] text-dark">First Name</p>
+                                <Input
+                                    placeholder="Jacob"
+                                    value={field.state.value}
+                                    onChange={(e) => field.handleChange(e.target.value)}
+                                    onBlur={field.handleBlur}
+                                />
+                                <FieldError errors={field.state.meta.errors} />
+                            </div>
+                        )}
+                    />
+                <form.Field
+                        name="lastname"
+                        children={(field) => (
+                            <div className="flex flex-col gap-2">
+                                <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Last Name</p>
+                                <Input
+                                    placeholder="Jones"
+                                    value={field.state.value}
+                                    onChange={(e) => field.handleChange(e.target.value)}
+                                    onBlur={field.handleBlur}
+                                />
+                                <FieldError errors={field.state.meta.errors} />
+                            </div>
+                        )}
+                    />
+                <form.Field
+                    name="password"
+                    children={(field) => (
+                        <div className="flex flex-col gap-2">
+                            <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Password</p>
+                            <Input
+                                placeholder="••••••••••••••••"
+                                type="password"
+                                value={field.state.value}
+                                onChange={(e) => field.handleChange(e.target.value)}
+                                onBlur={field.handleBlur}
+                            />
+                                <FieldError errors={field.state.meta.errors} />
+                        </div>
+                    )}
+                />
+                <form.Subscribe
+                    selector={(state) => [state.canSubmit, state.isSubmitting]}
+                    children={([canSubmit, isSubmitting]) => (
+                        <Button
+                            className="w-full"
+                            type="submit"
+                            disabled={!canSubmit || isSubmitting}
+                        >
+                            {isSubmitting ? "Saving..." : "Save Changes"}
+                        </Button>
+                    )}
+                />
             </form>
         </div>
     )
