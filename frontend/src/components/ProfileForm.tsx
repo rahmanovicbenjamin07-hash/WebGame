@@ -10,6 +10,11 @@ import { useUser } from "@/authentication/userContext";
 import { ProfileFormSchema } from "@/schemas/ProfileFormSchema";
 import { fileToBase64 } from "@/utils/fileToBase";
 import { Label } from "./ui/label";
+import { apiFetch } from "@/lib/api";
+
+interface UpdateProfileResponse {
+    image?: string;
+}
 
 export function ProfileForm(){
     const { user, setUser } = useUser();
@@ -32,21 +37,16 @@ export function ProfileForm(){
             
             const avatarBase64 = await fileToBase64(avatar);   
            
-            const response = await fetch(`http://localhost:3001/user/update/${user?.id}`, {
-                method:"PUT",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
+            return apiFetch<UpdateProfileResponse>(`/user/update/${user?.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...values,
-                    avatar: avatarBase64, 
+                    avatar: avatarBase64,
                     avatarName: avatar?.name,
                     avatarType: avatar?.type,
                 }),
-            })
-
-            const result = await response.json();
-            if(!response.ok) throw new Error(result.error || "Failed to update profile!");
-            return result;
+            });
         },
         onSuccess: (result) => {
             setUser({ ...user!, image: result.image ?? user?.image ?? null });

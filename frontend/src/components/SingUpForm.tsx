@@ -11,6 +11,7 @@ import { FieldError } from "./ui/FieldError";
 import { sha256Hex } from "@/lib/crypto";
 import { fileToBase64 } from "@/utils/fileToBase";
 import { Label } from "./ui/label";
+import { apiFetch } from "@/lib/api"
 
 const isMobile = window.innerWidth < 1024;
 
@@ -32,21 +33,18 @@ export function SignUpForm(){
 
             const avatarBase64 = await fileToBase64(avatar);
 
-            const response = await fetch("http://localhost:3001/user/signup", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
+            return apiFetch('/user/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 ...values,
-                avatar: avatarBase64, 
+                avatar: avatarBase64,
                 avatarName: avatar?.name,
                 avatarType: avatar?.type,
                 password: sha256Hex(values.password),
-                confirmpassword: sha256Hex(values.confirmpassword) ,
+                confirmpassword: sha256Hex(values.confirmpassword),
             }),
         });
-
-        if (!response.ok) throw new Error("Sign up failed");
-        return response.json();
     },
         onSuccess: () => {
             navigate({ to: '/home/signed-in' });

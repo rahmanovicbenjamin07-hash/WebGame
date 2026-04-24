@@ -1,3 +1,6 @@
+import { apiFetch } from "@/lib/api"
+import { type User } from "@/authentication/userContext"
+
 interface userData {
   email: string
   firstname: string
@@ -10,20 +13,14 @@ export interface SignInInput {
   password: string
 }
 
+type LoginResponse = {
+    data: User,
+    message: string
+}
 
 export const fetchUser = async () => {
   try {
-    const res = await fetch('http://localhost:3001/user/me', {
-      method: 'GET',
-      credentials: 'include',
-    })
-
-    if (!res.ok) {
-      throw new Error('Failed to fetch user')
-    }
-
-    const data = (await res.json()) as { user: userData }
-
+    const data = await apiFetch<{ user: userData }>('/user/me')
     return data.user
   } catch (error) {
     console.error(error)
@@ -33,20 +30,13 @@ export const fetchUser = async () => {
 
 export const signIn = async (data: SignInInput) => {
   try {
-    const res = await fetch('http://localhost:3001/user/signin', {
+    return await apiFetch<LoginResponse>('/user/signin', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include',
       body: JSON.stringify(data),
     })
-
-    if (!res.ok) {
-      throw new Error('Invalid credentials')
-    }
-
-    return await res.json()
   } catch (error) {
     console.error(error)
     return null

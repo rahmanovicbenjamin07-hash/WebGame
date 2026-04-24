@@ -16,11 +16,17 @@ import { fetchLocation } from "@/utils/querys/locations-query";
 import { toast } from "sonner"
 import { useUser } from "@/authentication/userContext";
 import { LabelBig } from "./ui/labelBig";
+import { apiFetch } from "@/lib/api";
 
 interface GuessingTabProps {
     open: boolean;
     setOpen: (open: boolean) => void;
     locationId: number | null;
+}
+
+interface GuessResponse {
+    id: number
+    missMeters: number
 }
 
 export function GuessingTab({open,setOpen,locationId}: GuessingTabProps) {
@@ -53,22 +59,20 @@ export function GuessingTab({open,setOpen,locationId}: GuessingTabProps) {
             { latitude: lat, longitude: lng }                      
         );
 
-        const response = await fetch(`http://localhost:3001/guess/${user?.id}` , { 
-            method:"POST",
-            headers:{
-                    "Content-Type": "application/json",
+        const result = await apiFetch<GuessResponse>(`/guess/${user?.id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
                 },
-            body: JSON.stringify({
-                locationId:locationId,
-                guessedLat:lat,
-                guessedLng:lng,
-                missMeters:missMeters
+                body: JSON.stringify({
+                    locationId: locationId,
+                    guessedLat: lat,
+                    guessedLng: lng,
+                    missMeters: missMeters,
                 }),
-          });
+            });
 
-          const result = await response.json();
-            if (!response.ok) throw new Error(result.error || "Guess failed");
-            return { result, missMeters };
+        return { result, missMeters };
         },
         onSuccess: ({missMeters}) => {
             queryClient.invalidateQueries({ queryKey: ['bestGuesses'] });

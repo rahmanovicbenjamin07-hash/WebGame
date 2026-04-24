@@ -7,6 +7,7 @@ import { defaultIcon } from "./ui/MapDeafultsIcon";
 import { getLocationName } from "@/utils/LocationName";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { fileToBase64 } from "@/utils/fileToBase";
+import { apiFetch } from "@/lib/api";
 
 export function NewLocationForm(){
     const queryClient = useQueryClient();
@@ -31,20 +32,16 @@ export function NewLocationForm(){
 
             const imageBase64 = await fileToBase64(file);   
                      
-            const response = await fetch("http://localhost:3001/location/newLocation", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                    ...values,           
+            return apiFetch('/location/newLocation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...values,
                     image: imageBase64,
                     imageName: file?.name,
                     imageType: file?.type,
                 }),
-            })
-
-            const result = await response.json();
-            if(!response.ok) throw new Error(result.error || "Failed to add new location!");
-            return result;
+            });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['LocationsLoading'] });

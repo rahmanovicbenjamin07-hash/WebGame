@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { ProfileForm } from '@/components/ProfileForm'
 import { ClosesGuesesProfile } from '@/components/ProfileBestGuess'
 import { NewLocationForm } from '@/components/newLoactionForm'
