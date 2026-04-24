@@ -6,6 +6,7 @@ import {LocationPicker} from "../components/ui/MapLocationPicke"
 import { defaultIcon } from "./ui/MapDeafultsIcon";
 import { getLocationName } from "@/utils/LocationName";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { fileToBase64 } from "@/utils/fileToBase";
 
 export function NewLocationForm(){
     const queryClient = useQueryClient();
@@ -28,15 +29,7 @@ export function NewLocationForm(){
     const newLocationMutation = useMutation({
         mutationFn: async (values: { lat: number; lng: number; locationName: string }) => {
 
-            let imageBase64: string | null = null;
-                if (file) {
-                    imageBase64 = await new Promise<string>((resolve, reject) => {
-                        const reader = new FileReader();
-                        reader.onload = () => resolve(reader.result as string);
-                        reader.onerror = reject;
-                        reader.readAsDataURL(file);
-                    });
-            }   
+            const imageBase64 = await fileToBase64(file);   
                      
             const response = await fetch("http://localhost:3001/location/newLocation", {
             method: "POST",

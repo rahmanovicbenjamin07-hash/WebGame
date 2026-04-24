@@ -8,6 +8,7 @@ import { Input } from "./ui/input";
 import { FieldError } from "./ui/FieldError";
 import { useUser } from "@/authentication/userContext";
 import { ProfileFormSchema } from "@/schemas/ProfileFormSchema";
+import { fileToBase64 } from "@/utils/fileToBase";
 
 export function ProfileForm(){
     const queryClient = useQueryClient();
@@ -47,15 +48,7 @@ export function ProfileForm(){
     const updateProfileMutation = useMutation({
         mutationFn: async (values :{password:string; firstname:string; lastname:string}) => {
             
-            let avatarBase64: string | null = null;
-                if (avatar) {
-                    avatarBase64 = await new Promise<string>((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result as string);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(avatar);
-                });
-            }
+            const avatarBase64 = await fileToBase64(avatar);   
            
             const response = await fetch(`http://localhost:3001/user/update/${user?.id}`, {
                 method:"PUT",

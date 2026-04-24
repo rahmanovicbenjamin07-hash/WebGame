@@ -9,6 +9,7 @@ import { useForm } from "@tanstack/react-form";
 import { signUpSchema} from '@/schemas/SignUpSchema';
 import { FieldError } from "./ui/FieldError";
 import { sha256Hex } from "@/lib/crypto";
+import { fileToBase64 } from "@/utils/fileToBase";
 
 const isMobile = window.innerWidth < 1024;
 
@@ -28,15 +29,7 @@ export function SignUpForm(){
     const SignUpMutation = useMutation({
         mutationFn: async (values: { email: string; firstname: string; lastname: string; password: string; confirmpassword: string;}) => {
 
-            let avatarBase64: string | null = null;
-                if (avatar) {
-                    avatarBase64 = await new Promise<string>((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result as string);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(avatar);
-                });
-            }
+            const avatarBase64 = await fileToBase64(avatar);
 
             const response = await fetch("http://localhost:3001/user/signup", {
             method: "POST",
