@@ -104,49 +104,56 @@ usersRoute.get("/:id", async (c) => {
 
 usersRoute.put("/update/:id",async (c) => {
     const {id} = c.req.param();
-    const body = await c.req.parseBody();
+    const body = await c.req.json();
     const firstname = body["firstname"] as string;
     const lastname = body["lastname"] as string;
-    const email = body["email"] as string;
     const password = body["password"] as string;
-    const avatar = body["avatar"] as File | undefined
+    const avatarBase64 = body["avatar"] as string | undefined;
+    const avatarName = body["avatarName"] as string | undefined;
+    const avatarType = body["avatarType"] as string | undefined;
+
     const [user] = await db.select().from(usersTable).where(eq(usersTable.id, Number(id)));
 
-    const isPasswordSame = await compare(password, user.password);
-    if (!isPasswordSame) return c.json({ error: "Invalid credentials" }, 401);
+    if (!user) return c.json({ error: "User not found" }, 404);
 
-    let image: string | null = user.image;
+    let image: string | null = null;
+    let newHashedPassword :string | undefined = undefined;
 
-    if (avatar && avatar instanceof File) {
-    const fileName = `${Date.now()}-${avatar.name}`;
-    const arrayBuffer = await avatar.arrayBuffer();
-    const buffer = new Uint8Array(arrayBuffer);
-
-    const { data: uploadData, error } = await supabase.storage
-        .from("avatars")
-        .upload(fileName, buffer, {
-            contentType: avatar.type,
-        });
-
-    console.log("Upload error:", error);
-    console.log("Upload data:", uploadData);
-
-    if (!error) {
-        const { data } = supabase.storage
-            .from("avatars")
-            .getPublicUrl(fileName);
-        image = data.publicUrl;
-        console.log("Public URL:", image);
+    if(password && password.trim() !==""){
+        const isPasswordSame = await compare(password,user.password);
+        if(!isPasswordSame) return c.json({error:"Invalid credentials!"},401);
     }
-}
 
-    const response = await db.update(usersTable).set({firstname,lastname,image: image,}).where(eq(usersTable.id, Number(id)));
-    
+    if (avatarBase64 && avatarName) {
+    const base64Data = avatarBase64.replace(/^data:.+;base64,/, "");
+    const buffer = Buffer.from(base64Data, "base64");
+    const fileName = `${Date.now()}-${avatarName}`;
+
+    const { error } = await supabase.storage.from("avatars").upload(fileName, buffer, {
+                contentType: avatarType || "image/jpeg",
+            });
+
+        if (!error) {
+            const { data } = supabase.storage.from("avatars").getPublicUrl(fileName);
+            image = data.publicUrl;
+        }
+
+} 
+
+    await db.update(usersTable).set({
+        firstname,
+        lastname,
+        ...(image !== null ? { image } : {}),
+        ...(newHashedPassword ? { password: newHashedPassword } : {}),
+    }).where(eq(usersTable.id, Number(id)));
+
+    const response = await db.update(usersTable).set({firstname,lastname,...(image !== null && { image }),}).where(eq(usersTable.id, Number(id)));
+    console.log("Response: ", response);   
     if(!response){
         return c.json({error:"User not found"}, 404);
     }
 
-    const [updatedUser] = await db.select().from(usersTable).where(eq(usersTable.id, Number(id))).limit(1);
+     const [updatedUser] = await db.select().from(usersTable).where(eq(usersTable.id, Number(id))).limit(1);
     return c.json(updatedUser);
 })
 

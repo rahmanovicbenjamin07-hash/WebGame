@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "../components/ui/button"
 import ProfileImage from "../assets/ProfileImageLarge.png";
 import { InputNoBorder } from "./ui/inputNoBorder";
@@ -13,17 +13,16 @@ export function ProfileForm(){
     const queryClient = useQueryClient();
     const { user } = useUser();
     const [message,setMessage] = useState<string | null>(null);
-    const [userAvatar, setUserAvatar] = useState<File | null>(null);
+    const [avatar, setAvatar] = useState<File | null>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
-    useEffect(() => {
-    if (user) {
-        form.setFieldValue("email", user.email);
-        form.setFieldValue("firstname", user.firstname);
-        form.setFieldValue("lastname", user.lastname);
-        form.setFieldValue("password", ""); 
-    }
-    }, [user]); 
+    const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setAvatar(file);
+            setAvatarPreview(URL.createObjectURL(file));
+            }   
+    }; 
 
     const userAvatarQuery = useQuery({
         queryKey: ['userAvatar', user?.id],
@@ -32,7 +31,7 @@ export function ProfileForm(){
 
             if (!res.ok) throw new Error("Failed to fetch avatar");
             const data = await res.json();
-            return data[0]?.image ?? null;             
+            return data[0]?.image ?? null;          
         },
 
         enabled: !!user?.id,
@@ -45,24 +44,16 @@ export function ProfileForm(){
 
     const displayAvatar = avatarPreview ?? userAvatarQuery.data ?? ProfileImage;
 
-    const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            setUserAvatar(file);
-            setAvatarPreview(URL.createObjectURL(file));
-        }
-    };
-
     const updateProfileMutation = useMutation({
-        mutationFn: async (values :{email:string; password:string; firstname:string; lastname:string}) => {
+        mutationFn: async (values :{password:string; firstname:string; lastname:string}) => {
             
             let avatarBase64: string | null = null;
-                if (userAvatar) {
+                if (avatar) {
                     avatarBase64 = await new Promise<string>((resolve, reject) => {
                     const reader = new FileReader();
                     reader.onload = () => resolve(reader.result as string);
                     reader.onerror = reject;
-                    reader.readAsDataURL(userAvatar);
+                    reader.readAsDataURL(avatar);
                 });
             }
            
@@ -72,9 +63,9 @@ export function ProfileForm(){
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     ...values,
-                    avatar:avatarBase64,
-                    avatarName: userAvatar?.name,
-                    avatarType: userAvatar?.type,
+                    avatar: avatarBase64, 
+                    avatarName: avatar?.name,
+                    avatarType: avatar?.type,
                 }),
             })
 
@@ -86,7 +77,6 @@ export function ProfileForm(){
             queryClient.invalidateQueries({ queryKey: ['userAvatar'] });
             if (result.image) setAvatarPreview(result.image);
             setMessage("Profile updated successfully!");
-            setUserAvatar(null);
         },
         onError: (error) => {
             setMessage(error.message)
@@ -95,10 +85,10 @@ export function ProfileForm(){
 
     const form = useForm({
         defaultValues: {
-            email:"",
-            password:"",
-            firstname:"",
-            lastname:"",          
+            email: user?.email ?? "",
+            password: "",
+            firstname: user?.firstname ?? "",
+            lastname: user?.lastname ?? "",          
         },
         validators: {
             onChange: ProfileFormSchema,
@@ -123,7 +113,7 @@ export function ProfileForm(){
                 )}
             </div>
 
-            <form className="flex flex-col lg:gap-4 gap-6 w-full" onSubmit={(e) => {
+            <form key={user?.id} className="flex flex-col lg:gap-4 gap-6 w-full" onSubmit={(e) => {
                     e.preventDefault();
                     form.handleSubmit();
             }}
