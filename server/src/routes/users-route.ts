@@ -147,12 +147,6 @@ usersRoute.put("/update/:id",async (c) => {
         ...(newHashedPassword ? { password: newHashedPassword } : {}),
     }).where(eq(usersTable.id, Number(id)));
 
-    const response = await db.update(usersTable).set({firstname,lastname,...(image !== null && { image }),}).where(eq(usersTable.id, Number(id)));
-    console.log("Response: ", response);   
-    if(!response){
-        return c.json({error:"User not found"}, 404);
-    }
-
      const [updatedUser] = await db.select().from(usersTable).where(eq(usersTable.id, Number(id))).limit(1);
     return c.json(updatedUser);
 })
@@ -199,7 +193,7 @@ usersRoute.post("/signin", async (c) => {
   });
 
 
-    return c.json({ message: "Signed in successfully", data: { email: user.email ,firstname: user.firstname, lastname: user.lastname, id: user.id} });
+    return c.json({ message: "Signed in successfully", data: { email: user.email ,firstname: user.firstname, lastname: user.lastname, id: user.id, image: user.image} });
 })
 
 {/* "Security" route to redirect */}

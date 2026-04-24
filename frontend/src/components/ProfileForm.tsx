@@ -12,8 +12,7 @@ import { fileToBase64 } from "@/utils/fileToBase";
 import { Label } from "./ui/label";
 
 export function ProfileForm(){
-    const queryClient = useQueryClient();
-    const { user } = useUser();
+    const { user, setUser } = useUser();
     const [message,setMessage] = useState<string | null>(null);
     const [avatar, setAvatar] = useState<File | null>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -26,25 +25,7 @@ export function ProfileForm(){
             }   
     }; 
 
-    const userAvatarQuery = useQuery({
-        queryKey: ['userAvatar', user?.id],
-        queryFn: async () => {
-            const res = await fetch(`http://localhost:3001/user/${user?.id}`);
-
-            if (!res.ok) throw new Error("Failed to fetch avatar");
-            const data = await res.json();
-            return data[0]?.image ?? null;          
-        },
-
-        enabled: !!user?.id,
-      
-        select: (image) => {
-            return image;
-        }
-           
-    })
-
-    const displayAvatar = avatarPreview ?? userAvatarQuery.data ?? ProfileImage;
+    const displayAvatar = avatarPreview ?? user?.image ?? ProfileImage;
 
     const updateProfileMutation = useMutation({
         mutationFn: async (values :{password:string; firstname:string; lastname:string}) => {
@@ -68,7 +49,7 @@ export function ProfileForm(){
             return result;
         },
         onSuccess: (result) => {
-            queryClient.invalidateQueries({ queryKey: ['userAvatar'] });
+            setUser({ ...user!, image: result.image ?? user?.image ?? null });
             if (result.image) setAvatarPreview(result.image);
             setMessage("Profile updated successfully!");
         },
