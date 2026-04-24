@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { SignUpForm } from '../components/SingUpForm'
+import { SignUpForm } from '../components/SignUpForm'
 import BgImage from '../assets/SignUpPageImage.png'
 import Logo from '../assets/Logo.png'
 import { NavigationSignedOut } from '@/components/navigationSignedOut'

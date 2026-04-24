@@ -11,7 +11,7 @@ interface userData {
   lastname: string
 }
 
-export function ClosesGuesesProfile() {
+export function ProfileBestGuess() {
   const [user, setUser] = useState<userData | null>(null)
 
   useEffect(() => {

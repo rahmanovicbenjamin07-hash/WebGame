@@ -8,8 +8,8 @@ import {
 } from "@/components/ui/dialog"
 import { InputNoBorder } from "./ui/inputNoBorder"
 import { MapContainer, TileLayer, Marker} from "react-leaflet";
-import {LocationPicker} from "../components/ui/MapLocationPicke"
-import { defaultIcon } from "./ui/MapDeafultsIcon"; 
+import {LocationPicker} from "../components/ui/MapLocationPicker"
+import { defaultIcon } from "./ui/MapDefaultsIcon"; 
 import { getLocationName } from "@/utils/LocationName";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchLocation } from "@/utils/querys/locations-query";
@@ -33,7 +33,7 @@ export function GuessingTab({open,setOpen,locationId}: GuessingTabProps) {
     const queryClient = useQueryClient();
     const [lat, setLat] = useState<number>(0);
     const [lng, setLng] = useState<number>(0);
-    const [missedMeters,setMissedMeter] = useState<string>("");
+    const [missedMeters,setMissedMeters] = useState<string>("");
     const [locationName,setLocationName] = useState<string>("");
     const { user } = useUser();
    
@@ -76,7 +76,7 @@ export function GuessingTab({open,setOpen,locationId}: GuessingTabProps) {
         },
         onSuccess: ({missMeters}) => {
             queryClient.invalidateQueries({ queryKey: ['bestGuesses'] });
-            setMissedMeter(JSON.stringify(missMeters) + "m");
+            setMissedMeters(JSON.stringify(missMeters) + "m");
         },
         onError: (error: Error) => {
             toast.error(error.message)
