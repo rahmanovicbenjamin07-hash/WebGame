@@ -15,6 +15,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchLocation } from "@/utils/querys/locations-query";
 import { toast } from "sonner"
 import { useUser } from "@/authentication/userContext";
+import { LabelBig } from "./ui/labelBig";
 
 interface GuessingTabProps {
     open: boolean;
@@ -108,11 +109,11 @@ export function GuessingTab({open,setOpen,locationId}: GuessingTabProps) {
                     <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
                         <div className="flex lg:gap-7.25 gap-2.5 w-full lg:flex-row flex-col">
                             <div className="flex flex-col gap-2.5 lg:w-53">
-                                <label className="font-poppins font-normal text-[16px] leading-[100%]">Error distance</label>
+                                <LabelBig>Error distance</LabelBig>
                                 <InputNoBorder placeholder={`${missedMeters}`} readOnly className="lg:w-auto w-full"/>
                             </div>
                             <div className="flex flex-col gap-2.5 lg:min-w-0 lg:w-92.75 min-w-full items-stretch">
-                                <label className="font-poppins font-normal text-[16px] leading-[100%]">Guessed location</label>
+                                <LabelBig>Guessed location</LabelBig>
                                 <InputNoBorder value={locationName} readOnly className="lg:w-auto w-full"/>
                             </div>
                         </div>

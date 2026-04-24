@@ -3,7 +3,7 @@ import { Label as LabelPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
 
-function Label({
+function LabelBig({
   className,
   ...props
 }: React.ComponentProps<typeof LabelPrimitive.Root>) {
@@ -11,7 +11,7 @@ function Label({
     <LabelPrimitive.Root
       data-slot="label"
       className={cn(
-        "text-[12px] weight-[500]! leading-none text-dark lg:leading-[150%] font-poppins",
+        "text-[16px] weight-[500]! leading-none text-dark lg:leading-[150%] font-poppins",
         className
       )}
       {...props}
@@ -19,4 +19,4 @@ function Label({
   )
 }
 
-export { Label }
+export { LabelBig }

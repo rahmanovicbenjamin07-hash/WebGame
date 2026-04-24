@@ -9,6 +9,7 @@ import { FieldError } from "./ui/FieldError";
 import { useUser } from "@/authentication/userContext";
 import { ProfileFormSchema } from "@/schemas/ProfileFormSchema";
 import { fileToBase64 } from "@/utils/fileToBase";
+import { Label } from "./ui/label";
 
 export function ProfileForm(){
     const queryClient = useQueryClient();
@@ -128,7 +129,7 @@ export function ProfileForm(){
                 name="email"
                 children={(field) => (
                     <div className="flex flex-col gap-2">
-                        <p className="text-[16px] weight-[500]! leading-[150%]">Email</p>
+                        <Label>Email</Label>
                             <InputNoBorder
                             placeholder="example@net.com"  
                             type="email" 
@@ -141,7 +142,7 @@ export function ProfileForm(){
                         name="firstname"
                         children={(field) => (
                             <div className="flex flex-col gap-2">
-                                <p className="text-[12px] weight-[500]! leading-[150%] text-dark">First Name</p>
+                                <Label>First Name</Label>
                                 <Input
                                     placeholder="Jacob"
                                     value={field.state.value}
@@ -156,7 +157,7 @@ export function ProfileForm(){
                         name="lastname"
                         children={(field) => (
                             <div className="flex flex-col gap-2">
-                                <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Last Name</p>
+                                <Label>Last Name</Label>
                                 <Input
                                     placeholder="Jones"
                                     value={field.state.value}
@@ -171,7 +172,7 @@ export function ProfileForm(){
                     name="password"
                     children={(field) => (
                         <div className="flex flex-col gap-2">
-                            <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Password</p>
+                            <Label>Password</Label>
                             <Input
                                 placeholder="••••••••••••••••"
                                 type="password"

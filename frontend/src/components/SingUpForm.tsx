@@ -10,6 +10,7 @@ import { signUpSchema} from '@/schemas/SignUpSchema';
 import { FieldError } from "./ui/FieldError";
 import { sha256Hex } from "@/lib/crypto";
 import { fileToBase64 } from "@/utils/fileToBase";
+import { Label } from "./ui/label";
 
 const isMobile = window.innerWidth < 1024;
 
@@ -109,7 +110,7 @@ export function SignUpForm(){
                     name="email"
                     children={(field) => (
                         <div className="flex flex-col gap-2">
-                            <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Email</p>
+                            <Label>Email</Label>
                             <Input
                                 placeholder="example@net.com"
                                 type="email"
@@ -128,7 +129,7 @@ export function SignUpForm(){
                         name="firstname"
                         children={(field) => (
                             <div className="flex flex-col gap-2">
-                                <p className="text-[12px] weight-[500]! leading-[150%] text-dark">First Name</p>
+                                <Label>First Name</Label>
                                 <Input
                                     placeholder="Jacob"
                                     value={field.state.value}
@@ -143,7 +144,7 @@ export function SignUpForm(){
                         name="lastname"
                         children={(field) => (
                             <div className="flex flex-col gap-2">
-                                <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Last Name</p>
+                                <Label>Last Name</Label>
                                 <Input
                                     placeholder="Jones"
                                     value={field.state.value}
@@ -161,7 +162,7 @@ export function SignUpForm(){
                     name="password"
                     children={(field) => (
                         <div className="flex flex-col gap-2">
-                            <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Password</p>
+                            <Label>Password</Label>
                             <Input
                                 placeholder="••••••••••••••••"
                                 type="password"
@@ -179,7 +180,7 @@ export function SignUpForm(){
                     name="confirmpassword"
                     children={(field) => (
                         <div className="flex flex-col gap-2">
-                            <p className="text-[12px] weight-[500]! leading-[150%] text-dark">Confirm password</p>
+                            <Label>Confirm Password</Label>
                             <Input
                                 placeholder="••••••••••••••••"
                                 type="password"

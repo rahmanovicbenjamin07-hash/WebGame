@@ -8,6 +8,7 @@ import { useForm } from "@tanstack/react-form";
 import { setStoredUser, type User } from "@/authentication/userContext";
 import { signInSchema } from '@/schemas/SignInSchema';
 import { FieldError } from "./ui/FieldError";
+import { Label } from "./ui/label";
 
 type LoginResponse = {
     data: User,
@@ -64,7 +65,7 @@ export function SignInForm(){
                     name="email"                    
                     children={(field) => (
                         <div className="flex flex-col gap-2">
-                            <p className="text-[12px] weight-[500]! text-dark lg:leading-[150%]">Email</p>
+                            <Label>Email</Label>
                             <Input
                                 placeholder="example@net.com"
                                 type="email"
@@ -76,12 +77,12 @@ export function SignInForm(){
                         </div>
                     )}
                 />
-
+                
                 <form.Field
                     name="password"
                     children={(field) => (
                         <div className="flex flex-col gap-2">
-                            <p className="text-[12px] weight-[500]! leading-none text-dark lg:leading-[150%]">Password</p>
+                            <Label>Password</Label>
                             <Input
                                 placeholder="••••••••••••••••"
                                 type="password"
