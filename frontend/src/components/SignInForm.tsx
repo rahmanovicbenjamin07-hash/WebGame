@@ -5,7 +5,7 @@ import { Link } from '@tanstack/react-router';
 import { signIn } from "@/authentication/auth";
 import { useMutation} from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
-import { setStoredUser, type User } from "@/authentication/userContext";
+import { setStoredUser, type User, useUser } from "@/authentication/userContext";
 import { signInSchema } from '@/schemas/SignInSchema';
 import { FieldError } from "./ui/FieldError";
 import { Label } from "./ui/label";
@@ -17,6 +17,7 @@ type LoginResponse = {
 
 export function SignInForm(){
     const navigate = useNavigate();
+    const { setUser } = useUser();
 
     const SignInMutation = useMutation({
         mutationFn: async (values: { email: string; password: string }) => {           
@@ -25,7 +26,8 @@ export function SignInForm(){
             return result;    
         },
         onSuccess: (response: LoginResponse) => {
-            setStoredUser(response.data)
+            setStoredUser(response.data);
+            setUser(response.data);
             navigate({ to: '/home/signed-in' });
         },
         onError: (error) => {

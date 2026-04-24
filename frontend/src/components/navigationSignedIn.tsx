@@ -6,22 +6,14 @@ import { useNavigate } from '@tanstack/react-router';
 import menuIcon from "../assets/MenuIcon.svg";
 import arrowDark from "../assets/ArrowBlack.svg"
 import arrowGradient from "../assets/ArrowGradient.svg"
-import { fetchUserAvatar } from "@/utils/querys/user-query";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation} from "@tanstack/react-query";
 import { useUser } from "@/authentication/userContext";
 
 export function NavigationSignedIn(){
     const [openMenu, setOpenMenu] = useState<boolean>(false);;
-    const queryClient = useQueryClient();
     const navigate = useNavigate();
-    const { user } = useUser();
+    const { user, logout } = useUser();
 
-    const userAvatarQuery = useQuery({
-    queryKey:['userAvatar'],
-    queryFn: async () => await fetchUserAvatar(user?.id!),
-    enabled: !!user?.id
-    })   
-   
     const logOutMutation = useMutation({
         mutationFn: async () => {
             const response = await fetch("http://localhost:3001/user/signout", {
@@ -34,7 +26,7 @@ export function NavigationSignedIn(){
         },
 
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['user'] });
+            logout();
             navigate({ to: '/home' });
         },
         onError: (error) => {
@@ -46,16 +38,8 @@ export function NavigationSignedIn(){
         e.preventDefault();
         logOutMutation.mutate();
     };
-    
-    const userAvatar = userAvatarQuery.data;
 
-    if(userAvatarQuery.isError){
-    return <p>{userAvatarQuery.error.message}</p>
-  }
-
-    if(userAvatarQuery.isPending) {
-    return <p>Loading...</p>
-    }
+    const userAvatar = user?.image ?? ProfileImage;
 
     return(
         <div className="bg-foreground-primary flex flex-row justify-between items-center pt-11.5 lg:pb-0 py-[31.5px] lg:px-0 px-8.75 md:shadow-none shadow-md z-500 max-w-325 mx-auto">

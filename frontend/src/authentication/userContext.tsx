@@ -5,7 +5,7 @@ export interface User {
     firstname: string
     id: number
     lastname: string
-    avatar: string
+    image: string | null
 }
 
 export interface UserContextType {
