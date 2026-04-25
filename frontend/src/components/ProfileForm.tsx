@@ -11,22 +11,23 @@ import { ProfileFormSchema } from "@/schemas/ProfileFormSchema";
 import { fileToBase64 } from "@/utils/fileToBase";
 import { Label } from "./ui/label";
 import { updateUser } from '@/api/updateUser';
+import { useObjectUrl } from "@/hook/useObjectUrl";
 
 export function ProfileForm(){
     const { user, setUser } = useUser();
     const [message,setMessage] = useState<string | null>(null);
     const [avatar, setAvatar] = useState<File | null>(null);
-    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+    const objectUrlPreview = useObjectUrl(avatar);
+    const [serverAvatarPreview, setServerAvatarPreview] = useState<string | null>(null);
+
+    const displayAvatar = serverAvatarPreview ?? objectUrlPreview ?? user?.image ?? ProfileImage;
 
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
             setAvatar(file);
-            setAvatarPreview(URL.createObjectURL(file));
             }   
     }; 
-
-    const displayAvatar = avatarPreview ?? user?.image ?? ProfileImage;
     
     const updateProfileMutation = useMutation({
         mutationFn: async (values :{password:string; firstname:string; lastname:string}) => {
@@ -42,7 +43,7 @@ export function ProfileForm(){
         },
         onSuccess: (result) => {
             setUser({ ...user!, image: result.image ?? user?.image ?? null });
-            if (result.image) setAvatarPreview(result.image);
+            if (result.image) setServerAvatarPreview(result.image);
             setMessage("Profile updated successfully!");
         },
         onError: (error) => {
