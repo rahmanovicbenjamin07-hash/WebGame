@@ -1,8 +1,8 @@
-import { useMemo } from "react";
 import placeholderImage from "../../assets/placeholder-image.png";
+import { useObjectUrl } from "@/hook/useObjectUrl";
 
 const ImagePreview = ({ file }: { file: File | null }) => {
-    const previewUrl = useMemo(() => (file ? URL.createObjectURL(file) : null), [file]);
+    const previewUrl = useObjectUrl(file);
 
     return (
         <div 

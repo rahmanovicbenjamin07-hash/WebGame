@@ -12,18 +12,18 @@ import { fileToBase64 } from "@/utils/fileToBase";
 import { Label } from "./ui/label";
 import { signUp } from "@/api/signUp";
 import { useIsMobile } from "@/utils/isMobile";
+import { useObjectUrl } from "@/hook/useObjectUrl";
+import { toast } from "sonner";
 
 export function SignUpForm(){
     const isMobile = useIsMobile(1024);
     const navigate = useNavigate();
     const [avatar, setAvatar] = useState<File | null>(null);
-    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  
+    const avatarPreview = useObjectUrl(avatar);
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
         setAvatar(file);
-        setAvatarPreview(URL.createObjectURL(file));
         }   
     };    
   
@@ -38,7 +38,7 @@ export function SignUpForm(){
             navigate({ to: '/home/signed-in' });
         },
         onError: (error) => {
-            alert(error.message);
+            toast.error(error.message);
         },    
     })
 
