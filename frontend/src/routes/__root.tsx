@@ -4,7 +4,7 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import appCss from '../styles.css?url'
 import { UserProvider, type UserContextType } from '@/authentication/userContext'
-import { fetchUser } from '@/authentication/auth'
+import { getStoredUser } from '@/authentication/userContext'
 import { Toaster } from "@/components/ui/sonner"
 
 const queryClient = new QueryClient()
@@ -14,11 +14,12 @@ export const Route = createRootRouteWithContext<{
       auth: UserContextType | null;
 }>()({
   beforeLoad: async () => {
-  const user = await fetchUser().catch(() => null)  
+  const stored = getStoredUser();
+  
   return {
     auth: {
-      isAuthenticated: !!user,
-      user,
+      isAuthenticated: !!stored,
+      user: stored,
     }
   }
 },
