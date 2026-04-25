@@ -9,6 +9,7 @@ import { setStoredUser, type User, useUser } from "@/authentication/userContext"
 import { signInSchema } from '@/schemas/SignInSchema';
 import { FieldError } from "./ui/FieldError";
 import { Label } from "./ui/label";
+import { toast } from "sonner";
 
 type LoginResponse = {
     data: User,
@@ -21,9 +22,7 @@ export function SignInForm(){
 
     const SignInMutation = useMutation({
         mutationFn: async (values: { email: string; password: string }) => {           
-            const result = await signIn({email: values.email, password: values.password });
-            if (!result) throw new Error("Invalid credentials");
-            return result;    
+            return signIn({ email: values.email, password: values.password });    
         },
         onSuccess: (response: LoginResponse) => {
             setStoredUser(response.data);
@@ -31,7 +30,7 @@ export function SignInForm(){
             navigate({ to: '/home/signed-in' });
         },
         onError: (error) => {
-            alert(error.message);
+            toast.error(error.message);
         },
     })
 

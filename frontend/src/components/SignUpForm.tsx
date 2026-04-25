@@ -8,10 +8,8 @@ import { useMutation} from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
 import { signUpSchema} from '@/schemas/SignUpSchema';
 import { FieldError } from "./ui/FieldError";
-import { sha256Hex } from "@/lib/crypto";
 import { fileToBase64 } from "@/utils/fileToBase";
 import { Label } from "./ui/label";
-import { apiFetch } from "@/lib/api"
 import { signUp } from "@/api/signUp";
 
 const isMobile = window.innerWidth < 1024;
@@ -34,7 +32,7 @@ export function SignUpForm(){
 
             const avatarBase64 = await fileToBase64(avatar);
 
-            return signUp({...values,avatar: avatarBase64,avatarName: avatar?.name,avatarType: avatar?.type,password: await  sha256Hex(values.password),confirmpassword: await  sha256Hex(values.confirmpassword),})
+            return signUp({...values,avatar: avatarBase64,avatarName: avatar?.name,avatarType: avatar?.type,password: values.password,confirmpassword: values.confirmpassword,})
     },
         onSuccess: () => {
             navigate({ to: '/home/signed-in' });

@@ -1,5 +1,6 @@
 import { apiFetch } from "@/lib/api"
 import { type User } from "@/authentication/userContext"
+import { sha256Hex } from "@/lib/crypto"
 
 interface userData {
   email: string
@@ -28,13 +29,14 @@ export const fetchUser = async () => {
   }
 }
 
-export const signIn = async (data: SignInInput) => {
-    return await apiFetch<LoginResponse>('/user/signin', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-}
+export const signIn = async (data: SignInInput): Promise<LoginResponse> => {
+  return apiFetch<LoginResponse>('/user/signin', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email: data.email,
+      password: await sha256Hex(data.password),
+    }),
+  });
+};
 

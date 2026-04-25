@@ -54,6 +54,7 @@ if (avatar && avatar instanceof File) {
         console.log("Public URL:", image);
     }
 }
+
     const hashedPassword = await hash(password, 10);
     
     const [newUser] = await db.insert(usersTable).values({
@@ -166,13 +167,11 @@ usersRoute.delete("/:id", async (c) => {
 
 usersRoute.post("/signin", async (c) => {
     const {email,password} = await c.req.json();
+    
     const [user] = await db.select().from(usersTable).where(eq(usersTable.email, email));
-    if(!user) {
-        return c.json({error:"Invalid credentials"},401);
-    }
+    if (!user) return c.json({ error: "Invalid credentials" }, 401);
 
-    const sha256Password = createHash('sha256').update(password).digest('hex');
-    const isPasswordSame = await compare(sha256Password, user.password);
+    const isPasswordSame = await compare(password, user.password)
 
     if (!isPasswordSame) return c.json({ error: "Invalid credentials" }, 401);
 

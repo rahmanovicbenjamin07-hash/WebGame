@@ -1,4 +1,5 @@
 import { apiFetch } from "@/lib/api";
+import { sha256Hex } from "@/lib/crypto";
 
 export interface SignUpPayload {
   avatar?: string | null;
@@ -14,14 +15,14 @@ export interface SignUpResponse {
   email: string;
 }
 
-export const signUp = (payload: SignUpPayload): Promise<SignUpResponse> => {
-    console.log("Payload: ", payload)
-  
-    return apiFetch('/user/signup', {
+export const signUp = async (payload: SignUpPayload): Promise<SignUpResponse> => {
+  return apiFetch('/user/signup', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({
+      ...payload,
+      password: await sha256Hex(payload.password),
+      confirmpassword: await sha256Hex(payload.confirmpassword),
+    }),
   });
-
-  
 };
