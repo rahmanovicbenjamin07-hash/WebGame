@@ -11,10 +11,10 @@ import { FieldError } from "./ui/FieldError";
 import { fileToBase64 } from "@/utils/fileToBase";
 import { Label } from "./ui/label";
 import { signUp } from "@/api/signUp";
-
-const isMobile = window.innerWidth < 1024;
+import { useIsMobile } from "@/utils/isMobile";
 
 export function SignUpForm(){
+    const isMobile = useIsMobile(1024);
     const navigate = useNavigate();
     const [avatar, setAvatar] = useState<File | null>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
