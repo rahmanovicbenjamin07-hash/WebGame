@@ -1,12 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { SignInForm } from '../components/SignInForm'
-import BgImage from '../assets/SignUpPageImage.png'
-import Logo from '../assets/Logo.png'
-import { NavigationSignedOut } from '@/components/navigationSignedOut'
+import { SignInForm } from '../../components/Forms/SignInForm'
+import BgImage from '../../assets/SignUpPageImage.png'
+import Logo from '../../assets/Logo.png'
+import { NavigationSignedOut } from '../../components/Navigations/navigationSignedOut'
 
 {/* Solve the problem of redirecting to this page after the refresh */}
 
-export const Route = createFileRoute('/signin')({
+export const Route = createFileRoute('/AuthPage/signin')({
   component: SingIn,
 })
 

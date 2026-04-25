@@ -1,11 +1,11 @@
 import { useState } from "react";
-import Logo from "../assets/Logo.png";
+import Logo from "../../assets/Logo.png";
 import { Link } from '@tanstack/react-router';
-import ProfileImage from "../assets/ProfileImageSmall.png";
+import ProfileImage from "../../assets/ProfileImageSmall.png";
 import { useNavigate } from '@tanstack/react-router';
-import menuIcon from "../assets/MenuIcon.svg";
-import arrowDark from "../assets/ArrowBlack.svg"
-import arrowGradient from "../assets/ArrowGradient.svg"
+import menuIcon from "../../assets/MenuIcon.svg";
+import arrowDark from "../../assets/ArrowBlack.svg"
+import arrowGradient from "../../assets/ArrowGradient.svg"
 import { useMutation} from "@tanstack/react-query";
 import { useUser } from "@/authentication/userContext";
 import { signOut } from "@/api/signOut";
@@ -38,11 +38,11 @@ export function NavigationSignedIn(){
 
     return(
         <div className="bg-foreground-primary flex flex-row justify-between items-center pt-11.5 lg:pb-0 py-[31.5px] lg:px-0 px-8.75 md:shadow-none shadow-md z-500 max-w-325 mx-auto">
-            <Link to="/home/signed-in">
+            <Link to="/home/Dashboard">
                 <img src={Logo} alt=""/>
             </Link>
             <div className="md:flex gap-12 items-center  hidden">
-                <Link  to="/home/signed-in" className="text-dark text-[16px] font-normal font-poppins cursor-pointer">Home</Link>
+                <Link  to="/home/Dashboard" className="text-dark text-[16px] font-normal font-poppins cursor-pointer">Home</Link>
                 <button className="text-dark text-[16px] font-normal font-poppins cursor-pointer" onClick={handleLogOut}>Logout</button>
                 <Link to="/profile">
                     <img src={userAvatar ?? ProfileImage} className="h-10 w-10 overflow-hidden rounded-full"/>
@@ -61,7 +61,7 @@ export function NavigationSignedIn(){
                             )}
                     </div>
                     <div className="flex flex-col items-stretch gap-6 ">
-                            <Link  to="/home/signed-in" className="cursor-pointer flex flex-row justify-between items-center">
+                            <Link  to="/home/Dashboard" className="cursor-pointer flex flex-row justify-between items-center">
                                <h5 className="font-normal font-raleway">Home</h5>
                                <img src={arrowDark} className="mr-4"/>
                             </Link>

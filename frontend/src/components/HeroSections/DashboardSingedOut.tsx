@@ -1,14 +1,14 @@
-import { NavigationSignedOut } from "./navigationSignedOut";
-import { Button } from "./ui/button";
-import BgImg from "../assets/HeroSignedOutBg.png"
-import LockGuess from "./ui/LockedGuess";
-import { Footer } from "./footer";
+import { NavigationSignedOut } from "../Navigations/navigationSignedOut";
+import { Button } from "../ui/button";
+import BgImg from "../../assets/HeroSignedOutBg.png"
+import LockGuess from "../ui/LockedGuess";
+import { Footer } from "../footer";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from '@tanstack/react-query'
 import { loadUploadSignedOut } from "@/utils/querys/locations-query";
 
 
-export function HeroHomeSignedOut(){
+export function DashboardSingedOut(){
     
     const query = useQuery({
         queryKey:['uploadsSignedOut'],
@@ -36,7 +36,7 @@ export function HeroHomeSignedOut(){
                                     <h4 className="text-primary md:hidden block text-center leading-[150%]">Explore the world with Geotagger!</h4>
                                 <p className="max-w-105">Geotagger is webiste that allowes you to post picture and tag it on the map. Other user than try to locate it via Google Maps. </p>     
                                 </div>                   
-                                <Link to="/signup" className="lg:self-start items-center">
+                                <Link to="/AuthPage/signup" className="lg:self-start items-center">
                                     <Button variant="default">Sign up</Button>
                                 </Link> 
                         </div>
@@ -53,7 +53,7 @@ export function HeroHomeSignedOut(){
                             <LockGuess imageUrl={upload.imageUrl}></LockGuess>
                         )}
                     </div>
-                    <Link to="/signup">
+                    <Link to="/AuthPage/signup">
                         <Button variant="default">Sign up</Button>
                     </Link>                  
                 </div>

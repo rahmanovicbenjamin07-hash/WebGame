@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-import { Button } from "../components/ui/button"
-import ProfileImage from "../assets/ProfileImageLarge.png";
-import { InputNoBorder } from "./ui/inputNoBorder";
+import { Button } from "../ui/button"
+import ProfileImage from "../../assets/ProfileImageLarge.png";
+import { InputNoBorder } from "../ui/inputNoBorder";
 import { useMutation} from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
-import { Input } from "./ui/input";
-import { FieldError } from "./ui/FieldError";
+import { Input } from "../ui/input";
+import { FieldError } from "../ui/FieldError";
 import { useUser } from "@/authentication/userContext";
 import { ProfileFormSchema } from "@/schemas/ProfileFormSchema";
 import { fileToBase64 } from "@/utils/fileToBase";
-import { Label } from "./ui/label";
+import { Label } from "../ui/label";
 import { updateUser } from '@/api/updateUser';
 import { useObjectUrl } from "@/hook/useObjectUrl";
 

@@ -1,4 +1,4 @@
-import { HeroHomeSignedOut } from '@/components/HeroHomeSignedOut'
+import { DashboardSingedOut } from '../components/HeroSections/DashboardSingedOut'
 import { createFileRoute } from '@tanstack/react-router'
 export const Route = createFileRoute('/home')({
   component: RouteComponent,
@@ -7,7 +7,7 @@ export const Route = createFileRoute('/home')({
 function RouteComponent() {
   return (
     <div>
-      <HeroHomeSignedOut />
+      <DashboardSingedOut />
     </div>
   )
 }

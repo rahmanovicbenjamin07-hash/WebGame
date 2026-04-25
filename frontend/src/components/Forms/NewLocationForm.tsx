@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import ImagePreview from "./ui/imagePreview";
-import { Button } from "./ui/button";
+import ImagePreview from "../ui/imagePreview";
+import { Button } from "../ui/button";
 import { MapContainer, TileLayer, Marker} from "react-leaflet";
-import {LocationPicker} from "../components/ui/MapLocationPicker"
-import { defaultIcon } from "./ui/MapDefaultsIcon";
+import {LocationPicker} from "../ui/MapLocationPicker"
+import { defaultIcon } from "../ui/MapDefaultsIcon";
 import { getLocationName } from "@/utils/LocationName";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { fileToBase64 } from "@/utils/fileToBase";

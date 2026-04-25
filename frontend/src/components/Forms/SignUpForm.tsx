@@ -1,15 +1,15 @@
-import { Input } from "../components/ui/input"
-import { Button } from "../components/ui/button"
+import { Input } from "../ui/input"
+import { Button } from "../ui/button"
 import { useState } from "react";
 import { useNavigate } from '@tanstack/react-router';
 import { Link } from '@tanstack/react-router';
-import ProfileImagePreview from "./ui/profileImagePreview";
+import ProfileImagePreview from "../ui/profileImagePreview";
 import { useMutation} from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
 import { signUpSchema} from '@/schemas/SignUpSchema';
-import { FieldError } from "./ui/FieldError";
+import { FieldError } from "../ui/FieldError";
 import { fileToBase64 } from "@/utils/fileToBase";
-import { Label } from "./ui/label";
+import { Label } from "../ui/label";
 import { signUp } from "@/api/signUp";
 import { useIsMobile } from "@/utils/isMobile";
 import { useObjectUrl } from "@/hook/useObjectUrl";
@@ -35,7 +35,7 @@ export function SignUpForm(){
             return signUp({...values,avatar: avatarBase64,avatarName: avatar?.name,avatarType: avatar?.type,password: values.password,confirmpassword: values.confirmpassword,})
     },
         onSuccess: () => {
-            navigate({ to: '/home/signed-in' });
+            navigate({ to: '/home/Dashboard' });
         },
         onError: (error) => {
             toast.error(error.message);
@@ -195,7 +195,7 @@ export function SignUpForm(){
 
                 <div className="flex justify-between items-center">
                     <p className="leading-6">Already have an account?</p>
-                    <Link to="/signin" className="text-primary text-[16px] font-normal">Sign in</Link>
+                    <Link to="/AuthPage/signin" className="text-primary text-[16px] font-normal">Sign in</Link>
                 </div>
             </form>
         </div>

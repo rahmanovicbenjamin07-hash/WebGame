@@ -1,10 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { SignUpForm } from '../components/SignUpForm'
-import BgImage from '../assets/SignUpPageImage.png'
-import Logo from '../assets/Logo.png'
-import { NavigationSignedOut } from '@/components/navigationSignedOut'
+import { SignUpForm } from '../../components/Forms/SignUpForm'
+import BgImage from '../../assets/SignUpPageImage.png'
+import Logo from '../../assets/Logo.png'
+import { NavigationSignedOut } from '../../components/Navigations/navigationSignedOut'
 
-export const Route = createFileRoute('/signup')({
+export const Route = createFileRoute('/AuthPage/signup')({
   component: SignUpPage,
 })
 

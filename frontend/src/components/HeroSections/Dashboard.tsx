@@ -1,17 +1,17 @@
-import { Button } from "../components/ui/button";
-import CloseGuess  from "../components/ui/CloseGuess";
-import { Footer } from "./footer";
-import NewUploads from "../components/ui/NewUploads";
-import { NavigationSignedIn } from '../components/navigationSignedIn'
+import { Button } from "../../components/ui/button";
+import CloseGuess  from "../../components/ui/CloseGuess";
+import { Footer } from "../footer";
+import NewUploads from "../../components/ui/NewUploads";
+import { NavigationSignedIn } from '../../components/Navigations/navigationSignedIn'
 import { useState } from "react";
-import { GuessingTab } from "./GuessingTab";
+import { GuessingTab } from "../Forms/GuessingTab";
 import { useIsMobile } from "@/utils/isMobile";
 import { fetchGuesses } from "@/utils/querys/guesses-query";
 import { useQuery, useInfiniteQuery} from '@tanstack/react-query'
 import { fetchLocationsList } from "@/utils/querys/locations-query";
 import { useUser } from "@/authentication/userContext";
 
-export function HeroHomeSignedIn(){
+export function Dashboard(){
     const [open, setOpen] = useState(false);
     const [selectedLocationId, setSelectedLocationId] = useState<number | null>(null);
     const isMobile = useIsMobile();

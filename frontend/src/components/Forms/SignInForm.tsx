@@ -1,5 +1,5 @@
-import { Input } from "../components/ui/input";
-import { Button } from "../components/ui/button";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 import { useNavigate } from '@tanstack/react-router';
 import { Link } from '@tanstack/react-router';
 import { signIn } from "@/authentication/auth";
@@ -7,8 +7,8 @@ import { useMutation} from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
 import { setStoredUser, useUser } from "@/authentication/userContext";
 import { signInSchema } from '@/schemas/SignInSchema';
-import { FieldError } from "./ui/FieldError";
-import { Label } from "./ui/label";
+import { FieldError } from "../ui/FieldError";
+import { Label } from "../ui/label";
 import type { LoginResponseDto } from '@/types/api';
 import { toast } from "sonner";
 
@@ -23,7 +23,7 @@ export function SignInForm(){
         onSuccess: (response: LoginResponseDto) => {
             setStoredUser(response.data);
             setUser(response.data);
-            navigate({ to: '/home/signed-in' });
+            navigate({ to: '/home/Dashboard' });
         },
         onError: (error) => {
             toast.error(error.message);
@@ -108,7 +108,7 @@ export function SignInForm(){
 
                 <div className="flex justify-between items-center">
                     <p className="lg:leading-[150%]">Do you want to create an account?</p>
-                    <Link to="/signup" className="text-primary text-[16px] font-normal text-nowrap">Sign up</Link>
+                    <Link to="/AuthPage/signup" className="text-primary text-[16px] font-normal text-nowrap">Sign up</Link>
                 </div>
             </form>
         </div>

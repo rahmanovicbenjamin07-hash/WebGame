@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { ProfileForm } from '@/components/ProfileForm'
+import { ProfileForm } from '../../components/Forms/ProfileForm'
 import { ProfileBestGuess } from '@/components/ProfileBestGuess'
-import { NewLocationForm } from '@/components/NewLocationForm'
-import { NavigationSignedIn } from '@/components/navigationSignedIn'
+import { NewLocationForm } from '@/components/Forms/NewLocationForm'
+import { NavigationSignedIn } from '@/components/Navigations/navigationSignedIn'
 import { Footer } from '@/components/footer'
 import { useUser } from '@/authentication/userContext'
 

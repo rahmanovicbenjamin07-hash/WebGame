@@ -6,16 +6,16 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { InputNoBorder } from "./ui/inputNoBorder"
+import { InputNoBorder } from "../ui/inputNoBorder"
 import { MapContainer, TileLayer, Marker} from "react-leaflet";
-import {LocationPicker} from "../components/ui/MapLocationPicker"
-import { defaultIcon } from "./ui/MapDefaultsIcon"; 
+import {LocationPicker} from "../ui/MapLocationPicker"
+import { defaultIcon } from "../ui/MapDefaultsIcon"; 
 import { getLocationName } from "@/utils/LocationName";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchLocation } from "@/utils/querys/locations-query";
 import { toast } from "sonner"
 import { useUser } from "@/authentication/userContext";
-import { LabelBig } from "./ui/labelBig";
+import { LabelBig } from "../ui/labelBig";
 import { createGuess } from '@/api/addGuesses';
 
 interface GuessingTabProps {
