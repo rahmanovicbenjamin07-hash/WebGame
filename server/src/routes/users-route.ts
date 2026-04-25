@@ -121,10 +121,11 @@ usersRoute.put("/update/:id",async (c) => {
     let image: string | null = null;
     let newHashedPassword :string | undefined = undefined;
 
-    if(password && password.trim() !==""){
-        const isPasswordSame = await compare(password,user.password);
-        if(!isPasswordSame) return c.json({error:"Invalid credentials!"},401);
-    }
+    if (password && password.trim() !== "") {
+    const isPasswordSame = await compare(password, user.password); 
+    if (!isPasswordSame) return c.json({ error: "Invalid credentials!" }, 401);
+    newHashedPassword = await hash(password, 10);
+}
 
     if (avatarBase64 && avatarName) {
     const base64Data = avatarBase64.replace(/^data:.+;base64,/, "");
