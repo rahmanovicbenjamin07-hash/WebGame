@@ -10,6 +10,7 @@ import { deleteCookie, setCookie } from "hono/cookie";
 import { authMiddleware } from '../../middleware/middleware.js';
 import "dotenv/config";
 import supabase from "../db/supabase.js";
+import { createHash } from 'crypto';
 
 const usersRoute = new Hono()
 
@@ -170,7 +171,8 @@ usersRoute.post("/signin", async (c) => {
         return c.json({error:"Invalid credentials"},401);
     }
 
-    const isPasswordSame = await compare(password, user.password);
+    const sha256Password = createHash('sha256').update(password).digest('hex');
+    const isPasswordSame = await compare(sha256Password, user.password);
 
     if (!isPasswordSame) return c.json({ error: "Invalid credentials" }, 401);
 

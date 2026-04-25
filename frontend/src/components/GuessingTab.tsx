@@ -55,12 +55,7 @@ export function GuessingTab({open,setOpen,locationId}: GuessingTabProps) {
             { latitude: lat, longitude: lng }                      
         );
 
-        const result = await createGuess(user?.id, {
-            locationId,
-            guessedLat: lat,
-            guessedLng: lng,
-            missMeters,
-            });
+        const result = await createGuess(user?.id, {locationId,guessedLat: lat,guessedLng: lng,missMeters});
 
         return { result, missMeters };
         },

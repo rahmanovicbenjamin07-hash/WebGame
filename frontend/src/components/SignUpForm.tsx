@@ -12,6 +12,7 @@ import { sha256Hex } from "@/lib/crypto";
 import { fileToBase64 } from "@/utils/fileToBase";
 import { Label } from "./ui/label";
 import { apiFetch } from "@/lib/api"
+import { signUp } from "@/api/signUp";
 
 const isMobile = window.innerWidth < 1024;
 
@@ -33,18 +34,7 @@ export function SignUpForm(){
 
             const avatarBase64 = await fileToBase64(avatar);
 
-            return apiFetch('/user/signup', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                ...values,
-                avatar: avatarBase64,
-                avatarName: avatar?.name,
-                avatarType: avatar?.type,
-                password: sha256Hex(values.password),
-                confirmpassword: sha256Hex(values.confirmpassword),
-            }),
-        });
+            return signUp({...values,avatar: avatarBase64,avatarName: avatar?.name,avatarType: avatar?.type,password: await  sha256Hex(values.password),confirmpassword: await  sha256Hex(values.confirmpassword),})
     },
         onSuccess: () => {
             navigate({ to: '/home/signed-in' });

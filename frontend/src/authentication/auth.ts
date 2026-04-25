@@ -29,7 +29,6 @@ export const fetchUser = async () => {
 }
 
 export const signIn = async (data: SignInInput) => {
-  try {
     return await apiFetch<LoginResponse>('/user/signin', {
       method: 'POST',
       headers: {
@@ -37,9 +36,5 @@ export const signIn = async (data: SignInInput) => {
       },
       body: JSON.stringify(data),
     })
-  } catch (error) {
-    console.error(error)
-    return null
-  }
 }
 
