@@ -1,16 +1,5 @@
 import { apiFetch } from '@/lib/api';
-
-export interface CreateGuessPayload {
-  locationId: number | null;
-  guessedLat: number;
-  guessedLng: number;
-  missMeters: number;
-}
-
-export interface GuessResponse {
-  id: number;
-  missMeters: number;
-}
+import type { CreateGuessPayload, GuessResponse } from '@/types/api';
 
 export const createGuess = (
   userId: number  | undefined,

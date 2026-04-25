@@ -5,16 +5,12 @@ import { Link } from '@tanstack/react-router';
 import { signIn } from "@/authentication/auth";
 import { useMutation} from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
-import { setStoredUser, type User, useUser } from "@/authentication/userContext";
+import { setStoredUser, useUser } from "@/authentication/userContext";
 import { signInSchema } from '@/schemas/SignInSchema';
 import { FieldError } from "./ui/FieldError";
 import { Label } from "./ui/label";
+import type { LoginResponseDto } from '@/types/api';
 import { toast } from "sonner";
-
-type LoginResponse = {
-    data: User,
-    message:string
-}
 
 export function SignInForm(){
     const navigate = useNavigate();
@@ -24,7 +20,7 @@ export function SignInForm(){
         mutationFn: async (values: { email: string; password: string }) => {           
             return signIn({ email: values.email, password: values.password });    
         },
-        onSuccess: (response: LoginResponse) => {
+        onSuccess: (response: LoginResponseDto) => {
             setStoredUser(response.data);
             setUser(response.data);
             navigate({ to: '/home/signed-in' });

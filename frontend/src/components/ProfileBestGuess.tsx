@@ -1,32 +1,15 @@
 import CloseGuess from './ui/CloseGuess'
-import { useState, useEffect } from 'react'
-import { fetchUser } from '@/authentication/auth'
 import { useQuery } from '@tanstack/react-query'
 import { fetchGuesses } from '@/utils/querys/guesses-query'
-
-interface userData {
-  email: string
-  firstname: string
-  id: number
-  lastname: string
-}
+import { useUser } from '@/authentication/userContext'
 
 export function ProfileBestGuess() {
-  const [user, setUser] = useState<userData | null>(null)
-
-  useEffect(() => {
-    fetchUser().then((data) => {
-      if (data) {
-        setUser(data)
-      }
-    })
-  }, [])
-
+  const { user } = useUser();
 
   const query = useQuery({
-    queryKey:['bestGuesses'],
+    queryKey: ['bestGuesses'],
     queryFn: async () => await fetchGuesses(user?.id!),
-    enabled: !!user?.id
+    enabled: !!user?.id,
   })
 
   if(query.isError){

@@ -1,12 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import type { UserDto } from '@/types/api'
 
-export interface User {
-    email: string
-    firstname: string
-    id: number
-    lastname: string
-    image: string | null
-}
+export type User = UserDto;
 
 export interface UserContextType {
   isAuthenticated: boolean

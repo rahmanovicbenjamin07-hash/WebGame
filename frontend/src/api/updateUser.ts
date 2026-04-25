@@ -1,19 +1,7 @@
 import { apiFetch } from '@/lib/api';
 import { sha256Hex } from '@/lib/crypto';
+import type { UpdateUserPayload, UpdateProfileResponse } from '@/types/api';
 
-export interface UpdateUserPayload {
-  avatar?: string | null;
-  avatarName?: string;
-  avatarType?: string;
-  password?: string;
-  [key: string]: unknown;
-}
-
-export interface UpdateProfileResponse {
-  id: number;
-  username: string;
-  image?: string;
-}
 
 export const updateUser = async (
   userId: number | undefined,
