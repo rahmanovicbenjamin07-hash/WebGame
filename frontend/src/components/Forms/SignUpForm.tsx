@@ -9,7 +9,7 @@ import { signUpSchema} from '@/schemas/SignUpSchema';
 import { FieldError } from "../ui/FieldError";
 import { fileToBase64 } from "@/utils/fileToBase";
 import { Label } from "../ui/label";
-import { signUp } from "@/api/signUp";
+import { signUp } from "../../utils/querys/user-query";
 import { useIsMobile } from "@/utils/isMobile";
 import { useObjectUrl } from "@/hook/useObjectUrl";
 import { toast } from "sonner";

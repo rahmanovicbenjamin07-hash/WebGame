@@ -8,7 +8,7 @@ import arrowDark from "../../assets/ArrowBlack.svg"
 import arrowGradient from "../../assets/ArrowGradient.svg"
 import { useMutation} from "@tanstack/react-query";
 import { useUser } from "@/authentication/userContext";
-import { signOut } from "@/api/signOut";
+import { signOut } from "../../utils/querys/user-query";
 
 export function NavigationSignedIn(){
     const [openMenu, setOpenMenu] = useState<boolean>(false);;
