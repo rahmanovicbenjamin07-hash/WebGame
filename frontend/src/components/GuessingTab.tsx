@@ -16,7 +16,7 @@ import { fetchLocation } from "@/utils/querys/locations-query";
 import { toast } from "sonner"
 import { useUser } from "@/authentication/userContext";
 import { LabelBig } from "./ui/labelBig";
-import { apiFetch } from "@/lib/api";
+import { createGuess } from '@/api/addGuesses';
 
 interface GuessingTabProps {
     open: boolean;
@@ -24,10 +24,6 @@ interface GuessingTabProps {
     locationId: number | null;
 }
 
-interface GuessResponse {
-    id: number
-    missMeters: number
-}
 
 export function GuessingTab({open,setOpen,locationId}: GuessingTabProps) {
     const queryClient = useQueryClient();
@@ -59,17 +55,11 @@ export function GuessingTab({open,setOpen,locationId}: GuessingTabProps) {
             { latitude: lat, longitude: lng }                      
         );
 
-        const result = await apiFetch<GuessResponse>(`/guess/${user?.id}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    locationId: locationId,
-                    guessedLat: lat,
-                    guessedLng: lng,
-                    missMeters: missMeters,
-                }),
+        const result = await createGuess(user?.id, {
+            locationId,
+            guessedLat: lat,
+            guessedLng: lng,
+            missMeters,
             });
 
         return { result, missMeters };

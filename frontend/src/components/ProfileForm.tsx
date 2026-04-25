@@ -10,11 +10,7 @@ import { useUser } from "@/authentication/userContext";
 import { ProfileFormSchema } from "@/schemas/ProfileFormSchema";
 import { fileToBase64 } from "@/utils/fileToBase";
 import { Label } from "./ui/label";
-import { apiFetch } from "@/lib/api";
-
-interface UpdateProfileResponse {
-    image?: string;
-}
+import { updateUser } from '@/api/updateUser';
 
 export function ProfileForm(){
     const { user, setUser } = useUser();
@@ -31,22 +27,18 @@ export function ProfileForm(){
     }; 
 
     const displayAvatar = avatarPreview ?? user?.image ?? ProfileImage;
-
+    
     const updateProfileMutation = useMutation({
         mutationFn: async (values :{password:string; firstname:string; lastname:string}) => {
             
             const avatarBase64 = await fileToBase64(avatar);   
            
-            return apiFetch<UpdateProfileResponse>(`/user/update/${user?.id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    ...values,
-                    avatar: avatarBase64,
-                    avatarName: avatar?.name,
-                    avatarType: avatar?.type,
-                }),
-            });
+            return updateUser(user?.id, {
+                ...values,
+                avatar: avatarBase64,
+                avatarName: avatar?.name,
+                avatarType: avatar?.type,
+                });
         },
         onSuccess: (result) => {
             setUser({ ...user!, image: result.image ?? user?.image ?? null });
@@ -72,6 +64,8 @@ export function ProfileForm(){
             updateProfileMutation.mutate(value);
         }
     })
+
+    const isLoading = updateProfileMutation.isPending;
 
     return (
         <div className="relative xl:max-w-105 lg:min-h-189.75 flex flex-col items-center justify-end gap-6 my-auto shadow-[0_0_10px_0_rgba(0,0,0,0.2)] px-8 pb-6 rounded-2xl">
@@ -168,14 +162,14 @@ export function ProfileForm(){
                 <form.Subscribe
                     selector={(state) => [state.canSubmit, state.isSubmitting]}
                     children={([canSubmit, isSubmitting]) => (
-                        <Button
-                            className="w-full"
-                            type="submit"
-                            disabled={!canSubmit || isSubmitting}
-                        >
-                            {isSubmitting ? "Saving..." : "Save Changes"}
-                        </Button>
-                    )}
+                    <Button
+                        className="w-full"
+                        type="submit"
+                        disabled={!canSubmit || isSubmitting || isLoading}
+                    >
+                        {isLoading ? "Saving..." : "Save Changes"}
+                    </Button>
+                )}
                 />
             </form>
         </div>

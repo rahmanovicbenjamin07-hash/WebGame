@@ -8,7 +8,7 @@ import arrowDark from "../assets/ArrowBlack.svg"
 import arrowGradient from "../assets/ArrowGradient.svg"
 import { useMutation} from "@tanstack/react-query";
 import { useUser } from "@/authentication/userContext";
-import { apiFetch } from "@/lib/api";
+import { signOut } from "@/api/signOut";
 
 export function NavigationSignedIn(){
     const [openMenu, setOpenMenu] = useState<boolean>(false);;
@@ -16,12 +16,8 @@ export function NavigationSignedIn(){
     const { user, logout } = useUser();
 
     const logOutMutation = useMutation({
-        mutationFn: async () => {
-
-            return apiFetch("/user/signout", {
-                method:"POST",
-                credentials: "include",
-            })
+        mutationFn: async () => {     
+            return signOut();
         },
 
         onSuccess: () => {
