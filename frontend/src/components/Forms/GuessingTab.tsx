@@ -16,7 +16,7 @@ import { fetchLocation } from "@/utils/querys/locations-query";
 import { toast } from "sonner"
 import { useUser } from "@/authentication/userContext";
 import { LabelBig } from "../ui/labelBig";
-import { createGuess } from '@/api/addGuesses';
+import { createGuess } from '@/utils/querys/guesses-query';
 
 interface GuessingTabProps {
     open: boolean;

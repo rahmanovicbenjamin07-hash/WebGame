@@ -10,7 +10,7 @@ import { useUser } from "@/authentication/userContext";
 import { ProfileFormSchema } from "@/schemas/ProfileFormSchema";
 import { fileToBase64 } from "@/utils/fileToBase";
 import { Label } from "../ui/label";
-import { updateUser } from '@/api/updateUser';
+import { updateUser } from '../../utils/querys/user-query';
 import { useObjectUrl } from "@/hook/useObjectUrl";
 
 export function ProfileForm(){

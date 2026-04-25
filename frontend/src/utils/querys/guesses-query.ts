@@ -1,4 +1,6 @@
-import { apiFetch } from "@/lib/api"
+import { apiFetch } from '@/lib/api';
+import type { CreateGuessPayload, GuessResponse } from '@/types/api';
+
 
 interface Guess {
   id: number
@@ -15,23 +17,18 @@ export const fetchGuesses = async (userId: number) => {
 }
 
 
-export const addGuess = async (userId: number, locationId: number,lat: number,lng: number,missMeters: number) => {
-    try {
+export const createGuess = (
+  userId: number  | undefined,
+  payload: CreateGuessPayload,
+): Promise<GuessResponse> => {
+  if (!userId) throw new Error('User is not logged in');
 
-        return await apiFetch(`/guess/${userId}`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              locationId: locationId,
-              guessedLat: lat,
-              guessedLng: lng,
-              missMeters: missMeters,
-            }),
-          })
-          }catch (error) {
-          console.error(error);
-        }
-}
+  return apiFetch<GuessResponse>(`/guess/${userId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+};
 
