@@ -3,7 +3,7 @@ import CloseGuess  from "../../components/ui/CloseGuess";
 import NewUploads from "../../components/ui/NewUploads";
 import { NavigationSignedIn } from '../../components/Navigations/navigationSignedIn'
 import { useState } from "react";
-import { GuessingTab } from "../Forms/GuessingTab";
+import { GuessingTab } from "../Forms/guessing-tab";
 import { useIsMobile } from "@/utils/isMobile";
 import { fetchGuesses } from "@/utils/querys/guesses-query";
 import { useQuery, useInfiniteQuery} from '@tanstack/react-query'
