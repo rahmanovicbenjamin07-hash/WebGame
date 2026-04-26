@@ -6,9 +6,8 @@ import ProfileImagePreview from "../ui/profileImagePreview";
 import { useMutation} from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
 import { signUpSchema} from '@/schemas/SignUpSchema';
-import { FieldError } from "../ui/FieldError";
 import { fileToBase64 } from "@/utils/fileToBase";
-import { Label } from "../ui/label";
+import { FieldGroup, Field, FieldLabel, FieldError } from "../ui/form-field-components";
 import { signUp } from "../../utils/querys/user-query";
 import { useIsMobile } from "@/utils/isMobile";
 import { useObjectUrl } from "@/hook/useObjectUrl";
@@ -80,86 +79,88 @@ export function SignUpForm(){
                 form.handleSubmit();
             }}
         >
-            <form.Field
-                name="email"
-                children={(field) => (
-                    <div className="flex flex-col gap-2">
-                        <Label>Email</Label>
-                        <Input
-                            placeholder="example@net.com"
-                            type="email"
-                            value={field.state.value}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            onBlur={field.handleBlur}
-                        />
-                        <FieldError errors={field.state.meta.errors} />
-                    </div>
-                )}
-            />
-            <div className="flex gap-4">
+            <FieldGroup>
                 <form.Field
-                    name="firstname"
+                    name="email"
                     children={(field) => (
-                        <div className="flex flex-col gap-2">
-                            <Label>First Name</Label>
+                        <Field>
+                            <FieldLabel>Email</FieldLabel>
                             <Input
-                                placeholder="Jacob"
+                                placeholder="example@net.com"
+                                type="email"
                                 value={field.state.value}
                                 onChange={(e) => field.handleChange(e.target.value)}
                                 onBlur={field.handleBlur}
                             />
                             <FieldError errors={field.state.meta.errors} />
-                        </div>
+                        </Field>
                     )}
                 />
+                <div className="flex gap-4">
+                    <form.Field
+                        name="firstname"
+                        children={(field) => (
+                            <Field>
+                                <FieldLabel>First Name</FieldLabel>
+                                <Input
+                                    placeholder="Jacob"
+                                    value={field.state.value}
+                                    onChange={(e) => field.handleChange(e.target.value)}
+                                    onBlur={field.handleBlur}
+                                />
+                                <FieldError errors={field.state.meta.errors} />
+                            </Field>
+                        )}
+                    />
+                    <form.Field
+                        name="lastname"
+                        children={(field) => (
+                            <Field>
+                                <FieldLabel>Last Name</FieldLabel>
+                                <Input
+                                    placeholder="Jones"
+                                    value={field.state.value}
+                                    onChange={(e) => field.handleChange(e.target.value)}
+                                    onBlur={field.handleBlur}
+                                />
+                                <FieldError errors={field.state.meta.errors} />
+                            </Field>
+                        )}
+                    />
+                </div>
                 <form.Field
-                    name="lastname"
+                    name="password"
                     children={(field) => (
-                        <div className="flex flex-col gap-2">
-                            <Label>Last Name</Label>
+                        <Field>
+                            <FieldLabel>Password</FieldLabel>
                             <Input
-                                placeholder="Jones"
+                                placeholder="••••••••••••••••"
+                                type="password"
                                 value={field.state.value}
                                 onChange={(e) => field.handleChange(e.target.value)}
                                 onBlur={field.handleBlur}
                             />
                             <FieldError errors={field.state.meta.errors} />
-                        </div>
+                        </Field>
                     )}
                 />
-            </div>
-            <form.Field
-                name="password"
-                children={(field) => (
-                    <div className="flex flex-col gap-2">
-                        <Label>Password</Label>
-                        <Input
-                            placeholder="••••••••••••••••"
-                            type="password"
-                            value={field.state.value}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            onBlur={field.handleBlur}
-                        />
-                        <FieldError errors={field.state.meta.errors} />
-                    </div>
-                )}
-            />
-            <form.Field
-                name="confirmpassword"
-                children={(field) => (
-                    <div className="flex flex-col gap-2">
-                        <Label>Confirm Password</Label>
-                        <Input
-                            placeholder="••••••••••••••••"
-                            type="password"
-                            value={field.state.value}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            onBlur={field.handleBlur}
-                        />
-                        <FieldError errors={field.state.meta.errors} />
-                    </div>
-                )}
-            />
+                <form.Field
+                    name="confirmpassword"
+                    children={(field) => (
+                        <Field>
+                            <FieldLabel>Confirm Password</FieldLabel>
+                            <Input
+                                placeholder="••••••••••••••••"
+                                type="password"
+                                value={field.state.value}
+                                onChange={(e) => field.handleChange(e.target.value)}
+                                onBlur={field.handleBlur}
+                            />
+                            <FieldError errors={field.state.meta.errors} />
+                        </Field>
+                    )}
+                />
+            </FieldGroup>
             <form.Subscribe
                 selector={(state) => [state.canSubmit, state.isSubmitting]}
                 children={([canSubmit, isSubmitting]) => (

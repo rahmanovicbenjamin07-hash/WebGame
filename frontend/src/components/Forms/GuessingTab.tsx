@@ -7,16 +7,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { InputNoBorder } from "../ui/inputNoBorder"
-import { MapContainer, TileLayer, Marker} from "react-leaflet";
-import {LocationPicker} from "../ui/MapLocationPicker"
-import { defaultIcon } from "../ui/MapDefaultsIcon"; 
-import { getLocationName } from "@/utils/LocationName";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchLocation } from "@/utils/querys/locations-query";
 import { toast } from "sonner"
 import { useUser } from "@/authentication/userContext";
-import { LabelBig } from "../ui/labelBig";
 import { createGuess } from '@/utils/querys/guesses-query';
+import LocationMap from "../ui/map-location";
+import { Field, FieldLabel } from "../ui/form-field-components";
 
 interface GuessingTabProps {
     open: boolean;
@@ -84,27 +81,27 @@ export function GuessingTab({open,setOpen,locationId}: GuessingTabProps) {
                 </div>
                 <div className="flex flex-col lg:gap-4 gap-7.25 lg:w-[50%] justify-stretch items-stretch">
                     <div>
-                        <MapContainer center={[44.6131, 17.9867]} zoomControl={false} zoom={7} className="w-full lg:h-50.25 h-46.25 rounded-[19px] z-0">
-                            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />                                                              
-                            <LocationPicker onLocationSelect={async (lat, lng) => {
+                        <LocationMap
+                            lat={lat}
+                            lng={lng}
+                            onLocationSelect={(lat, lng, name) => {
                                 setLat(lat);
                                 setLng(lng);
-                                const name = await getLocationName(lat, lng);
                                 setLocationName(name);
-                            }} />
-                            {lat !== 0 && lng !== 0 && ( <Marker position={[lat, lng]} icon={defaultIcon} /> )}  
-                        </MapContainer> 
+                            }}
+                            className="lg:h-50.25 h-46.25"
+                            /> 
                     </div>
                     <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
                         <div className="flex lg:gap-7.25 gap-2.5 w-full lg:flex-row flex-col">
-                            <div className="flex flex-col gap-2.5 lg:w-53">
-                                <LabelBig>Error distance</LabelBig>
+                            <Field className="lg:w-53">
+                                <FieldLabel>Error distance</FieldLabel>
                                 <InputNoBorder placeholder={`${missedMeters}`} readOnly className="lg:w-auto w-full"/>
-                            </div>
-                            <div className="flex flex-col gap-2.5 lg:min-w-0 lg:w-92.75 min-w-full items-stretch">
-                                <LabelBig>Guessed location</LabelBig>
+                            </Field>
+                            <Field className="lg:min-w-0 lg:w-92.75 min-w-full items-stretch">
+                                <FieldLabel>Guessed location</FieldLabel>
                                 <InputNoBorder value={locationName} readOnly className="lg:w-auto w-full"/>
-                            </div>
+                            </Field>
                         </div>
                         <Button type="submit" className="lg:w-34.25 w-full" disabled={guessMutation.isPending}>
                             {guessMutation.isPending ? "Guessing..." : "Guess"}

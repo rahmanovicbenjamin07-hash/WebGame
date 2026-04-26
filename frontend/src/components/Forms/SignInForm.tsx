@@ -6,13 +6,13 @@ import { useMutation} from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
 import { setStoredUser, useUser } from "@/authentication/userContext";
 import { signInSchema } from '@/schemas/SignInSchema';
-import { FieldError } from "../ui/FieldError";
-import { Label } from "../ui/label";
 import type { LoginResponseDto } from '@/types/api';
 import { toast } from "sonner";
 import { AuthWrapper } from "../ui/AuthWrapper";
 import { AuthRedirectLink } from "../ui/AuthRedirectLink";
 import { AuthHeading } from "../ui/AuthHeading";
+import {  FieldGroup, Field, FieldLabel, FieldError } from "../ui/form-field-components";
+
 
 export function SignInForm(){
     const navigate = useNavigate();
@@ -55,38 +55,40 @@ export function SignInForm(){
                 form.handleSubmit();
             }}
         >
-            <form.Field
-                name="email"                    
-                children={(field) => (
-                    <div className="flex flex-col gap-2">
-                        <Label>Email</Label>
-                        <Input
-                            placeholder="example@net.com"
-                            type="email"
-                            value={field.state.value}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            onBlur={field.handleBlur}
-                        />
-                        <FieldError errors={field.state.meta.errors} />
-                    </div>
-                )}
-            />
-            <form.Field
-                name="password"
-                children={(field) => (
-                    <div className="flex flex-col gap-2">
-                        <Label>Password</Label>
-                        <Input
-                            placeholder="••••••••••••••••"
-                            type="password"
-                            value={field.state.value}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            onBlur={field.handleBlur}
-                        />
-                        <FieldError errors={field.state.meta.errors} />
-                    </div>
-                )}
-            />
+            <FieldGroup>
+                <form.Field
+                    name="email"                    
+                    children={(field) => (
+                        <Field>
+                            <FieldLabel>Email</FieldLabel>
+                            <Input
+                                placeholder="example@net.com"
+                                type="email"
+                                value={field.state.value}
+                                onChange={(e) => field.handleChange(e.target.value)}
+                                onBlur={field.handleBlur}
+                            />
+                            <FieldError errors={field.state.meta.errors} />
+                        </Field>
+                    )}
+                />
+                <form.Field
+                    name="password"
+                    children={(field) => (
+                        <Field>
+                            <FieldLabel>Password</FieldLabel>
+                            <Input
+                                placeholder="••••••••••••••••"
+                                type="password"
+                                value={field.state.value}
+                                onChange={(e) => field.handleChange(e.target.value)}
+                                onBlur={field.handleBlur}
+                            />
+                            <FieldError errors={field.state.meta.errors} />
+                        </Field>
+                    )}
+                />
+            </FieldGroup>
             <form.Subscribe
                 selector={(state) => [state.canSubmit, state.isSubmitting]}
                 children={([canSubmit, isSubmitting]) => (

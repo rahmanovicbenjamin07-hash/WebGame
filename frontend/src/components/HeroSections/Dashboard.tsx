@@ -1,6 +1,5 @@
 import { Button } from "../../components/ui/button";
 import CloseGuess  from "../../components/ui/CloseGuess";
-import { Footer } from "../footer";
 import NewUploads from "../../components/ui/NewUploads";
 import { NavigationSignedIn } from '../../components/Navigations/navigationSignedIn'
 import { useState } from "react";
@@ -11,6 +10,8 @@ import { useQuery, useInfiniteQuery} from '@tanstack/react-query'
 import { fetchLocationsList } from "@/utils/querys/locations-query";
 import { useUser } from "@/authentication/userContext";
 import { SectionHeading } from "../ui/SectionHeading";
+import FooterWrapper from "../Wrappers/footer-wrapper";
+import PageWrapper from "../Wrappers/dashboard-page-wrapper";
 
 export function Dashboard(){
     const [open, setOpen] = useState(false);
@@ -60,7 +61,7 @@ export function Dashboard(){
     <>
         <GuessingTab open={open} setOpen={setOpen} locationId={selectedLocationId}/>
         <NavigationSignedIn/>
-        <div className="relative lg:pb-26.5 pb-29">
+        <PageWrapper className="lg:pb-26.5 pb-29">
             <div className="max-w-325 lg:mx-auto mx-8.75 lg:mt-20.75 mt-0">
                 <div className="flex flex-col lg:gap-2 gap-4 lg:mt-0 mt-14">
                     <SectionHeading
@@ -95,10 +96,8 @@ export function Dashboard(){
                     )}
                 </div>
             </div>
-            <div className="absolute left-0 right-0 bottom-0">
-                <Footer/>
-            </div>
-        </div>
+            <FooterWrapper/>
+        </PageWrapper>
     </>
 );
 }
