@@ -159,7 +159,13 @@ usersRoute.put("/update", authMiddleware, async (c) => {
         ...(newHashedPassword ? { password: newHashedPassword } : {}),
     }).where(eq(usersTable.id, Number(userId)));
 
-     const [updatedUser] = await db.select().from(usersTable).where(eq(usersTable.id, Number(userId))).limit(1);
+    const [updatedUser] = await db.select({
+        id: usersTable.id,
+        email: usersTable.email,
+        firstname: usersTable.firstname,
+        lastname: usersTable.lastname,
+        image: usersTable.image,
+    }).from(usersTable).where(eq(usersTable.id, Number(userId))).limit(1);
     return c.json(updatedUser);
 })
 
