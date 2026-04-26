@@ -17,7 +17,13 @@ const usersRoute = new Hono()
 {/* Route to get all users*/}
 
 usersRoute.get('/', async (c) => {
-    const users = await db.select().from(usersTable);
+    const users = await db.select({
+        id: usersTable.id,
+        email: usersTable.email,
+        firstname: usersTable.firstname,
+        lastname: usersTable.lastname,
+        image: usersTable.image,
+    }).from(usersTable);
     return c.json(users);
 })
 
@@ -91,21 +97,24 @@ usersRoute.get("/me", authMiddleware, async (c) => {
 {/* Route to get user with specific id*/}
 
 usersRoute.get("/:id", async (c) => {
-    const {id} = c.req.param();
-    const user = await db.select().from(usersTable).where(eq(usersTable.id,Number(id)));
+    const { id } = c.req.param();
+    const [user] = await db.select({
+        id: usersTable.id,
+        email: usersTable.email,
+        firstname: usersTable.firstname,
+        lastname: usersTable.lastname,
+        image: usersTable.image,
+    }).from(usersTable).where(eq(usersTable.id, Number(id)));
 
-    if(!user) {
-        return c.json({error:"No user in database"},401);
-    }
-
+    if (!user) return c.json({ error: "No user in database" }, 404);
     return c.json(user);
 })
 
 {/* Route to get update user*/}
 
 
-usersRoute.put("/update/:id",async (c) => {
-    const {id} = c.req.param();
+usersRoute.put("/update", authMiddleware, async (c) => {
+    const { userId } = c.get("jwtPayload");
     const body = await c.req.json();
     const firstname = body["firstname"] as string;
     const lastname = body["lastname"] as string;
@@ -114,7 +123,7 @@ usersRoute.put("/update/:id",async (c) => {
     const avatarName = body["avatarName"] as string | undefined;
     const avatarType = body["avatarType"] as string | undefined;
 
-    const [user] = await db.select().from(usersTable).where(eq(usersTable.id, Number(id)));
+    const [user] = await db.select().from(usersTable).where(eq(usersTable.id, Number(userId)));
 
     if (!user) return c.json({ error: "User not found" }, 404);
 
@@ -148,18 +157,18 @@ usersRoute.put("/update/:id",async (c) => {
         lastname,
         ...(image !== null ? { image } : {}),
         ...(newHashedPassword ? { password: newHashedPassword } : {}),
-    }).where(eq(usersTable.id, Number(id)));
+    }).where(eq(usersTable.id, Number(userId)));
 
-     const [updatedUser] = await db.select().from(usersTable).where(eq(usersTable.id, Number(id))).limit(1);
+     const [updatedUser] = await db.select().from(usersTable).where(eq(usersTable.id, Number(userId))).limit(1);
     return c.json(updatedUser);
 })
 
 
 {/* Route to delete user with specific id*/}
 
-usersRoute.delete("/:id", async (c) => {
-    const {id} = c.req.param();
-    const deletedUser = await db.delete(usersTable).where(eq(usersTable.id,Number(id)));
+usersRoute.delete("/", authMiddleware, async (c) => {
+    const { userId } = c.get("jwtPayload")
+    const deletedUser = await db.delete(usersTable).where(eq(usersTable.id,Number(userId)));
     return c.json(deletedUser);
 })
 

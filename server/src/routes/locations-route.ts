@@ -4,6 +4,7 @@ import { db } from '../db/index.js';
 import { desc,asc, eq } from 'drizzle-orm';
 import { NUMBER } from 'sequelize';
 import supabase from "../db/supabase.js";
+import { authMiddleware } from '../../middleware/middleware.js';
 
 const locationRoute = new Hono()
 
@@ -16,7 +17,7 @@ locationRoute.get('/', async (c) => {
 
 {/* Route for creating new location from profile */}
 
-locationRoute.post("/newLocation", async (c) => {
+locationRoute.post("/newLocation", authMiddleware, async (c) => {
   try {
     const body = await c.req.json();
 
