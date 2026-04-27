@@ -6,3 +6,4 @@ export const createGuess = async  (params: {userId: number;locationId: number;gu
     const [guess] = await db.insert(guessesTable).values(params).returning();
     return guess;
 }
+
