@@ -1,230 +1,115 @@
 import { Hono } from 'hono'
-import { usersTable } from '../db/schema.js';
-import { db } from '../db/index.js';
-import { eq } from 'drizzle-orm';
-import { NUMBER } from 'sequelize';
-import { error } from 'console';
-import { compare, hash } from 'bcryptjs';
-import { sign } from "hono/jwt";
 import { deleteCookie, setCookie } from "hono/cookie";
 import { authMiddleware } from '../../middleware/middleware.js';
 import "dotenv/config";
-import supabase from "../db/supabase.js";
-import { createHash } from 'crypto';
+import { getUsers } from './services/get-users.js';
+import { createUser } from './services/create-user.js';
+import { updateUser } from './services/update-user.js';
+import { getUserById } from './services/get-user.js';
+import { deleteUser } from './services/delete-user.js';
+import { signInUser } from './services/sign-in-user.js';
 
 const usersRoute = new Hono()
 
-{/* Route to get all users*/}
-
-usersRoute.get('/', async (c) => {
-    const users = await db.select({
-        id: usersTable.id,
-        email: usersTable.email,
-        firstname: usersTable.firstname,
-        lastname: usersTable.lastname,
-        image: usersTable.image,
-    }).from(usersTable);
+usersRoute.get('/', authMiddleware, async (c) => {
+    const users = await getUsers();
     return c.json(users);
-})
-
-{/* Sign up route */}
+});
 
 usersRoute.post("/signup", async (c) => {
     const body = await c.req.json();
-    const firstname = body["firstname"] as string;
-    const lastname = body["lastname"] as string;
-    const email = body["email"] as string;
-    const password = body["password"] as string;
-    const avatar = body["avatar"] as File | undefined;
-    let image: string | null = null;
 
-if (avatar && avatar instanceof File) {
-    const fileName = `${Date.now()}-${avatar.name}`;
-    const arrayBuffer = await avatar.arrayBuffer();
-    const buffer = new Uint8Array(arrayBuffer);
+    const user = await createUser({
+        firstname: body.firstname,
+        lastname: body.lastname,
+        email: body.email,
+        password: body.password,
+        avatar: body.avatar,
+    });
 
-    const { data: uploadData, error } = await supabase.storage
-        .from("avatars")
-        .upload(fileName, buffer, {
-            contentType: avatar.type,
-        });
-
-    console.log("Upload error:", error);
-    console.log("Upload data:", uploadData);
-
-    if (!error) {
-        const { data } = supabase.storage
-            .from("avatars")
-            .getPublicUrl(fileName);
-        image = data.publicUrl;
-        console.log("Public URL:", image);
-    }
-}
-
-    const hashedPassword = await hash(password, 10);
-    
-    const [newUser] = await db.insert(usersTable).values({
-        firstname,
-        lastname,
-        email,
-        password: hashedPassword,
-        image: image,
-    }).returning();
-
-    return c.json({ message: "User created and signed in", user: newUser }, 201);
-})
-
-{/* Cookie check route */}
+    return c.json(
+        { message: "User created and signed in", user }, 201);
+});
 
 usersRoute.get("/me", authMiddleware, async (c) => {
     const tokenData = c.get("jwtPayload");
-    const [user] = await db
-        .select({
-            id: usersTable.id,
-            email: usersTable.email,
-            firstname: usersTable.firstname,
-            lastname: usersTable.lastname,
-            image: usersTable.image,
-        })
-        .from(usersTable)
-        .where(eq(usersTable.id, tokenData.userId));
-
-    if (!user) return c.json({ error: "User not found" }, 404);
-
+     const user = await getUserById(Number(tokenData.userId));
+    if (!user) return c.json({ error: 'User not found' }, 404);
     return c.json({ user });
 });
 
-{/* Route to get user with specific id*/}
-
 usersRoute.get("/:id", async (c) => {
     const { id } = c.req.param();
-    const [user] = await db.select({
-        id: usersTable.id,
-        email: usersTable.email,
-        firstname: usersTable.firstname,
-        lastname: usersTable.lastname,
-        image: usersTable.image,
-    }).from(usersTable).where(eq(usersTable.id, Number(id)));
-
-    if (!user) return c.json({ error: "No user in database" }, 404);
+    const user = await getUserById(Number(id));
+    if (!user) return c.json({ error: "User not found" }, 404);
     return c.json(user);
-})
-
-{/* Route to get update user*/}
-
+});
 
 usersRoute.put("/update", authMiddleware, async (c) => {
     const { userId } = c.get("jwtPayload");
     const body = await c.req.json();
-    const firstname = body["firstname"] as string;
-    const lastname = body["lastname"] as string;
-    const password = body["password"] as string;
-    const avatarBase64 = body["avatar"] as string | undefined;
-    const avatarName = body["avatarName"] as string | undefined;
-    const avatarType = body["avatarType"] as string | undefined;
 
-    const [user] = await db.select().from(usersTable).where(eq(usersTable.id, Number(userId)));
-
-    if (!user) return c.json({ error: "User not found" }, 404);
-
-    let image: string | null = null;
-    let newHashedPassword :string | undefined = undefined;
-
-    if (password && password.trim() !== "") {
-    const isPasswordSame = await compare(password, user.password); 
-    if (!isPasswordSame) return c.json({ error: "Invalid credentials!" }, 401);
-    newHashedPassword = await hash(password, 10);
-}
-
-    if (avatarBase64 && avatarName) {
-    const base64Data = avatarBase64.replace(/^data:.+;base64,/, "");
-    const buffer = Buffer.from(base64Data, "base64");
-    const fileName = `${Date.now()}-${avatarName}`;
-
-    const { error } = await supabase.storage.from("avatars").upload(fileName, buffer, {
-                contentType: avatarType || "image/jpeg",
-            });
-
-        if (!error) {
-            const { data } = supabase.storage.from("avatars").getPublicUrl(fileName);
-            image = data.publicUrl;
-        }
-
-} 
-
-    await db.update(usersTable).set({
-        firstname,
-        lastname,
-        ...(image !== null ? { image } : {}),
-        ...(newHashedPassword ? { password: newHashedPassword } : {}),
-    }).where(eq(usersTable.id, Number(userId)));
-
-    const [updatedUser] = await db.select({
-        id: usersTable.id,
-        email: usersTable.email,
-        firstname: usersTable.firstname,
-        lastname: usersTable.lastname,
-        image: usersTable.image,
-    }).from(usersTable).where(eq(usersTable.id, Number(userId))).limit(1);
-    return c.json(updatedUser);
-})
-
-
-{/* Route to delete user with specific id*/}
+    try {
+        const user = await updateUser({
+            userId: Number(userId),
+            firstname: body.firstname,
+            lastname: body.lastname,
+            currentPassword: body.currentPassword, 
+            newPassword: body.newPassword,          
+            avatarBase64: body.avatar,
+            avatarName: body.avatarName,
+            avatarType: body.avatarType,
+        });
+        if (!user) return c.json({ error: 'User not found' }, 404);
+        return c.json(user);
+    } catch (err) {
+        return c.json({ error: (err as Error).message }, 401);
+    }
+});
 
 usersRoute.delete("/", authMiddleware, async (c) => {
-    const { userId } = c.get("jwtPayload")
-    const deletedUser = await db.delete(usersTable).where(eq(usersTable.id,Number(userId)));
-    return c.json(deletedUser);
+    const { userId } = c.get('jwtPayload');
+    try {
+        await deleteUser(Number(userId));
+        return c.json({ message: 'User deleted successfully' });
+    } catch (err) {
+        return c.json({ error: 'Failed to delete user' }, 500);
+    }
 })
-
-
-{/* Sign in route */}
 
 usersRoute.post("/signin", async (c) => {
-    const {email,password} = await c.req.json();
-    
-    const [user] = await db.select().from(usersTable).where(eq(usersTable.email, email));
-    if (!user) return c.json({ error: "Invalid credentials" }, 401);
-
-    const isPasswordSame = await compare(password, user.password)
-
-    if (!isPasswordSame) return c.json({ error: "Invalid credentials" }, 401);
-
-    const tokenData = {
-        userId:user.id,
-        email:user.email,
-        exp:Math.floor(Date.now() / 1000) + 60 * 60 * 24,
+    const { email, password } = await c.req.json();
+    if (!email || !password) {
+        return c.json({ error: 'Email and password are required' }, 400);
     }
+    try {
+        const { token, user } = await signInUser(email, password);
+        setCookie(c, 'session', token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'Lax',
+            path: '/',
+            domain: 'localhost',
+        });
+        return c.json({ message: 'Signed in successfully', data: user });
+    } catch (err) {
+        const message = (err as Error).message;
+        const status = message === 'Invalid credentials' ? 401 : 500;
+        return c.json({ error: message }, status);
+    }
+});
 
-    const secret = process.env.AUTH_SECRET!;
-
-    const token = await sign(tokenData,secret, "HS256");
-
-    setCookie(c, "session", token, {
-    httpOnly: true,
-    secure: false, 
-    sameSite: "Lax", 
-    path: "/",
-    domain: "localhost",
-  });
-
-
-    return c.json({ message: "Signed in successfully", data: { email: user.email ,firstname: user.firstname, lastname: user.lastname, id: user.id, image: user.image} });
-})
-
-{/* "Security" route to redirect */}
-
-usersRoute.post("/signout", (c) => {
-  deleteCookie(c, "session", {
+usersRoute.post('/signout', (c) => {
+    deleteCookie(c, 'session', {
         httpOnly: true,
         secure: false,
-        sameSite: "Lax",
-        path: "/",
+        sameSite: 'Lax',
+        path: '/',
     });
-    return c.json({ message: "Signed out successfully" });
+    return c.json({ message: 'Signed out successfully' });
 });
 
 
 
 export default usersRoute;
+
