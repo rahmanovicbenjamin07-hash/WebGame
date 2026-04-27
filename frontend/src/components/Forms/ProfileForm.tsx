@@ -29,27 +29,25 @@ export function ProfileForm(){
             }   
     }; 
     
-    const updateProfileMutation = useMutation({
-        mutationFn: async (values :{password:string; firstname:string; lastname:string}) => {
-            
-            const avatarBase64 = await fileToBase64(avatar);   
-           
-            return updateUser(user?.id, {
-                ...values,
-                avatar: avatarBase64,
-                avatarName: avatar?.name,
-                avatarType: avatar?.type,
-                });
-        },
-        onSuccess: (result) => {
-            setUser({ ...user!, image: result.image ?? user?.image ?? null });
-            if (result.image) setServerAvatarPreview(result.image);
-            setMessage("Profile updated successfully!");
-        },
-        onError: (error) => {
-            setMessage(error.message)
-        }
-    })
+   const updateProfileMutation = useMutation({
+    mutationFn: async (values: { password: string; firstname: string; lastname: string }) => {
+        const avatarBase64 = await fileToBase64(avatar);   
+        return updateUser({
+            ...values,
+            avatar: avatarBase64,
+            avatarName: avatar?.name,
+            avatarType: avatar?.type,
+        });
+    },
+    onSuccess: (result) => {
+        setUser({ ...user!, image: result.image ?? user?.image ?? null });
+        if (result.image) setServerAvatarPreview(result.image);
+        setMessage("Profile updated successfully!");
+    },
+    onError: (error) => {
+        setMessage(error.message)
+    }
+})
 
     const form = useForm({
         defaultValues: {

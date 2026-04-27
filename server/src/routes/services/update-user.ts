@@ -1,4 +1,4 @@
-import { compare, hash } from 'bcryptjs';
+import { compare } from 'bcryptjs';
 import { db } from '../../db/index.js';
 import { usersTable } from '../../db/schema.js';
 import { eq } from 'drizzle-orm';
@@ -8,13 +8,12 @@ export const updateUser = async (params: {
     userId: number;
     firstname?: string;
     lastname?: string;
-    currentPassword?: string; 
-    newPassword?: string;     
+    password?: string;    
     avatarBase64?: string;
     avatarName?: string;
     avatarType?: string;
 }) => {
-    const { userId, firstname, lastname, currentPassword, newPassword, avatarBase64, avatarName, avatarType } = params;
+    const { userId, firstname, lastname, password, avatarBase64, avatarName, avatarType } = params;
 
     const [user] = await db
         .select()
@@ -23,18 +22,12 @@ export const updateUser = async (params: {
 
     if (!user) return null;
 
-    let image: string | undefined;
-    let newHashedPassword: string | undefined;
+    if (password && password.trim() !== "") {
+    const isValid = await compare(password, user.password);
+    if (!isValid) throw new Error("Invalid credentials");
+}
 
-    if (newPassword && newPassword.trim() !== "") {
-        if (!currentPassword) throw new Error("Current password required");
-        
-        const isValid = await compare(currentPassword, user.password);
-        if (!isValid) throw new Error("Invalid credentials");
-        
-        newHashedPassword = await hash(newPassword, 10);
-    }
-
+    let image: string | undefined; 
 
     if (avatarBase64 && avatarName) {
         const base64Data = avatarBase64.replace(/^data:.+;base64,/, "");
@@ -61,7 +54,6 @@ export const updateUser = async (params: {
             ...(firstname ? { firstname } : {}),
             ...(lastname ? { lastname } : {}),
             ...(image ? { image } : {}),
-            ...(newHashedPassword ? { password: newHashedPassword } : {}),
         })
         .where(eq(usersTable.id, userId));
 
