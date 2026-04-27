@@ -31,5 +31,5 @@ export const fetchLocationsList = async ({ pageParam = 0, limit = 9 }: Locations
 }
 
 export const fetchLocation = async (locationId: number) => {
-    return apiFetch<LocationData[]>(`/location/${locationId}`)
+    return apiFetch<LocationData>(`/location/${locationId}`) 
 }

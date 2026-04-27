@@ -39,7 +39,7 @@ export function Dashboard(){
 
     const query = useQuery({
     queryKey:['bestGuesses'],
-    queryFn: async () => await fetchGuesses(user?.id!),
+    queryFn: async () => await fetchGuesses(),
     enabled: !!user?.id
     })
 

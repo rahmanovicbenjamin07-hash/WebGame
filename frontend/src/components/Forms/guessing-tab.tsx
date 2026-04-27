@@ -10,7 +10,6 @@ import { InputNoBorder } from "../ui/inputNoBorder"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchLocation } from "@/utils/querys/locations-query";
 import { toast } from "sonner"
-import { useUser } from "@/authentication/userContext";
 import { createGuess } from '@/utils/querys/guesses-query';
 import LocationMap from "../ui/map-location";
 import { Field, FieldLabel } from "../ui/form-field-components";
@@ -28,19 +27,21 @@ export function GuessingTab({open,setOpen,locationId}: GuessingTabProps) {
     const [lng, setLng] = useState<number>(0);
     const [missedMeters,setMissedMeters] = useState<string>("");
     const [locationName,setLocationName] = useState<string>("");
-    const { user } = useUser();
    
 
     const locationQuery = useQuery({
         queryKey: ['location', locationId],
         queryFn: () => fetchLocation(locationId!),
-    enabled: !!locationId,
-    select: (data) => data[0] ? {
-        imageUrl: data[0].locationImage,
-        locationId: data[0].id,
-        lat: data[0].lat,
-        lng: data[0].lng,
-    } : null,
+        enabled: !!locationId,
+        select: (data) => {
+            if (!data) return null;
+            return {
+                imageUrl: data.locationImage,
+                locationId: data.id,
+                lat: data.lat,
+                lng: data.lng,
+            }
+        },
     });
 
     const location = locationQuery.data;
@@ -52,7 +53,7 @@ export function GuessingTab({open,setOpen,locationId}: GuessingTabProps) {
             { latitude: lat, longitude: lng }                      
         );
 
-        const result = await createGuess(user?.id, {locationId,guessedLat: lat,guessedLng: lng,missMeters});
+         const result = await createGuess({ locationId, guessedLat: lat, guessedLng: lng, missMeters });
 
         return { result, missMeters };
         },
