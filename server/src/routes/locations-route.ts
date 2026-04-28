@@ -3,6 +3,8 @@ import { authMiddleware } from '../../middleware/middleware.js';
 import { getLocations, getNewestLocations } from './services/location-services.js';
 import { createLocation } from './services/location-services.js';
 import { getLocationById } from './services/location-services.js';
+import { zValidator } from '@hono/zod-validator';
+import { createLocationSchema, locationPaginationSchema } from '../schemas/locations-schemas.js';
 
 const locationRoute = new Hono();
 
@@ -11,9 +13,9 @@ locationRoute.get('/', async (c) => {
     return c.json(locations);
 });
 
-locationRoute.post('/newLocation', authMiddleware, async (c) => {
+locationRoute.post('/newLocation', zValidator("json", createLocationSchema) ,authMiddleware, async (c) => {
     try {
-        const body = await c.req.json();
+        const body = c.req.valid("json");
 
         if (!body.image) {
             return c.json({ error: 'Image is required' }, 400);
@@ -21,8 +23,8 @@ locationRoute.post('/newLocation', authMiddleware, async (c) => {
 
         const newLocation = await createLocation({
             location: body.locationName,
-            lat: Number(body.lat),
-            lng: Number(body.lng),
+            lat: body.lat,
+            lng: body.lng,
             imageBase64: body.image,
             imageName: body.imageName,
             imageType: body.imageType,
@@ -36,16 +38,15 @@ locationRoute.post('/newLocation', authMiddleware, async (c) => {
     }
 });
 
-locationRoute.get('/new', async (c) => {
-    const offset = Number(c.req.query('offset') || 0);
-    const limit = Number(c.req.query('limit') || 9);
+locationRoute.get('/new', zValidator("query", locationPaginationSchema), async (c) => {
+    const { limit, offset } = c.req.valid("query");
     const locations = await getNewestLocations(limit, offset);
     return c.json(locations);
 });
 
 
-locationRoute.get('/new/signed-out', async (c) => {
-    const offset = Number(c.req.query('offset') || 0);
+locationRoute.get('/new/signed-out',zValidator("query",locationPaginationSchema) ,async (c) => {
+    const { offset } = c.req.valid("query");
     const locations = await getNewestLocations(3, offset);
     return c.json(locations);
 });
