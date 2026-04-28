@@ -2,12 +2,12 @@ import { Hono } from 'hono'
 import { deleteCookie, setCookie } from "hono/cookie";
 import { authMiddleware } from '../../middleware/middleware.js';
 import "dotenv/config";
-import { getUsers } from './services/get-users.js';
-import { createUser } from './services/create-user.js';
-import { updateUser } from './services/update-user.js';
-import { getUserById } from './services/get-user.js';
-import { deleteUser } from './services/delete-user.js';
-import { signInUser } from './services/sign-in-user.js';
+import { getUsers } from './services/user-services.js';
+import { createUser } from './services/user-services.js';
+import { updateUser } from './services/user-services.js';
+import { getUserById } from './services/user-services.js';
+import { deleteUser } from './services/user-services.js';
+import { signInUser } from './services/user-services.js';
 
 const usersRoute = new Hono()
 

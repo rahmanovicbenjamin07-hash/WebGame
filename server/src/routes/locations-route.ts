@@ -1,13 +1,8 @@
 import { Hono } from 'hono'
-import { locationsTable } from '../db/schema.js';
-import { db } from '../db/index.js';
-import { desc,asc, eq } from 'drizzle-orm';
-import { NUMBER } from 'sequelize';
-import supabase from "../db/supabase.js";
 import { authMiddleware } from '../../middleware/middleware.js';
-import { getLocations, getNewestLocations } from './services/get-location.js';
-import { createLocation } from './services/create-location.js';
-import { getLocationById } from './services/get-location-byId.js';
+import { getLocations, getNewestLocations } from './services/location-services.js';
+import { createLocation } from './services/location-services.js';
+import { getLocationById } from './services/location-services.js';
 
 const locationRoute = new Hono();
 

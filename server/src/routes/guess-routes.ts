@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { authMiddleware } from '../../middleware/middleware.js';
-import { createGuess } from './services/create-guess.js';
-import { getBestGuesses } from './services/get-best-guesses.js';
+import { createGuess } from './services/guess-service.js';
+import { getBestGuesses } from './services/guess-service.js';
 
 const guessesRoute = new Hono()
 

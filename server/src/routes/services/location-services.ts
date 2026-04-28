@@ -1,6 +1,30 @@
 import { db } from '../../db/index.js';
 import { locationsTable } from '../../db/schema.js';
+import { desc } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import supabase from '../../db/supabase.js';
+
+export const getLocations = async () => {
+    return await db.select().from(locationsTable);
+};
+
+export const getNewestLocations = async (limit: number, offset: number) => {
+    return await db
+        .select({ id: locationsTable.id, imageUrl: locationsTable.locationImage })
+        .from(locationsTable)
+        .orderBy(desc(locationsTable.createdAt))
+        .limit(limit)
+        .offset(offset);
+};
+
+export const getLocationById = async (id: number) => {
+    const [location] = await db
+        .select()
+        .from(locationsTable)
+        .where(eq(locationsTable.id, id));
+
+    return location ?? null;
+};
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_SIZE = 10 * 1024 * 1024;
