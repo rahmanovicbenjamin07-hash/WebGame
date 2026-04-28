@@ -9,6 +9,7 @@ import { deleteUser } from './services/user-services.js';
 import { signInUser } from './services/user-services.js';
 import { zValidator } from '@hono/zod-validator';
 import { signinSchema, signupSchema, updateUserSchema } from '../schemas/users-schemas.js';
+import { sessionCookieDeleteOptions, sessionCookieOptions } from '../coockie-options.js';
 
 const usersRoute = new Hono()
 
@@ -79,13 +80,7 @@ usersRoute.post("/signin", zValidator("json",signinSchema) ,async (c) => {
     
     try {
         const { token, user } = await signInUser(email, password);
-        setCookie(c, 'session', token, {
-            httpOnly: true,
-            secure: false,
-            sameSite: 'Lax',
-            path: '/',
-            domain: 'localhost',
-        });
+        setCookie(c, 'session', token, sessionCookieOptions);
         return c.json({ message: 'Signed in successfully', data: user });
     } catch (err) {
         const message = (err as Error).message;
@@ -95,12 +90,7 @@ usersRoute.post("/signin", zValidator("json",signinSchema) ,async (c) => {
 });
 
 usersRoute.post('/signout', (c) => {
-    deleteCookie(c, 'session', {
-        httpOnly: true,
-        secure: false,
-        sameSite: 'Lax',
-        path: '/',
-    });
+    deleteCookie(c, 'session', sessionCookieDeleteOptions);
     return c.json({ message: 'Signed out successfully' });
 });
 

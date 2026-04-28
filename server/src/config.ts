@@ -8,6 +8,7 @@ const envSchema = z.object({
     AUTH_SECRET:   z.string().min(1, 'AUTH_SECRET is required'),
     PORT:          z.coerce.number().default(3001),
     WEB_ORIGIN:    z.string().default('http://localhost:3000'),
+    NODE_ENV:      z.enum(['development', 'production', 'test']).default('development'),
 });
 
 const parsed = envSchema.safeParse(process.env);
