@@ -105,6 +105,5 @@ usersRoute.post('/signout', (c) => {
 });
 
 
-
 export default usersRoute;
 
