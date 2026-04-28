@@ -2,29 +2,27 @@ import { Hono } from 'hono'
 import { deleteCookie, setCookie } from "hono/cookie";
 import { authMiddleware } from '../../middleware/middleware.js';
 import "dotenv/config";
-import { getUsers } from './services/user-services.js';
 import { createUser } from './services/user-services.js';
 import { updateUser } from './services/user-services.js';
 import { getUserById } from './services/user-services.js';
 import { deleteUser } from './services/user-services.js';
 import { signInUser } from './services/user-services.js';
+import { zValidator } from '@hono/zod-validator';
+import { signinSchema, signupSchema, updateUserSchema } from '../schemas/users-schemas.js';
 
 const usersRoute = new Hono()
 
-usersRoute.get('/', authMiddleware, async (c) => {
-    const users = await getUsers();
-    return c.json(users);
-});
-
-usersRoute.post("/signup", async (c) => {
-    const body = await c.req.json();
+usersRoute.post("/signup", zValidator("json", signupSchema), async (c) => {
+    const body = c.req.valid("json");
 
     const user = await createUser({
         firstname: body.firstname,
-        lastname: body.lastname,
-        email: body.email,
-        password: body.password,
-        avatar: body.avatar,
+        lastname:  body.lastname,
+        email:     body.email,
+        password:  body.password,
+        avatar:     body.avatar,
+        avatarName: body.avatarName,
+        avatarType: body.avatarType,
     });
 
     return c.json(
@@ -45,9 +43,9 @@ usersRoute.get("/:id", async (c) => {
     return c.json(user);
 });
 
-usersRoute.put("/update", authMiddleware, async (c) => {
+usersRoute.put("/update", authMiddleware, zValidator("json",updateUserSchema), async (c) => {
     const { userId } = c.get("jwtPayload");
-    const body = await c.req.json();
+    const body = c.req.valid("json");
 
     try {
         const user = await updateUser({
@@ -55,7 +53,7 @@ usersRoute.put("/update", authMiddleware, async (c) => {
             firstname: body.firstname,
             lastname: body.lastname,
             password: body.password,
-            avatarBase64: body.avatar,
+            avatarBase64: body.avatarBase64,
             avatarName: body.avatarName,
             avatarType: body.avatarType,
         });
@@ -76,11 +74,9 @@ usersRoute.delete("/", authMiddleware, async (c) => {
     }
 })
 
-usersRoute.post("/signin", async (c) => {
-    const { email, password } = await c.req.json();
-    if (!email || !password) {
-        return c.json({ error: 'Email and password are required' }, 400);
-    }
+usersRoute.post("/signin", zValidator("json",signinSchema) ,async (c) => {
+    const { email, password } = c.req.valid("json");
+    
     try {
         const { token, user } = await signInUser(email, password);
         setCookie(c, 'session', token, {

@@ -9,25 +9,21 @@ import "dotenv/config";
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_SIZE = 5 * 1024 * 1024; 
 
-export const uploadAvatar = async (avatar?: File): Promise<string | null> => {
-    if (!avatar || !(avatar instanceof File)) return null;
+export const uploadAvatar = async (
+    avatarBase64?: string,
+    avatarName?: string,
+    avatarType?: string
+): Promise<string | null> => {
+    if (!avatarBase64 || !avatarName) return null;
 
-    if (!ALLOWED_TYPES.includes(avatar.type)) {
-        throw new Error('Invalid file type. Only JPEG, PNG and WebP are allowed.');
-    }
-
-    if (avatar.size > MAX_SIZE) {
-        throw new Error('File too large. Maximum size is 5MB.');
-    }
-
-    const fileName = `${Date.now()}-${avatar.name}`;
-    const arrayBuffer = await avatar.arrayBuffer();
-    const buffer = new Uint8Array(arrayBuffer);
+    const base64Data = avatarBase64.replace(/^data:.+;base64,/, "");
+    const buffer = Buffer.from(base64Data, "base64");
+    const fileName = `${Date.now()}-${avatarName}`;
 
     const { error } = await supabase.storage
         .from("avatars")
         .upload(fileName, buffer, {
-            contentType: avatar.type,
+            contentType: avatarType || "image/jpeg",
         });
 
     if (error) {
@@ -143,16 +139,6 @@ export const signInUser = async (email: string, password: string) => {
     };
 };
 
-export const getUsers = async () => {
-    return await db.select({
-        id: usersTable.id,
-        email: usersTable.email,
-        firstname: usersTable.firstname,
-        lastname: usersTable.lastname,
-        image: usersTable.image,
-    }).from(usersTable);
-};
-
 export const getUserById = async (id: number) => {
     const [user] = await db
         .select({
@@ -177,9 +163,11 @@ export const createUser = async (data: {
     lastname: string;
     email: string;
     password: string;
-    avatar?: File;
+    avatar?: string;
+    avatarName?: string;
+    avatarType?: string;
 }) => {
-    const image = await uploadAvatar(data.avatar);
+    const image = await uploadAvatar(data.avatar, data.avatarName, data.avatarType);
 
     const hashedPassword = await hash(data.password, 10);
 
