@@ -1,5 +1,4 @@
 import { z } from "zod"
-import { zValidator } from "@hono/zod-validator"
 
 export const signupSchema = z.object({
     firstname: z.string().min(1).max(50),
