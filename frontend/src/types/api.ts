@@ -52,15 +52,18 @@ export interface SignUpResponse {
 }
 
 export interface UpdateUserPayload {
-  avatar?: string | null;
+  avatarBase64?: string | null;
   avatarName?: string;
   avatarType?: string;
+  firstname?: string;
+  lastname?: string;
   password?: string;
   [key: string]: unknown;
 }
 
 export interface UpdateProfileResponse {
   id: number;
-  username: string;
   image?: string;
+  firstname?: string;  
+  lastname?: string;  
 }

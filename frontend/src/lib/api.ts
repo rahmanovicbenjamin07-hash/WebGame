@@ -8,7 +8,8 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
 
   if (!response.ok) {
     const result = await response.json().catch(() => ({}))
-    throw new Error(result.error || `Request failed: ${response.status}`)
+    const zodMessage = result.error?.issues?.[0]?.message
+    throw new Error(zodMessage || result.message || `Request failed: ${response.status}`)
   }
 
   return response.json() as Promise<T>

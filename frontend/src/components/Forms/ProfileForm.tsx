@@ -34,13 +34,18 @@ export function ProfileForm(){
         const avatarBase64 = await fileToBase64(avatar);   
         return updateUser({
             ...values,
-            avatar: avatarBase64,
+            avatarBase64: avatarBase64,
             avatarName: avatar?.name,
             avatarType: avatar?.type,
         });
     },
     onSuccess: (result) => {
-        setUser({ ...user!, image: result.image ?? user?.image ?? null });
+        setUser({ 
+        ...user!, 
+        image: result.image ?? user?.image ?? null,
+        firstname: result.firstname ?? user?.firstname ?? "",  
+        lastname: result.lastname ?? user?.lastname ?? "",     
+    });
         if (result.image) setServerAvatarPreview(result.image);
         setMessage("Profile updated successfully!");
     },
