@@ -7,137 +7,7 @@ import supabase from '../../db/supabase.js';
 import "dotenv/config";
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-const MAX_SIZE = 5 * 1024 * 1024; 
-
-export const uploadAvatar = async (
-    avatarBase64?: string,
-    avatarName?: string,
-    avatarType?: string
-): Promise<string | null> => {
-    if (!avatarBase64 || !avatarName) return null;
-
-    const base64Data = avatarBase64.replace(/^data:.+;base64,/, "");
-    const buffer = Buffer.from(base64Data, "base64");
-    const fileName = `${Date.now()}-${avatarName}`;
-
-    const { error } = await supabase.storage
-        .from("avatars")
-        .upload(fileName, buffer, {
-            contentType: avatarType || "image/jpeg",
-        });
-
-    if (error) {
-        console.error('Avatar upload failed:', error.message);
-        return null;
-    }
-
-    const { data } = supabase.storage
-        .from("avatars")
-        .getPublicUrl(fileName);
-
-    return data.publicUrl;
-};
-
-export const updateUser = async (params: {
-    userId: number;
-    firstname?: string;
-    lastname?: string;
-    password?: string;    
-    avatarBase64?: string;
-    avatarName?: string;
-    avatarType?: string;
-}) => {
-    const { userId, firstname, lastname, password, avatarBase64, avatarName, avatarType } = params;
-
-    const [user] = await db
-        .select()
-        .from(usersTable)
-        .where(eq(usersTable.id, Number(userId)));
-
-    if (!user) return null;
-
-    if (password && password.trim() !== "") {
-    const isValid = await compare(password, user.password);
-    if (!isValid) throw new Error("Invalid credentials");
-}
-
-    let image: string | undefined; 
-
-    if (avatarBase64 && avatarName) {
-        const base64Data = avatarBase64.replace(/^data:.+;base64,/, "");
-        const buffer = Buffer.from(base64Data, "base64");
-        const fileName = `${Date.now()}-${avatarName}`;
-
-        const { error } = await supabase.storage
-            .from("avatars")
-            .upload(fileName, buffer, {
-                contentType: avatarType || "image/jpeg",
-            });
-
-        if (!error) {
-            const { data } = supabase.storage
-                .from("avatars")
-                .getPublicUrl(fileName);
-            image = data.publicUrl;
-        }
-    }
-
-    await db
-        .update(usersTable)
-        .set({
-            ...(firstname ? { firstname } : {}),
-            ...(lastname ? { lastname } : {}),
-            ...(image ? { image } : {}),
-        })
-        .where(eq(usersTable.id, userId));
-
-    const [updatedUser] = await db
-        .select({
-            id: usersTable.id,
-            email: usersTable.email,
-            firstname: usersTable.firstname,
-            lastname: usersTable.lastname,
-            image: usersTable.image,
-        })
-        .from(usersTable)
-        .where(eq(usersTable.id, userId))
-        .limit(1);
-
-    return updatedUser;
-};
-
-export const signInUser = async (email: string, password: string) => {
-    const [user] = await db
-        .select()
-        .from(usersTable)
-        .where(eq(usersTable.email, email));
-
-    if (!user) throw new Error("Invalid credentials");
-
-    const isPasswordValid = await compare(password, user.password);
-    if (!isPasswordValid) throw new Error("Invalid credentials");
-
-    const token = await sign(
-        {
-            userId: user.id,
-            email: user.email,
-            exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24,
-        },
-        process.env.AUTH_SECRET!,
-        "HS256"
-    );
-
-    return {
-        token,
-        user: {
-            id: user.id,
-            email: user.email,
-            firstname: user.firstname,
-            lastname: user.lastname,
-            image: user.image,
-        },
-    };
-};
+const MAX_SIZE = 5 * 1024 * 1024;
 
 export const getUserById = async (id: number) => {
     const [user] = await db
@@ -149,14 +19,116 @@ export const getUserById = async (id: number) => {
             image: usersTable.image,
         })
         .from(usersTable)
-        .where(eq(usersTable.id, Number(id)));
-
-    return user ?? null;
+        .where(eq(usersTable.id, id));
+ 
+    if (!user) throw new Error('User not found');
+    return user;
 };
 
-export const deleteUser = async  (id:number) => {
-    await db.delete(usersTable).where(eq(usersTable.id,id));
+export const getUserByEmail = async (email: string) => {
+    const [user] = await db
+        .select()
+        .from(usersTable)
+        .where(eq(usersTable.email, email));
+ 
+    if (!user) throw new Error('Invalid credentials');
+    return user;
 }
+
+export const getUserPasswordById = async (id: number) => {
+    const [user] = await db
+        .select({ password: usersTable.password })
+        .from(usersTable)
+        .where(eq(usersTable.id, id));
+ 
+    if (!user) throw new Error('User not found');
+    return user.password;
+};
+
+export const insertUser = async (data: {
+    firstname: string;
+    lastname: string;
+    email: string;
+    password: string;
+    image?: string | null;
+}) => {
+    const [newUser] = await db
+        .insert(usersTable)
+        .values(data)
+        .returning();
+ 
+    return newUser;
+};
+
+export const updateUserFields = async (userId: number, fields: {
+    firstname?: string;
+    lastname?: string;
+    image?: string;
+}) => {
+    await db
+        .update(usersTable)
+        .set(fields)
+        .where(eq(usersTable.id, userId));
+};
+
+export const deleteUser = async (id: number) => {
+    await db.delete(usersTable).where(eq(usersTable.id, id));
+};
+
+export const validatePassword = async (plain: string, hashed: string) => {
+    const isValid = await compare(plain, hashed);
+    if (!isValid) throw new Error('Invalid credentials');
+};
+ 
+export const hashPassword = async (password: string) => {
+    return await hash(password, 10);
+};
+ 
+export const generateToken = async (userId: number, email: string) => {
+    return await sign(
+        {
+            userId,
+            email,
+            exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24,
+        },
+        process.env.AUTH_SECRET!,
+        'HS256'
+    );
+};
+
+export const parseAvatarBase64 = (avatarBase64: string) => {
+    const base64Data = avatarBase64.replace(/^data:.+;base64,/, '');
+    return Buffer.from(base64Data, 'base64');
+};
+
+export const getAvatarPublicUrl = (fileName: string) => {
+    const { data } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+ 
+    return data.publicUrl;
+};
+
+export const uploadAvatar = async (avatarBase64?: string, avatarName?: string, avatarType?: string) => {
+    if (!avatarBase64 || !avatarName) return undefined;
+ 
+    const buffer = parseAvatarBase64(avatarBase64);
+    const fileName = `${Date.now()}-${avatarName}`;
+ 
+    await uploadAvatarToStorage(fileName, buffer, avatarType);
+ 
+    return getAvatarPublicUrl(fileName);
+};
+
+export const uploadAvatarToStorage = async (fileName: string, buffer: Buffer, avatarType?: string) => {
+    const { error } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, buffer, {
+            contentType: avatarType || 'image/jpeg',
+        });
+ 
+    if (error) throw new Error(`Avatar upload failed: ${error.message}`);
+};
 
 export const createUser = async (data: {
     firstname: string;
@@ -168,16 +140,57 @@ export const createUser = async (data: {
     avatarType?: string;
 }) => {
     const image = await uploadAvatar(data.avatar, data.avatarName, data.avatarType);
-
-    const hashedPassword = await hash(data.password, 10);
-
-    const [newUser] = await db.insert(usersTable).values({
+    const hashedPassword = await hashPassword(data.password);
+ 
+    return await insertUser({
         firstname: data.firstname,
         lastname: data.lastname,
         email: data.email,
         password: hashedPassword,
-        image: image,
-    }).returning();
-
-    return newUser;
+        image,
+    });
+};
+ 
+export const signInUser = async (email: string, password: string) => {
+    const user = await getUserByEmail(email);
+    await validatePassword(password, user.password);
+    const token = await generateToken(user.id, user.email);
+ 
+    return {
+        token,
+        user: {
+            id: user.id,
+            email: user.email,
+            firstname: user.firstname,
+            lastname: user.lastname,
+            image: user.image,
+        },
+    };
+};
+ 
+export const updateUser = async (params: {
+    userId: number;
+    firstname?: string;
+    lastname?: string;
+    password?: string;
+    avatarBase64?: string;
+    avatarName?: string;
+    avatarType?: string;
+}) => {
+    const { userId, firstname, lastname, password, avatarBase64, avatarName, avatarType } = params;
+ 
+    if (password && password.trim() !== '') {
+        const currentPassword = await getUserPasswordById(userId);
+        await validatePassword(password, currentPassword);
+    }
+ 
+    const image = await uploadAvatar(avatarBase64, avatarName, avatarType);
+ 
+    await updateUserFields(userId, {
+        ...(firstname ? { firstname } : {}),
+        ...(lastname ? { lastname } : {}),
+        ...(image ? { image } : {}),
+    });
+ 
+    return await getUserById(userId);
 };
