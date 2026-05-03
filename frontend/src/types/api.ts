@@ -11,6 +11,7 @@ export interface GuessDto {
   missMeters: number;
   locationId: number;
   userId: number;
+  imageUrl: string;
 }
 
 export interface NewUploadDto {
