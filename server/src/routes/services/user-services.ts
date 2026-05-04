@@ -179,15 +179,13 @@ export const updateUser = async ({ userId, firstname, lastname, password, avatar
         const currentPassword = await getUserPasswordById(userId);
         await validatePassword(password, currentPassword);
     }
- 
+
     const image = await uploadAvatar(avatarBase64, avatarName, avatarType);
- 
-    await updateUserFields(userId, {
-        ...(firstname ? { firstname } : {}),
-        ...(lastname ? { lastname } : {}),
-        ...(image ? { image } : {}),
+
+    return await updateUserFields(userId, {
+        ...(firstname && { firstname }),
+        ...(lastname && { lastname }),
+        ...(image && { image }),
     });
- 
-    return await getUserById(userId);
 };
 
