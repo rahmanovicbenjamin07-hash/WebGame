@@ -1,13 +1,11 @@
 import { db } from '../../db/index.js';
-import { locationsTable } from '../../db/schema.js';
-import { desc } from 'drizzle-orm';
-import { eq } from 'drizzle-orm';
-import supabase from '../../db/supabase.js';
+import { locationsTable, type InsertLocation } from '../../db/schema.js';
+import { desc, eq } from 'drizzle-orm';
 import { getPublicUrl, uploadFile } from './supabase-storage-services.js';
 
-
 export const getLocations = async () => {
-    return await db.select().from(locationsTable);
+    const locations = await db.select().from(locationsTable);
+    return locations;
 };
  
 export const getLocationById = async (id: number) => {
@@ -21,25 +19,22 @@ export const getLocationById = async (id: number) => {
 };
 
 export const getNewestLocations = async (limit: number, offset: number) => {
-    return await db
+    const locations = await db
         .select({ id: locationsTable.id, imageUrl: locationsTable.locationImage })
         .from(locationsTable)
         .orderBy(desc(locationsTable.createdAt))
         .limit(limit)
         .offset(offset);
+
+    return locations;
 };
 
-export async function insertLocation(location: string, locationImage: string, lat: number, lng: number) {
+export async function insertLocation(data: InsertLocation) {
     const [newLocation] = await db
         .insert(locationsTable)
-        .values({
-            location,
-            locationImage,
-            lat,
-            lng,
-        })
+        .values(data)
         .returning();
- 
+
     return newLocation;
 }
 
@@ -91,13 +86,15 @@ export const createLocation = async (params: {
     imageType?: string;
 }) => {
     const { location, lat, lng, imageBase64, imageName, imageType } = params;
- 
+
     const { mimeType, buffer } = parseImageBase64(imageBase64);
     validateImage(mimeType, buffer);
- 
+
     const fileName = buildFileName(mimeType, imageName);
     const imageUrl = await uploadLocationImage(fileName, buffer, imageType, mimeType);
- 
-    return await insertLocation(location, imageUrl, lat, lng);
+
+    const newLocation = await insertLocation({ location, locationImage: imageUrl, lat, lng });
+
+    return newLocation;
 };
 

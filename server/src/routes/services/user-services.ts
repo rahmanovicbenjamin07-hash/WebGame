@@ -148,13 +148,15 @@ export const createUser = async (data: CreateUserInput) => {
     const image = await uploadAvatar(data.avatar, data.avatarName, data.avatarType);
     const hashedPassword = await hashPassword(data.password);
  
-    return await insertUser({
+    const newUser = await insertUser({
         firstname: data.firstname,
-        lastname: data.lastname,
-        email: data.email,
-        password: hashedPassword,
+        lastname:  data.lastname,
+        email:     data.email,
+        password:  hashedPassword,
         image,
     });
+
+    return newUser;
 };
  
 export const signInUser = async (email: string, password: string) => {
@@ -162,16 +164,18 @@ export const signInUser = async (email: string, password: string) => {
     await validatePassword(password, user.password);
     const token = await generateToken(user.id, user.email);
  
-    return {
+    const result = {
         token,
         user: {
-            id: user.id,
-            email: user.email,
+            id:        user.id,
+            email:     user.email,
             firstname: user.firstname,
-            lastname: user.lastname,
-            image: user.image,
+            lastname:  user.lastname,
+            image:     user.image,
         },
     };
+
+    return result;
 };
  
 export const updateUser = async ({ userId, firstname, lastname, password, avatarBase64, avatarName, avatarType }: UpdateUserInput) => {
@@ -182,10 +186,12 @@ export const updateUser = async ({ userId, firstname, lastname, password, avatar
 
     const image = await uploadAvatar(avatarBase64, avatarName, avatarType);
 
-    return await updateUserFields(userId, {
+    const updatedUser = await updateUserFields(userId, {
         ...(firstname && { firstname }),
         ...(lastname && { lastname }),
         ...(image && { image }),
     });
+
+    return updatedUser;
 };
 
