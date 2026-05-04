@@ -18,7 +18,7 @@ export const signinSchema = z.object({
 export const updateUserSchema = z.object({
     firstname:    z.string().min(1).max(50).optional(),
     lastname:     z.string().min(1).max(50).optional(),
-    password:     z.string().min(1).optional(),
+    password:     z.string().min(1),
     avatarBase64: z.string().optional(),
     avatarName:   z.string().optional(),
     avatarType:   z.string().optional(),

@@ -8,14 +8,14 @@ import "dotenv/config";
 import { z } from 'zod';
 import type { updateUserSchema } from '../../schemas/users-schemas.js';
 
-type CreateUserInput = Omit<InsertUser, 'password' | 'image'> & {
+type CreateUserInput = Omit<InsertUser, 'id' | 'image'> & {
     password: string;
     avatar?: string;
     avatarName?: string;
     avatarType?: string;
 };
 
-type UpdateUserInput = { userId: number } & z.infer<typeof updateUserSchema>;
+type UpdateUserInput = { userId: number } & Omit<z.infer<typeof updateUserSchema>, 'password'>;
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_SIZE = 5 * 1024 * 1024;
@@ -28,6 +28,7 @@ export const getUserById = async (id: number) => {
             firstname: usersTable.firstname,
             lastname: usersTable.lastname,
             image: usersTable.image,
+            password: usersTable.password,
         })
         .from(usersTable)
         .where(eq(usersTable.id, id));
@@ -91,7 +92,7 @@ export const deleteUser = async (id: number) => {
 
 export const validatePassword = async (plain: string, hashed: string) => {
     const isValid = await compare(plain, hashed);
-    if (!isValid) throw new Error('Invalid credentials');
+    return isValid;
 };
  
 export const hashPassword = async (password: string) => {
@@ -158,31 +159,8 @@ export const createUser = async (data: CreateUserInput) => {
 
     return newUser;
 };
- 
-export const signInUser = async (email: string, password: string) => {
-    const user = await getUserByEmail(email);
-    await validatePassword(password, user.password);
-    const token = await generateToken(user.id, user.email);
- 
-    const result = {
-        token,
-        user: {
-            id:        user.id,
-            email:     user.email,
-            firstname: user.firstname,
-            lastname:  user.lastname,
-            image:     user.image,
-        },
-    };
 
-    return result;
-};
- 
-export const updateUser = async ({ userId, firstname, lastname, password, avatarBase64, avatarName, avatarType }: UpdateUserInput) => {
-    if (password?.trim()) {
-        const currentPassword = await getUserPasswordById(userId);
-        await validatePassword(password, currentPassword);
-    }
+export const updateUser = async ({ userId, firstname, lastname, avatarBase64, avatarName, avatarType }: UpdateUserInput) => {
 
     const image = await uploadAvatar(avatarBase64, avatarName, avatarType);
 

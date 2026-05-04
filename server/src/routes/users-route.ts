@@ -2,7 +2,7 @@ import { Hono } from 'hono'
 import { deleteCookie, setCookie } from "hono/cookie";
 import { authMiddleware } from '../../middleware/middleware.js';
 import "dotenv/config";
-import { createUser, updateUser, getUserById, deleteUser, signInUser, getUserByEmail } from './services/user-services.js';
+import { createUser, updateUser, getUserById, deleteUser, getUserByEmail, validatePassword, generateToken } from './services/user-services.js';
 import { zValidator } from '@hono/zod-validator';
 import { signinSchema, signupSchema, updateUserSchema } from '../schemas/users-schemas.js';
 import { sessionCookieDeleteOptions, sessionCookieOptions } from '../coockie-options.js';
@@ -72,13 +72,24 @@ usersRoute.put("/update", authMiddleware, zValidator("json", updateUserSchema), 
     if (!userId) {
         return c.json({ error: 'Invalid or missing id' }, 400);
     }
- 
+    
+    const user = await getUserById(userId);
+
+    if(!user){
+        return c.json({error: "User not found!"})
+    }
+
+    const isMatchingPassword = await validatePassword(body.password, user.password);
+
+    if(!isMatchingPassword){
+        return c.json({error: "Invalid password"});
+    }
+
     try {
         const user = await updateUser({
             userId:       Number(userId),
             firstname:    body.firstname,
             lastname:     body.lastname,
-            password:     body.password,
             avatarBase64: body.avatarBase64,
             avatarName:   body.avatarName,
             avatarType:   body.avatarType,
@@ -106,13 +117,26 @@ usersRoute.delete("/", authMiddleware, async (c) => {
 
 usersRoute.post("/signin", zValidator("json", signinSchema), async (c) => {
     const { email, password } = c.req.valid("json");
- 
+
     if (!email || !password) {
         return c.json({ error: 'Invalid or missing email & password' }, 400);
     }
 
+    const user = await getUserByEmail(email);
+
+    if(!user){
+        return c.json({error: "Invalid credentials"});
+    }
+
+    const isMatchingPassword = await validatePassword(password, user.password);
+
+    if(!isMatchingPassword) {
+        return c.json({error: "Invalid credentials"});
+    }
+
+    const token = await generateToken(user.id, user.email);
+
     try {
-        const { token, user } = await signInUser(email, password);
         setCookie(c, 'session', token, sessionCookieOptions);
         return c.json({ message: 'Signed in successfully', data: user });
     } catch (err) {
