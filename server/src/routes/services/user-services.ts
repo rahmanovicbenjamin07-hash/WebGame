@@ -42,10 +42,9 @@ export const getUserByEmail = async (email: string) => {
         .select()
         .from(usersTable)
         .where(eq(usersTable.email, email));
- 
-    if (!user) throw new Error('Invalid credentials');
-    return user;
-}
+
+    return user ?? null;
+};
 
 export const getUserPasswordById = async (id: number) => {
     const [user] = await db
