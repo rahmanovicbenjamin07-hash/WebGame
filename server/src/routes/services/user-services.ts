@@ -1,10 +1,21 @@
 import { compare, hash } from 'bcryptjs';
 import { db } from '../../db/index.js';
 import { sign } from 'hono/jwt';
-import { usersTable } from '../../db/schema.js';
-import { eq } from 'drizzle-orm';
+import { usersTable, type InsertUser } from '../../db/schema.js';
+import { eq} from 'drizzle-orm';
 import supabase from '../../db/supabase.js';
 import "dotenv/config";
+import { z } from 'zod';
+import type { updateUserSchema } from '../../schemas/users-schemas.js';
+
+type CreateUserInput = Omit<InsertUser, 'password' | 'image'> & {
+    password: string;
+    avatar?: string;
+    avatarName?: string;
+    avatarType?: string;
+};
+
+type UpdateUserInput = { userId: number } & z.infer<typeof updateUserSchema>;
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_SIZE = 5 * 1024 * 1024;
@@ -45,13 +56,7 @@ export const getUserPasswordById = async (id: number) => {
     return user.password;
 };
 
-export const insertUser = async (data: {
-    firstname: string;
-    lastname: string;
-    email: string;
-    password: string;
-    image?: string | null;
-}) => {
+export const insertUser = async (data: InsertUser) => {
     const [newUser] = await db
         .insert(usersTable)
         .values(data)
@@ -65,10 +70,19 @@ export const updateUserFields = async (userId: number, fields: {
     lastname?: string;
     image?: string;
 }) => {
-    await db
+     const [updatedUser] = await db
         .update(usersTable)
         .set(fields)
-        .where(eq(usersTable.id, userId));
+        .where(eq(usersTable.id, userId))
+        .returning({
+            id:        usersTable.id,
+            email:     usersTable.email,
+            firstname: usersTable.firstname,
+            lastname:  usersTable.lastname,
+            image:     usersTable.image,
+        });
+
+    return updatedUser;
 };
 
 export const deleteUser = async (id: number) => {
@@ -130,15 +144,7 @@ export const uploadAvatarToStorage = async (fileName: string, buffer: Buffer, av
     if (error) throw new Error(`Avatar upload failed: ${error.message}`);
 };
 
-export const createUser = async (data: {
-    firstname: string;
-    lastname: string;
-    email: string;
-    password: string;
-    avatar?: string;
-    avatarName?: string;
-    avatarType?: string;
-}) => {
+export const createUser = async (data: CreateUserInput) => {
     const image = await uploadAvatar(data.avatar, data.avatarName, data.avatarType);
     const hashedPassword = await hashPassword(data.password);
  
@@ -168,18 +174,8 @@ export const signInUser = async (email: string, password: string) => {
     };
 };
  
-export const updateUser = async (params: {
-    userId: number;
-    firstname?: string;
-    lastname?: string;
-    password?: string;
-    avatarBase64?: string;
-    avatarName?: string;
-    avatarType?: string;
-}) => {
-    const { userId, firstname, lastname, password, avatarBase64, avatarName, avatarType } = params;
- 
-    if (password && password.trim() !== '') {
+export const updateUser = async ({ userId, firstname, lastname, password, avatarBase64, avatarName, avatarType }: UpdateUserInput) => {
+    if (password?.trim()) {
         const currentPassword = await getUserPasswordById(userId);
         await validatePassword(password, currentPassword);
     }
@@ -194,3 +190,4 @@ export const updateUser = async (params: {
  
     return await getUserById(userId);
 };
+

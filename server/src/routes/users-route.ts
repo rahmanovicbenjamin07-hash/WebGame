@@ -2,7 +2,7 @@ import { Hono } from 'hono'
 import { deleteCookie, setCookie } from "hono/cookie";
 import { authMiddleware } from '../../middleware/middleware.js';
 import "dotenv/config";
-import { createUser, updateUser, getUserById, deleteUser, signInUser } from './services/user-services.js';
+import { createUser, updateUser, getUserById, deleteUser, signInUser, getUserByEmail } from './services/user-services.js';
 import { zValidator } from '@hono/zod-validator';
 import { signinSchema, signupSchema, updateUserSchema } from '../schemas/users-schemas.js';
 import { sessionCookieDeleteOptions, sessionCookieOptions } from '../coockie-options.js';
@@ -13,15 +13,22 @@ usersRoute.post("/signup", zValidator("json", signupSchema), async (c) => {
     const body = c.req.valid("json");
 
     try {
+        const existingUser = await getUserByEmail(body.email);
+
+        if (existingUser) {
+            return c.json({ error: "User with this email already exists" }, 409);
+        }
+
         const user = await createUser({
-        firstname:  body.firstname,
-        lastname:   body.lastname,
-        email:      body.email,
-        password:   body.password,
-        avatar:     body.avatar,
-        avatarName: body.avatarName,
-        avatarType: body.avatarType,
-    });
+            firstname:  body.firstname,
+            lastname:   body.lastname,
+            email:      body.email,
+            password:   body.password,
+            avatar:     body.avatar,
+            avatarName: body.avatarName,
+            avatarType: body.avatarType,
+        });
+
         return c.json({ message: "User created and signed in", user }, 201);
     } catch (err) {
         return c.json({ error: (err as Error).message }, 500);
